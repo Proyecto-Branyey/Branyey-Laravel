@@ -54,7 +54,7 @@ class VariantesSeeder extends Seeder
             [
                 'producto_id' => 2,
                 'talla_id' => $tallas['6']->id,  // ID 3
-                'sku' => 'POL-KID-6-005',
+                'sku' => 'POL-KID-6-005',       
                 'stock' => 10,
             ],
             [
