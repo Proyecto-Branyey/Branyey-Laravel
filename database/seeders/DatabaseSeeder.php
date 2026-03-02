@@ -19,12 +19,13 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesSeeder::class);
         $this->call(UsersSeeder::class);
         //Clothes
-        $this->call(VariantesSeeder::class);
-        $this->call(VarianteColorSeeder::class);
         $this->call(ColoresSeeder::class);
         $this->call(TallasSeeder::class);
+        $this->call(ProductoSeeder::class);
+        $this->call(VariantesSeeder::class);
+        $this->call(VarianteColorSeeder::class);
         $this->call(EstilosCamisaSeeder::class);
-        $this->call(ProductosSeeder::class);
+        $this->call(ClasificacionTallaSeeder::class);
         //Payment
         $this->call(DetallesOrdenSeeder::class);
         $this->call(DetallesVentaSeeder::class);
