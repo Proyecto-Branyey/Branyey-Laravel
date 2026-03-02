@@ -1,27 +1,40 @@
 <?php
+// app/Models/Producto.php (agrega este método)
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Producto extends Model
 {
-    protected $table = 'productos';
-    public $timestamps = false;
+    // ... tus otros métodos y propiedades ...
 
-    protected $fillable = [
-        'estilo_id', 'clasificacion_id', 'nombre_comercial', 'descripcion', 'activo'
-    ];
-
-    public function estilo() {
-        return $this->belongsTo(EstiloCamisa::class, 'estilo_id');
+    /**
+     * Relación: Un producto tiene muchas imágenes por color.
+     */
+    public function imagenesPorColor(): HasMany
+    {
+        return $this->hasMany(ImagenProducto::class, 'id_producto');
     }
 
-    public function clasificacion() {
-        return $this->belongsTo(ClasificacionTalla::class, 'clasificacion_id');
+    /**
+     * Obtener la imagen de un color específico.
+     */
+    public function getImagenPorColor(string $color): ?ImagenProducto
+    {
+        return $this->imagenesPorColor()
+                    ->where('color', $color)
+                    ->first();
     }
 
-    public function variantes() {
-        return $this->hasMany(Variante::class, 'producto_id');
+    /**
+     * Obtener todos los colores disponibles con sus imágenes.
+     */
+    public function getColoresConImagenesAttribute()
+    {
+        return $this->imagenesPorColor->mapWithKeys(function ($imagen) {
+            return [$imagen->color => $imagen->url];
+        })->toArray();
     }
 }
