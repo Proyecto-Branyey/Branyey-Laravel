@@ -18,9 +18,15 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'username',         // Cambiamos de 'name' a 'username'
         'email',
         'password',
+        'rol_id',
+        'telefono',
+        'nombre_completo',
+        'direccion_defecto',
+        'ciudad_defecto',
+        'departamento_defecto',
     ];
 
     /**
@@ -44,5 +50,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Relación con el modelo Rol
+     */
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class);
     }
 }
