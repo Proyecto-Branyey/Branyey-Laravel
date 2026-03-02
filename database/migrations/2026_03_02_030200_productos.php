@@ -25,7 +25,7 @@ return new class extends Migration
             $table->boolean('activo')->default(true);
             
             // timestamps opcionales, pero recomendados en Laravel
-            $table->timestamps(); 
+            $table->timestamps();
         });
     }
 

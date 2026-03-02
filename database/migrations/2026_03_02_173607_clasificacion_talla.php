@@ -17,6 +17,7 @@ return new class extends Migration
             
             // Crea el campo ENUM con los valores exactos y restricción UNIQUE
             $table->enum('nombre', ['Niño', 'Dama', 'Adulto'])->unique();
+            $table->timestamps();
         });
 
         // Insertamos los datos iniciales de una vez para que la tabla no quede vacía
