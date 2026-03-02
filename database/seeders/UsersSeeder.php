@@ -4,12 +4,24 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class UsersSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        // Usuario administrador
+        // Verificar que existan los roles antes de crear usuarios
+        $roles = DB::table('roles')->count();
+        if ($roles === 0) {
+            $this->command->error('¡Error! Primero debes ejecutar RolesSeeder');
+            $this->command->line('Ejecuta: php artisan db:seed --class=RolesSeeder');
+            return;
+        }
+
+        // Usuario administrador (rol_id = 1)
         User::factory()->admin()->create([
             'username' => 'admin',
             'email' => 'admin@example.com',
@@ -20,7 +32,7 @@ class UsersSeeder extends Seeder
             'departamento_defecto' => 'Cundinamarca',
         ]);
 
-        // Usuario mayorista
+        // Usuario mayorista (rol_id = 2)
         User::factory()->mayorista()->create([
             'username' => 'mayorista1',
             'email' => 'mayorista@example.com',
@@ -31,7 +43,7 @@ class UsersSeeder extends Seeder
             'departamento_defecto' => 'Antioquia',
         ]);
 
-        // Usuario minorista
+        // Usuario minorista (rol_id = 3)
         User::factory()->minorista()->create([
             'username' => 'minorista1',
             'email' => 'minorista@example.com',
@@ -42,7 +54,15 @@ class UsersSeeder extends Seeder
             'departamento_defecto' => 'Valle del Cauca',
         ]);
 
-        // Usuarios de prueba aleatorios
-        User::factory()->count(15)->create();
+        // Crear 10 usuarios minoristas aleatorios adicionales
+        User::factory()->minorista()->count(10)->create();
+
+        // Opcional: crear algunos usuarios mayoristas aleatorios
+        User::factory()->mayorista()->count(3)->create();
+
+        $this->command->info('Usuarios creados exitosamente:');
+        $this->command->line('- 1 administrador');
+        $this->command->line('- 4 mayoristas (1 fijo + 3 aleatorios)');
+        $this->command->line('- 11 minoristas (1 fijo + 10 aleatorios)');
     }
 }
