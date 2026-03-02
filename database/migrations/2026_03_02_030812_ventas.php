@@ -17,8 +17,9 @@ return new class extends Migration
             $table->decimal('total', 12, 2);
             $table->enum('estado', ['pendiente', 'pagado', 'enviado', 'cancelado'])->default('pendiente');
             $table->timestamp('fecha')->useCurrent();
+            $table->timestamps();
             
-            $table->foreign('usuario_id')->references('id')->on('usuarios')->onDelete('set null');
+            $table->foreign('usuario_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 

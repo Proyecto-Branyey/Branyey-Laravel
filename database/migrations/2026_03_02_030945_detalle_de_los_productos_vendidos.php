@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('variante_id')->unsigned();
             $table->integer('cantidad');
             $table->decimal('precio_cobrado', 12, 2);
+            $table->timestamps();
             
             $table->foreign('venta_id')->references('id')->on('ventas')->onDelete('cascade');
             $table->foreign('variante_id')->references('id')->on('variantes');
