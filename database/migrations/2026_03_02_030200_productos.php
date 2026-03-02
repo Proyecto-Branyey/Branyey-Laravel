@@ -13,11 +13,19 @@ return new class extends Migration
     {
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
-            $table->integer('estilo_id')->unsigned();
+            
+            // Usamos foreignId para mayor compatibilidad con las convenciones de Laravel
+            $table->foreignId('estilo_id')->constrained('estilos_camisa');
+            
+            // Añadimos la clasificación (Niño, Dama, Adulto)
+            $table->foreignId('clasificacion_id')->constrained('clasificacion_talla');
+            
             $table->string('nombre_comercial', 255);
             $table->text('descripcion')->nullable();
             $table->boolean('activo')->default(true);
-            $table->foreign('estilo_id')->references('id')->on('estilos_camisa');
+            
+            // timestamps opcionales, pero recomendados en Laravel
+            $table->timestamps(); 
         });
     }
 
