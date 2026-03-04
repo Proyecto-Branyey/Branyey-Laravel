@@ -10,7 +10,7 @@
 
     <style>
         .hero {
-            background: url('https://images.unsplash.com/photo-1521334884684-d80222895322') center/cover no-repeat;
+            background:  url('{{ asset('images/fondo.png') }}') center center / cover no-repeat;
             height: 90vh;
             display: flex;
             align-items: center;
