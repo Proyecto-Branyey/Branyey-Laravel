@@ -15,6 +15,7 @@ return new class extends Migration  // ← Usando clase anónima (no hay conflic
             $table->string('color', 50);
             $table->string('url', 500);
             $table->timestamps();
+            $table->softDeletes();
             
             $table->unique(['id_producto', 'color']);
             

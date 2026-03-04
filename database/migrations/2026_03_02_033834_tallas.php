@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('recargo_minorista', 12, 2)->default(0)->unsigned();
             $table->decimal('recargo_mayorista', 12, 2)->default(0)->unsigned();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

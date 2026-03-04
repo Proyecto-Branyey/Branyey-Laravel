@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Venta extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'ventas';
 
     protected $fillable = [
@@ -22,6 +25,8 @@ class Venta extends Model
         'updated_at' => 'datetime',
         'usuario_id' => 'integer',
     ];
+
+    protected $dates = ['deleted_at'];
     
     const ESTADO_PENDIENTE = 'pendiente';
     const ESTADO_PAGADO = 'pagado';

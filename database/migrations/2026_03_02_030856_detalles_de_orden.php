@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('ciudad', 100);
             $table->string('departamento', 100);
             $table->timestamps();
+            $table->softDeletes();
             $table->foreign('venta_id')->references('id')->on('ventas')->onDelete('cascade');
         });
     }
