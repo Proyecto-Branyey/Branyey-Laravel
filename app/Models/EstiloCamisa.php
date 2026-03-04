@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EstiloCamisa extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'estilos_camisa';
     
     protected $fillable = [
@@ -18,6 +21,9 @@ class EstiloCamisa extends Model
         'precio_base_minorista' => 'float',
         'precio_base_mayorista' => 'float',
     ];
+
+    protected $dates = ['deleted_at'];
+
     public function productos()
     {
         return $this->hasMany(Producto::class, 'estilo_id');

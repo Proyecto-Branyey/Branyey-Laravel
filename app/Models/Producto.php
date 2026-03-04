@@ -6,9 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Producto extends Model
 {
+    use SoftDeletes;
+
     /**
      * La tabla asociada al modelo.
      *
@@ -46,6 +49,7 @@ class Producto extends Model
         'activo' => 'boolean',
     ];
 
+    protected $dates = ['deleted_at'];
     /**
      * Relación: Un producto pertenece a un estilo de camisa.
      */

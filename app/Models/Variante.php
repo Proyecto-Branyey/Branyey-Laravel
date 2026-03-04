@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Variante extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'variantes';
     
     protected $fillable = [
@@ -20,6 +23,8 @@ class Variante extends Model
         'producto_id' => 'integer',
         'talla_id' => 'integer',
     ];
+
+    protected $dates = ['deleted_at'];
 
     public function producto()
     {

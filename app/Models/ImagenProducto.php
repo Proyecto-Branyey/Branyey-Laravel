@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ImagenProducto extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     /**
      * La tabla asociada al modelo.
@@ -69,6 +70,8 @@ class ImagenProducto extends Model
         'extension',
         'existe_en_storage'
     ];
+
+    protected $dates = ['deleted_at'];
 
     // ==========================================
     // RELACIONES

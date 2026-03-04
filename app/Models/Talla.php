@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Talla extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'tallas';
     
     protected $fillable = [
@@ -18,6 +21,8 @@ class Talla extends Model
         'recargo_minorista' => 'float',
         'recargo_mayorista' => 'float',
     ];
+
+    protected $dates = ['deleted_at'];
     
     public function variantes()
     {
