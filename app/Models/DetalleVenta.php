@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class DetalleVenta extends Model
 {
     use SoftDeletes;
-    
+
     protected $table = 'detalle_ventas';
 
     protected $fillable = [
@@ -17,6 +17,8 @@ class DetalleVenta extends Model
         'cantidad',
         'precio_cobrado'
     ];
+
+    protected $dates = ['deleted_at'];
 
     public function venta() 
     {
