@@ -3,6 +3,10 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', function () {
+    return redirect('/tienda');
+});
+
 Route::prefix('tienda')->name('tienda.')->group(function () {
     
     Route::get('/', function () {
