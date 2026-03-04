@@ -7,14 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class DetallesOrden extends Model
 {
     protected $table = 'detalles_orden';
-    public $timestamps = false;
 
     protected $fillable = [
-        'venta_id', 'nombre_cliente', 'email_cliente', 'telefono_cliente',
-        'direccion_envio', 'ciudad', 'departamento'
+        'venta_id', 
+        'nombre_cliente', 
+        'email_cliente', 
+        'telefono_cliente',
+        'direccion_envio', 
+        'ciudad', 
+        'departamento'
     ];
 
-    public function venta() {
+    public function venta() 
+    {
         return $this->belongsTo(Venta::class, 'venta_id');
     }
 }
