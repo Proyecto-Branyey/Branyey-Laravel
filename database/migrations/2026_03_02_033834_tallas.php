@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('tallas', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 10); // VARCHAR(10) NOT NULL
-            $table->decimal('recargo_minorista', 12, 2)->default(0); // DECIMAL(12,2) DEFAULT 0
-            $table->decimal('recargo_mayorista', 12, 2)->default(0); // DECIMAL(12,2) DEFAULT 0
+            $table->decimal('recargo_minorista', 12, 2)->default(0)->unsigned();
+            $table->decimal('recargo_mayorista', 12, 2)->default(0)->unsigned();
             $table->timestamps();
         });
     }
