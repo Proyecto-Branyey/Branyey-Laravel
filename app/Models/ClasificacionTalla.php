@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class ClasificacionTalla extends Model
 {
     protected $table = 'clasificacion_talla';
-    public $timestamps = false;
-
     protected $fillable = ['nombre'];
 
     public function productos() {
