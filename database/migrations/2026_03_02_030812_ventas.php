@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('estado', ['pendiente', 'pagado', 'enviado', 'cancelado'])->default('pendiente');
             $table->timestamp('fecha')->useCurrent();
             $table->timestamps();
-            
+            $table->softDeletes();
             $table->foreign('usuario_id')->references('id')->on('users')->onDelete('set null');
         });
     }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('sku', 100)->unique();
             $table->integer('stock')->default(0);
             $table->timestamps();
+            $table->softDeletes();
             
             $table->foreign('producto_id')->references('id')->on('productos')->onDelete('cascade');
             $table->foreign('talla_id')->references('id')->on('tallas');

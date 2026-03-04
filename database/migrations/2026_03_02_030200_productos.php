@@ -26,6 +26,7 @@ return new class extends Migration
             
             // timestamps opcionales, pero recomendados en Laravel
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

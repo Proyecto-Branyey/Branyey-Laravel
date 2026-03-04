@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('variante_id')->unsigned();
             $table->integer('color_id')->unsigned();
             $table->integer('orden')->default(1);
+            $table->softDeletes();
             
             $table->foreign('variante_id')->references('id')->on('variantes')->onDelete('cascade');
             $table->foreign('color_id')->references('id')->on('colores');

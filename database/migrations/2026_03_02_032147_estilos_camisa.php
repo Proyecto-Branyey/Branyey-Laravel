@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('precio_base_minorista', 12, 2)->default(0);
             $table->decimal('precio_base_mayorista', 12, 2)->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
