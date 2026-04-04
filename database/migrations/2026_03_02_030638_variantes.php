@@ -10,18 +10,13 @@ return new class extends Migration
     {
         Schema::create('variantes', function (Blueprint $table) {
             $table->id();
-
             $table->foreignId('producto_id')
                   ->constrained('productos')
                   ->onDelete('cascade');
-
-            // ✅ CORRECTO (BIGINT compatible)
-            $table->foreignId('talla_id')
-                  ->constrained('tallas');
-
+            $table->foreignId('talla_id')->constrained('tallas');
             $table->string('sku', 100)->unique();
             $table->integer('stock')->default(0);
-
+            $table->decimal('precio_base', 10, 2)->default(0); // ✅ nueva columna
             $table->timestamps();
             $table->softDeletes();
         });

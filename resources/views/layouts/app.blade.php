@@ -2,81 +2,144 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Branyey - @yield('title', 'Tienda de Ropa')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Branyey - @yield('title', 'Tienda de Ropa Urbana')</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
     <style>
-        .hero { 
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('{{ asset('images/fondo.png') }}') center/cover no-repeat; 
-            height: 90vh; display: flex; align-items: center; justify-content: center; color: white;
+        :root { --primary-black: #111111; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        
+        .fw-black { font-weight: 900; }
+        .italic { font-style: italic; }
+        
+        .navbar { background-color: var(--primary-black) !important; padding: 1rem 0; }
+        .navbar-brand { font-weight: 900; letter-spacing: -1px; font-size: 1.5rem; }
+        .nav-link { font-weight: 500; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+        
+        .nav-role-badge { 
+            font-size: 0.65rem; 
+            text-transform: uppercase; 
+            padding: 3px 8px; 
+            border-radius: 50px; 
+            font-weight: 700;
+            margin-left: 5px;
         }
-        .navbar-brand { font-weight: 800; letter-spacing: 1px; }
-        footer { background: #111; color: white; padding: 30px 0; margin-top: 40px; }
-        .nav-role-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; vertical-align: middle; }
+
+        footer { background: var(--primary-black); color: rgba(255,255,255,0.6); padding: 40px 0; margin-top: 60px; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="{{ route('tienda.inicio') }}">BRANYEY</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('tienda.inicio') ? 'active fw-bold' : '' }}" href="{{ route('tienda.inicio') }}">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('tienda.catalogo') ? 'active fw-bold' : '' }}" href="{{ route('tienda.catalogo') }}">Catálogo</a>
-                </li>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{{ route('tienda.inicio') }}">BRANYEY</a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                @auth
-                    <li class="nav-item dropdown ms-lg-3">
-                        <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ Auth::user()->username }} 
-                            <span class="badge bg-primary nav-role-badge uppercase">{{ Auth::user()->rol->nombre ?? 'Cliente' }}</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Mi Perfil</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item text-danger">Cerrar Sesión</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                @else
-                    <li class="nav-item ms-lg-3">
-                        <a class="nav-link" href="{{ route('login') }}">Iniciar Sesión</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('tienda.inicio') ? 'active fw-bold' : '' }}" href="{{ route('tienda.inicio') }}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-sm btn-outline-light ms-lg-2" href="{{ route('register') }}">Registrarse</a>
+                        <a class="nav-link {{ request()->routeIs('tienda.catalogo') ? 'active fw-bold' : '' }}" href="{{ route('tienda.catalogo') }}">Catálogo</a>
                     </li>
-                @endauth
 
-                <li class="nav-item ms-lg-3">
-                    <a class="btn btn-outline-light position-relative" href="#">
-                        Carrito 🛒
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-                    </a>
-                </li>
-            </ul>
+                    @auth
+                        <li class="nav-item dropdown ms-lg-3">
+                            <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-2 fs-5"></i>
+                                {{ Auth::user()->username }}
+                                <span class="badge bg-primary nav-role-badge">
+                                    {{ Auth::user()->rol->nombre ?? 'Cliente' }}
+                                </span> {{-- Corregido aquí --}}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                @if(Auth::user()->rol && Auth::user()->rol->nombre == 'administrador')
+                                    <li><a class="dropdown-item fw-bold text-primary" href="{{ route('admin.dashboard') }}">Panel Admin</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                @endif
+                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Mi Perfil</a></li>
+                                <li><a class="dropdown-item" href="#">Mis Pedidos</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item text-danger">Cerrar Sesión</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    @else
+                        <li class="nav-item ms-lg-3">
+                            <a class="nav-link" href="{{ route('login') }}">Ingresar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light btn-sm rounded-pill px-3 ms-lg-2" href="{{ route('register') }}">Registro</a>
+                        </li>
+                    @endauth
+
+                    <li class="nav-item ms-lg-4">
+                        <a class="btn btn-light position-relative rounded-pill px-3 d-flex align-items-center" href="{{ route('tienda.cart.index') }}">
+                            <i class="bi bi-bag-fill me-2"></i>
+                            <span class="d-none d-lg-inline small fw-bold">CARRITO</span>
+                            @php $count = session('cart') ? count(session('cart')) : 0; @endphp {{-- Corregido el @php --}}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white" style="font-size: 0.7rem;">
+                                {{ $count }}
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
+    </nav>
+
+    <div class="container mt-4">
+        @if(session('success'))
+            <div class="alert alert-dark alert-dismissible fade show border-0 shadow-sm rounded-4 px-4 py-3" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+                    <div><strong>¡Éxito!</strong> {{ session('success') }}</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-4 px-4 py-3" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                    <div><strong>Atención:</strong> {{ session('error') }}</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
     </div>
-</nav>
 
-@yield('content')
+    <main>
+        @yield('content')
+    </main>
 
-<footer class="text-center">
-    <div class="container">
-        <p class="mb-0">© 2026 Branyey - Todos los derechos reservados</p>
-    </div>
-</footer>
+    <footer class="text-center">
+        <div class="container">
+            <h5 class="fw-black text-white mb-3">BRANYEY</h5>
+            <p class="small mb-4">Streetwear & Urban Culture - Bogotá, CO</p>
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                <a href="#" class="text-white-50 fs-5"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="text-white-50 fs-5"><i class="bi bi-tiktok"></i></a>
+                <a href="#" class="text-white-50 fs-5"><i class="bi bi-facebook"></i></a>
+            </div>
+            <div class="border-top border-secondary pt-4">
+                <p class="small mb-0">© 2026 Branyey. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

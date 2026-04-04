@@ -15,6 +15,11 @@ class ClasificacionTallaSeeder extends Seeder
             ['nombre' => 'Adulto'],
         ];
 
-        DB::table('clasificacion_talla')->insert($clasificaciones);
+        // En ClasificacionTallaSeeder.php o DatabaseSeeder.php
+DB::table('clasificacion_talla')->insert([
+    ['id' => 1, 'nombre' => 'Niño'],
+    ['id' => 2, 'nombre' => 'Dama'],
+    ['id' => 3, 'nombre' => 'Adulto'],
+]);
     }
 }

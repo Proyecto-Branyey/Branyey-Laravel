@@ -3,19 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Color extends Model
 {
-    // Se eliminó SoftDeletes para evitar errores de columna 'deleted_at' en SQLite
-    
+    // Nombre de la tabla en tu SQL
     protected $table = 'colores';
 
+    // Campos asignables
     protected $fillable = ['nombre', 'codigo_hex'];
-    
-    // Se eliminó la propiedad $dates que hacía referencia a deleted_at
 
-    public function variantes() {
-        return $this->belongsToMany(Variante::class, 'variante_color', 'color_id', 'variante_id')
-                    ->withPivot('orden');
+    // Desactivamos timestamps si no los tienes en la tabla colores
+    public $timestamps = false;
+
+    /**
+     * Relación con Variantes.
+     * Se eliminó ->withPivot('orden') para evitar el error SQLSTATE[42S22]
+     */
+    public function variantes(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Variante::class, 
+            'variante_color', 
+            'color_id', 
+            'variante_id'
+        );
     }
 }

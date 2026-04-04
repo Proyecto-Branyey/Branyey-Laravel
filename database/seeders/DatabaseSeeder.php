@@ -2,35 +2,26 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
+     * Mantenemos solo la configuración maestra de Branyey.
      */
     public function run(): void
     {
-        //Users
+        // 1. Configuración de Seguridad y Usuarios
         $this->call(RolesSeeder::class);
         $this->call(UsersSeeder::class);
-        //Clothes
+
+        // 2. Configuración Maestra de Ropa (Tablas Paramétricas)
+        $this->call(ClasificacionTallaSeeder::class);
         $this->call(ColoresSeeder::class);
         $this->call(TallasSeeder::class);
         $this->call(EstilosCamisaSeeder::class);
-                 $this->call(ClasificacionTallaSeeder::class);
-
-        $this->call(ProductosSeeder::class);
-        $this->call(VariantesSeeder::class);
-        $this->call(VarianteColorSeeder::class);
-
-        //Payment
-        $this->call(VentasSeeder::class);
-        $this->call(DetallesOrdenSeeder::class);
-        $this->call(DetallesVentaSeeder::class);
+        
+        // NO llamar a los seeders de Productos o Ventas aquí
     }
 }

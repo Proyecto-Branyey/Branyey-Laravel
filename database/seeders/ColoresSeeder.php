@@ -10,34 +10,24 @@ class ColoresSeeder extends Seeder
     public function run(): void
     {
         $colores = [
-            ['nombre' => 'azul bebe', 'codigo_hex' => null],
-            ['nombre' => 'azul oscuro', 'codigo_hex' => null],
-            ['nombre' => 'azul petroleo', 'codigo_hex' => null],
-            ['nombre' => 'azul rey', 'codigo_hex' => null],
-            ['nombre' => 'beige', 'codigo_hex' => null],
-            ['nombre' => 'beneton', 'codigo_hex' => null],
-            ['nombre' => 'blanco', 'codigo_hex' => null],
-            ['nombre' => 'gris jaspe', 'codigo_hex' => null],
-            ['nombre' => 'gris raton', 'codigo_hex' => null],
-            ['nombre' => 'mostaza', 'codigo_hex' => null],
-            ['nombre' => 'negro', 'codigo_hex' => null],
-            ['nombre' => 'palo rosa', 'codigo_hex' => null],
-            ['nombre' => 'petroleo', 'codigo_hex' => null],
-            ['nombre' => 'rojo', 'codigo_hex' => null],
-            ['nombre' => 'salmon', 'codigo_hex' => null],
-            ['nombre' => 'verde botella', 'codigo_hex' => null],
-            ['nombre' => 'verde cali', 'codigo_hex' => null],
-            ['nombre' => 'verde jade', 'codigo_hex' => null],
-            ['nombre' => 'verde menta', 'codigo_hex' => null],
-            ['nombre' => 'vino tinto', 'codigo_hex' => null],
+            ['nombre' => 'azul bebe', 'codigo_hex' => '#89CFF0'],
+            ['nombre' => 'azul oscuro', 'codigo_hex' => '#00008B'],
+            ['nombre' => 'azul petroleo', 'codigo_hex' => '#005F6A'],
+            ['nombre' => 'azul rey', 'codigo_hex' => '#4169E1'],
+            ['nombre' => 'beige', 'codigo_hex' => '#F5F5DC'],
+            ['nombre' => 'blanco', 'codigo_hex' => '#FFFFFF'],
+            ['nombre' => 'gris jaspe', 'codigo_hex' => '#B2BEB5'],
+            ['nombre' => 'mostaza', 'codigo_hex' => '#FFDB58'],
+            ['nombre' => 'negro', 'codigo_hex' => '#000000'],
+            ['nombre' => 'rojo', 'codigo_hex' => '#FF0000'],
+            ['nombre' => 'vino tinto', 'codigo_hex' => '#800000'],
+            ['nombre' => 'verde botella', 'codigo_hex' => '#006A4E'],
+            ['nombre' => 'verde menta', 'codigo_hex' => '#98FF98'],
         ];
 
-        // Ordenar alfabéticamente
-        usort($colores, function($a, $b) {
-            return strcmp($a['nombre'], $b['nombre']);
-        });
+        // Ordenar alfabéticamente antes de insertar
+        usort($colores, fn($a, $b) => strcmp($a['nombre'], $b['nombre']));
 
-        // Agregar timestamps
         foreach ($colores as &$color) {
             $color['created_at'] = now();
             $color['updated_at'] = now();

@@ -1,0 +1,81 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="bi bi-stack me-2"></i>Inventario de Branyey</h2>
+        <a href="{{ route('admin.productos.create') }}" class="btn btn-dark shadow-sm">
+            <i class="bi bi-plus-lg me-2"></i>Nueva Prenda
+        </a>
+    </div>
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4 p-3 mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                <div>
+                    <strong>¡Hecho!</strong> {{ session('success') }}
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Imagen Principal</th>
+                        <th>Producto</th>
+                        <th>Estilo</th>
+                        <th>Estado</th>
+                        <th class="text-end pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($productos as $producto)
+                    <tr>
+                        <td class="ps-4">
+                            @php $img = $producto->imagenes->where('es_principal', true)->first(); @endphp
+                            @if($img)
+                                <img src="{{ asset('storage/' . $img->url) }}" class="rounded-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+                            @else
+                                <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-image text-muted"></i>
+                                </div>
+                            @endif
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark">{{ $producto->nombre_comercial }}</div>
+                            <small class="text-muted">ID: #{{ $producto->id }}</small>
+                        </td>
+                        <td><span class="badge bg-secondary-subtle text-secondary border">{{ $producto->estilo->nombre }}</span></td>
+                        <td>
+                            @if($producto->activo)
+                                <span class="badge bg-success-subtle text-success">Activo</span>
+                            @else
+                                <span class="badge bg-danger-subtle text-danger">Inactivo</span>
+                            @endif
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="btn-group shadow-sm">
+                                <a href="#" class="btn btn-sm btn-white border"><i class="bi bi-pencil"></i></a>
+                                <form action="{{ route('admin.productos.destroy', $producto->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este producto?')">
+                                    @csrf @method('DELETE')
+                                    <button class="btn btn-sm btn-white border text-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">No hay productos registrados aún.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@endsection

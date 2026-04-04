@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DetallesOrden extends Model
 {
-    use SoftDeletes;
+    // Solo si añades la columna a la DB, si no, puedes borrar esta línea
+    use SoftDeletes; 
 
     protected $table = 'detalles_orden';
 
@@ -21,9 +23,13 @@ class DetallesOrden extends Model
         'departamento'
     ];
     
-    protected $dates = ['deleted_at'];
+    // Desactivamos timestamps porque no están en tu SQL para esta tabla
+    public $timestamps = false;
 
-    public function venta()
+    /**
+     * Relación: El detalle de envío pertenece a una venta.
+     */
+    public function venta(): BelongsTo
     {
         return $this->belongsTo(Venta::class, 'venta_id');
     }

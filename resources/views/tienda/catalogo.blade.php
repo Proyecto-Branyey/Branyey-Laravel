@@ -5,12 +5,12 @@
 @section('content')
 <div class="container py-5">
     <div class="row">
-        
+        {{-- Filtros --}}
         <div class="col-md-3 mb-4">
             <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 100px; border-radius: 15px;">
                 <h5 class="fw-bold mb-4 italic">FILTRAR</h5>
-                
-                <form action="{{ route('tienda.catalogo') }}" method="GET" id="filter-form">
+                <form action="{{ route('tienda.catalogo') }}" method="GET">
+                    {{-- Clasificación --}}
                     <div class="mb-4">
                         <label class="form-label small fw-bold text-uppercase text-muted">Categoría</label>
                         <select name="clasificacion_id" class="form-select border-0 bg-light shadow-none" onchange="this.form.submit()" style="border-radius: 10px;">
@@ -23,6 +23,7 @@
                         </select>
                     </div>
 
+                    {{-- Estilo --}}
                     <div class="mb-4">
                         <label class="form-label small fw-bold text-uppercase text-muted">Estilo de Prenda</label>
                         <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-sm">
@@ -48,6 +49,7 @@
             </div>
         </div>
 
+        {{-- Productos --}}
         <div class="col-md-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="fw-bold mb-0 italic text-uppercase">Colección <span class="text-muted">/ Branyey</span></h2>
@@ -60,13 +62,11 @@
                         <div class="card h-100 border-0 shadow-sm product-hover" style="border-radius: 20px; overflow: hidden;">
                             <div class="position-relative overflow-hidden" style="height: 380px; background-color: #f8f9fa;">
                                 <a href="{{ route('tienda.producto.detalle', $producto->id) }}">
-                                    @if($producto->imagenes->isNotEmpty())
-                                        <img src="{{ asset($producto->imagenes->first()->url) }}" 
-                                             class="w-100 h-100 img-zoom" 
-                                             style="object-fit: cover; object-position: top;"
-                                             alt="{{ $producto->nombre_comercial }}">
+                                    @php $img = $producto->imagenes->first(); @endphp
+                                    @if($img)
+                                        <img src="{{ Storage::url($img->url) }}" class="w-100 h-100 img-zoom" style="object-fit: cover; object-position: top;" alt="{{ $producto->nombre_comercial }}">
                                     @else
-                                        <div class="w-100 h-100 d-flex align-items-center justify-center text-muted small fw-bold italic" style="background: #eee;">NO IMAGE</div>
+                                        <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted small fw-bold italic" style="background: #eee;">NO IMAGE</div>
                                     @endif
                                 </a>
                             </div>
@@ -77,7 +77,14 @@
                                 </span>
                                 <h6 class="card-title fw-bold text-dark text-uppercase mb-3">{{ $producto->nombre_comercial }}</h6>
                                 <h5 class="fw-bold text-dark mb-3">
-                                    {{ $producto->estilo ? $producto->estilo->precio_minorista_formateado : '$0' }}
+                                    @php
+                                        $minPrecio = $producto->variantes->min('precio_base');
+                                        $maxPrecio = $producto->variantes->max('precio_base');
+                                    @endphp
+                                    ${{ number_format($minPrecio, 2) }}
+                                    @if($minPrecio != $maxPrecio)
+                                        - ${{ number_format($maxPrecio, 2) }}
+                                    @endif
                                 </h5>
                                 <a href="{{ route('tienda.producto.detalle', $producto->id) }}" class="btn btn-dark w-100 rounded-pill py-2 fw-bold text-uppercase small">
                                     Ver Pieza
@@ -99,16 +106,15 @@
                 {{ $productos->appends(request()->query())->links() }}
             </div>
         </div>
-
     </div>
 </div>
 
 <style>
-    .cursor-pointer { cursor: pointer; }
-    .product-hover { transition: transform 0.3s ease; }
-    .product-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
-    .img-zoom { transition: transform 0.5s ease; }
-    .product-hover:hover .img-zoom { transform: scale(1.05); }
-    .italic { font-style: italic; }
+.cursor-pointer { cursor: pointer; }
+.product-hover { transition: transform 0.3s ease; }
+.product-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+.img-zoom { transition: transform 0.5s ease; }
+.product-hover:hover .img-zoom { transform: scale(1.05); }
+.italic { font-style: italic; }
 </style>
 @endsection

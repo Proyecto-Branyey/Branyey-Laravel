@@ -9,9 +9,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tallas', function (Blueprint $table) {
-            $table->id(); // BIGINT UNSIGNED
+            $table->id(); 
 
             $table->string('nombre', 10);
+            
+            // --- ESTA ES LA LÍNEA QUE DEBES AGREGAR ---
+            // Asegúrate de que el nombre de la tabla coincida: 'clasificacion_talla'
+            $table->foreignId('clasificacion_id')->constrained('clasificacion_talla');
+            // ------------------------------------------
+
             $table->decimal('recargo_minorista', 12, 2)->default(0);
             $table->decimal('recargo_mayorista', 12, 2)->default(0);
 
