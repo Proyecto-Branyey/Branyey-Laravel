@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
-{
+{ // <--- ESTA ES LA LLAVE QUE FALTA O ESTÁ MAL PUESTA
     /**
      * Run the migrations.
      */
@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('variante_color', function (Blueprint $table) {
             $table->id();
-            $table->integer('variante_id')->unsigned();
-            $table->integer('color_id')->unsigned();
-            $table->integer('orden')->default(1);
-            $table->softDeletes();
-            
-            $table->foreign('variante_id')->references('id')->on('variantes')->onDelete('cascade');
-            $table->foreign('color_id')->references('id')->on('colores');
+
+            // Relación con variantes (Asegúrate de que sea BigInteger con foreignId)
+            $table->foreignId('variante_id')->constrained('variantes')->onDelete('cascade');
+
+            // Relación con colores (Asegúrate de que la tabla 'colores' exista)
+            $table->foreignId('color_id')->constrained('colores')->onDelete('cascade');
+
+            $table->timestamps();
         });
     }
 
@@ -30,4 +31,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('variante_color');
     }
-};
+}; // <--- Y ESTA CIERRA LA CLASE

@@ -3,14 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Variante extends Model
 {
-    use SoftDeletes;
+    use HasFactory;
 
     protected $table = 'variantes';
     
+    // Desactivamos timestamps si tu tabla no tiene created_at/updated_at
+    public $timestamps = false;
+
     protected $fillable = [
         'producto_id',
         'talla_id',
@@ -24,29 +30,35 @@ class Variante extends Model
         'talla_id' => 'integer',
     ];
 
-    protected $dates = ['deleted_at'];
+    // ==========================================
+    // RELACIONES
+    // ==========================================
 
-    public function producto()
+    public function producto(): BelongsTo
     {
-        return $this->belongsTo(Producto::class);
+        return $this->belongsTo(Producto::class, 'producto_id');
     }
     
-    public function talla()
+    public function talla(): BelongsTo
     {
-        return $this->belongsTo(Talla::class);
+        return $this->belongsTo(Talla::class, 'talla_id');
     }
     
-    public function colores()
+    public function colores(): BelongsToMany
     {
-        return $this->belongsToMany(Color::class, 'variante_color')
+        return $this->belongsToMany(Color::class, 'variante_color', 'variante_id', 'color_id')
                     ->withPivot('orden')
                     ->orderBy('orden');
     }
 
-    public function detallesVentas()
+    public function detallesVentas(): HasMany
     {
-        return $this->hasMany(DetalleVenta::class);
+        return $this->hasMany(DetalleVenta::class, 'variante_id');
     }
+
+    // ==========================================
+    // LÓGICA DE STOCK
+    // ==========================================
 
     public function tieneStock(int $cantidad = 1): bool
     {
@@ -69,20 +81,38 @@ class Variante extends Model
         return $this->save();
     }
 
+    // ==========================================
+    // ACCESORES Y CÁLCULOS
+    // ==========================================
+
     public function getNombreCompletoAttribute(): string
     {
+        // Usamos optional para evitar errores si las relaciones no cargan
+        $nombreProducto = $this->producto->nombre_comercial ?? 'Producto';
+        $nombreTalla = $this->talla->nombre ?? 'N/A';
         $colores = $this->colores->pluck('nombre')->implode(' + ');
         
-        return "{$this->producto->nombre} - Talla {$this->talla->nombre} - {$colores}";
+        return "{$nombreProducto} - Talla {$nombreTalla}" . ($colores ? " - {$colores}" : "");
     }
 
     public function getPrecioVenta(string $tipo = 'minorista'): float
     {
-        $precioBase = $this->producto->getPrecioBase($tipo);
-        $recargo = $this->talla->getRecargo($tipo);
+        // Obtenemos el precio del estilo a través del producto
+        $precioBase = $this->producto && $this->producto->estilo 
+            ? $this->producto->estilo->getPrecioBase($tipo) 
+            : 0;
+
+        // Sumamos recargos de talla si existen (puedes ajustar esta lógica según tu modelo Talla)
+        $recargo = (method_exists($this->talla, 'getRecargo')) 
+            ? $this->talla->getRecargo($tipo) 
+            : 0;
         
         return $precioBase + $recargo;
     }
+
+    // ==========================================
+    // SCOPES (FILTROS)
+    // ==========================================
 
     public function scopeConStock($query)
     {

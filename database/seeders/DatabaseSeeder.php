@@ -22,9 +22,12 @@ class DatabaseSeeder extends Seeder
         $this->call(ColoresSeeder::class);
         $this->call(TallasSeeder::class);
         $this->call(EstilosCamisaSeeder::class);
+                 $this->call(ClasificacionTallaSeeder::class);
+
         $this->call(ProductosSeeder::class);
         $this->call(VariantesSeeder::class);
         $this->call(VarianteColorSeeder::class);
+
         //Payment
         $this->call(VentasSeeder::class);
         $this->call(DetallesOrdenSeeder::class);

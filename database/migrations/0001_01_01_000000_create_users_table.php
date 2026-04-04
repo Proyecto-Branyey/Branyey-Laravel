@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        // CAMBIADO DE 'users' A 'usuarios'
+        Schema::create('usuarios', function (Blueprint $table) {
             $table->id();
             $table->string('username')->unique();
             $table->string('email')->unique();
@@ -19,11 +20,13 @@ return new class extends Migration
             $table->string('password');
             $table->foreignId('rol_id')->constrained('roles');
             $table->string('telefono')->nullable();
+            
             // Datos de envío
             $table->string('nombre_completo')->nullable();
             $table->text('direccion_defecto')->nullable();
             $table->string('ciudad_defecto')->nullable();
             $table->string('departamento_defecto')->nullable();
+            
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
@@ -37,7 +40,8 @@ return new class extends Migration
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+            // AJUSTADO: la relación ahora apunta a usuarios
+            $table->foreignId('user_id')->nullable()->index()->constrained('usuarios')->onDelete('cascade');
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');
@@ -50,7 +54,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('usuarios'); // CAMBIADO
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
+    protected $table = 'usuarios';
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable,Softdeletes;
 

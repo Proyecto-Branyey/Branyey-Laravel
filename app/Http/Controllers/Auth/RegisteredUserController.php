@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Rol; // Importante para asignar el rol inicial
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,27 +25,35 @@ class RegisteredUserController extends Controller
 
     /**
      * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        // 1. Validamos según los campos de tu modelo y formulario
+      // CÁMBIALO POR ESTO:
+$request->validate([
+    'username' => ['required', 'string', 'max:255', 'unique:usuarios'], // <-- APUNTA A LA NUEVA TABLA
+    'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:usuarios'],
+    'password' => ['required', 'confirmed', Rules\Password::defaults()],
+]);
 
+        // 2. Buscamos el ID del rol para nuevos usuarios (ajusta el nombre según tu DB)
+        // Normalmente el ID 1 o el rol 'Minorista'/'Cliente'
+        $rolInicial = Rol::where('nombre', 'minorista')->first();
+
+        // 3. Creamos el usuario con tus campos personalizados
         $user = User::create([
-            'name' => $request->name,
+            'nombre_completo' => $request->nombre_completo,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'rol_id' => $rolInicial->id ?? 3, // Si no encuentra el rol, pone el ID 1 por defecto
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        // 4. Redirigimos al catálogo para que vea los productos de inmediato
+        return redirect(route('tienda.catalogo', absolute: false));
     }
 }

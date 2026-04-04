@@ -10,28 +10,26 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('detalles_orden', function (Blueprint $table) {
-            $table->id();
-            $table->integer('venta_id')->unsigned();
-            $table->string('nombre_cliente', 255);
-            $table->string('email_cliente', 255);
-            $table->string('telefono_cliente', 50);
-            $table->text('direccion_envio');
-            $table->string('ciudad', 100);
-            $table->string('departamento', 100);
-            $table->timestamps();
-            $table->softDeletes();
-            $table->foreign('venta_id')->references('id')->on('ventas')->onDelete('cascade');
-        });
-    }
+{
+    Schema::create('detalles_orden', function (Blueprint $table) {
+    $table->id();
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('detalles_orden');
-    }
+    $table->foreignId('venta_id')
+          ->constrained('ventas')
+          ->onDelete('cascade');
+
+    $table->string('nombre_cliente');
+    $table->string('email_cliente');
+    $table->string('telefono_cliente');
+
+    $table->text('direccion_envio');
+
+    // ✅ ESTAS FALTABAN
+    $table->string('ciudad');
+    $table->string('departamento');
+
+    $table->timestamps();
+});
+}
 };
 

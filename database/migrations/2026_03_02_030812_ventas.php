@@ -10,24 +10,24 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('ventas', function (Blueprint $table) {
-            $table->id();
-            $table->integer('usuario_id')->unsigned()->nullable();
-            $table->decimal('total', 12, 2);
-            $table->enum('estado', ['pendiente', 'pagado', 'enviado', 'cancelado'])->default('pendiente');
-            $table->timestamp('fecha')->useCurrent();
-            $table->timestamps();
-            $table->softDeletes();
-            $table->foreign('usuario_id')->references('id')->on('users')->onDelete('set null');
-        });
-    }
+{
+    Schema::create('ventas', function (Blueprint $table) {
+    $table->id();
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('ventas');
-    }
+    $table->foreignId('usuario_id')
+          ->nullable()
+          ->constrained('usuarios')
+          ->nullOnDelete();
+
+    $table->decimal('total', 12, 2);
+
+    // ✅ ESTA ES LA QUE FALTA
+    $table->enum('estado', ['pendiente', 'pagado', 'enviado', 'cancelado'])
+          ->default('pendiente');
+
+    $table->timestamp('fecha')->useCurrent();
+
+    $table->timestamps();
+});
+}
 };

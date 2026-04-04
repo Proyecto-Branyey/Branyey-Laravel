@@ -10,7 +10,7 @@ class VentasSeeder extends Seeder
     public function run(): void
     {
         // Obtener un usuario real que exista
-        $usuario = DB::table('users')->first();
+        $usuario = DB::table('usuarios')->first();
         
         if (!$usuario) {
             $this->command->error('No hay usuarios. Ejecuta primero UsersSeeder');

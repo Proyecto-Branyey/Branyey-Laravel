@@ -3,12 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Talla extends Model
 {
-    use SoftDeletes;
-
     protected $table = 'tallas';
     
     protected $fillable = [
@@ -22,7 +19,7 @@ class Talla extends Model
         'recargo_mayorista' => 'float',
     ];
 
-    protected $dates = ['deleted_at'];
+    // Se eliminó SoftDeletes y la propiedad $dates para evitar conflictos con la DB
     
     public function variantes()
     {
@@ -49,16 +46,9 @@ class Talla extends Model
                      ->orWhere('recargo_mayorista', '>', 0);
     }
     
-    // Scope para ordenar (numéricas primero, luego letras)
+    // Scope para ordenar (Ajustado para mayor compatibilidad)
     public function scopeOrdenNatural($query)
     {
-        return $query->orderByRaw("
-            CASE
-                WHEN nombre REGEXP '^[0-9]+$' THEN 0
-                ELSE 1
-            END,
-            CAST(nombre AS UNSIGNED),
-            nombre
-        ");
+        return $query->orderBy('nombre', 'asc');
     }
 }
