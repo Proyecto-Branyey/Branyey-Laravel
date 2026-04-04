@@ -15,30 +15,28 @@ Route::get('/', function () {
     return redirect()->route('tienda.inicio');
 });
 
-// ECOSISTEMA TIENDA (Público)
+// ECOSISTEMA TIENDA (Público/Clientes)
 Route::prefix('tienda')->name('tienda.')->group(function () {
     
-    // Home con destacados
     Route::get('/', [ProductoController::class, 'inicio'])->name('inicio');
     
-    // Catálogo con filtros y paginación
+    // Ruta destino para Clientes (Minoristas/Mayoristas) tras el login
     Route::get('/catalogo', [ProductoController::class, 'index'])->name('catalogo');
 
-    // Perfil detallado de la prenda
     Route::get('/producto/{id}', [ProductoController::class, 'show'])->name('producto.detalle');
     
-    // API de búsqueda rápida
     Route::get('/buscar', [ProductoController::class, 'buscar'])->name('buscar');
 });
 
-// ECOSISTEMA ADMINISTRATIVO (Privado)
-Route::prefix('backoffice')->name('backoffice.')->middleware(['auth', 'verified'])->group(function () {
+// ECOSISTEMA ADMINISTRATIVO (Protegido por Rol)
+// Agregamos 'role:administrador' al middleware para bloquear intrusos
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:administrador'])->group(function () {
     
     Route::get('/dashboard', function () {
-        return view('backoffice.dashboard');
+        return view('admin.dashboard'); 
     })->name('dashboard');
 
-    // Aquí irán tus rutas de gestión de inventario, ventas, etc.
+    // Aquí irán tus recursos de inventario más adelante
 });
 
 // PERFIL DE USUARIO (Breeze)

@@ -23,7 +23,7 @@ class UsersSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => Hash::make('admin123'), // Cambia esta contraseña después
             'remember_token' => \Illuminate\Support\Str::random(10),
-            'rol_id' => 3, // Asumiendo que 3 es el ID de 'Admin' en tu RolesSeeder
+            'rol_id' => 1, // Asumiendo que 3 es el ID de 'Admin' en tu RolesSeeder
             'telefono' => '3001234567',
             'nombre_completo' => 'Administrador Principal',
             'direccion_defecto' => 'Calle Principal 123',

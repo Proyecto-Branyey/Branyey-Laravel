@@ -1,4 +1,6 @@
-@extends('layouts.app') @section('title', 'Iniciar Sesión')
+@extends('layouts.app') 
+
+@section('title', 'Iniciar Sesión')
 
 @section('content')
 <div class="container mt-5">
@@ -18,10 +20,10 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label for="email" class="form-label text-secondary small fw-bold">CORREO ELECTRÓNICO</label>
-                            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" 
-                                   name="email" value="{{ old('email') }}" required autofocus autocomplete="username">
-                            @error('email')
+                            <label for="login" class="form-label text-secondary small fw-bold">CORREO O USUARIO</label>
+                            <input id="login" type="text" class="form-control @error('login') is-invalid @enderror" 
+                                   name="login" value="{{ old('login') }}" required autofocus autocomplete="username">
+                            @error('login')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
