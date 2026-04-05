@@ -6,22 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('variantes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('producto_id')
-                  ->constrained('productos')
-                  ->onDelete('cascade');
+            $table->foreignId('producto_id')->constrained('productos')->onDelete('cascade');
             $table->foreignId('talla_id')->constrained('tallas');
-            $table->string('sku', 100)->unique();
-            $table->integer('stock')->default(0);
-            $table->decimal('precio_base', 10, 2)->default(0); // ✅ nueva columna
+            $table->decimal('precio_minorista', 10, 2);
+            $table->decimal('precio_mayorista', 10, 2);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('variantes');

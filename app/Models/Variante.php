@@ -10,7 +10,13 @@ class Variante extends Model
     protected $table = 'variantes';
     public $timestamps = true;
     protected $fillable = [
-        'producto_id', 'talla_id', 'sku', 'stock', 'precio_base'
+        'producto_id', 'talla_id', 'precio_minorista', 'precio_mayorista', 'stock'
+    ];
+
+    protected $casts = [
+        'precio_minorista' => 'decimal:2',
+        'precio_mayorista' => 'decimal:2',
+        'stock' => 'integer',
     ];
 
     public function producto(): BelongsTo {
@@ -25,8 +31,17 @@ class Variante extends Model
         return $this->belongsToMany(Color::class, 'variante_color', 'variante_id', 'color_id');
     }
 
-    // Precio formateado
+    // Precio formateado según rol
     public function getPrecioFormateadoAttribute(): string {
-        return '$' . number_format($this->precio_base, 2);
+        $precio = $this->getPrecioActual();
+        return formatPriceCOP($precio);
+    }
+
+    public function getPrecioActual(): float {
+        // Lógica para determinar precio según usuario
+        if (auth()->check() && auth()->user()->rol && strtolower(auth()->user()->rol->nombre) === 'mayorista') {
+            return $this->precio_mayorista ?? 0;
+        }
+        return $this->precio_minorista ?? 0;
     }
 }

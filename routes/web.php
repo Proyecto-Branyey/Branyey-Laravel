@@ -7,6 +7,7 @@ use App\Http\Controllers\Tienda\OrdenController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\ProductoAdminController;
+use App\Http\Controllers\Admin\EstiloAdminController;
 use Illuminate\Support\Facades\Route;
 
 // Redirección inicial a la tienda
@@ -67,6 +68,25 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
         Route::put('/{id}/actualizar', [ProductoAdminController::class, 'update'])->name('update');
         Route::delete('/{id}/eliminar', [ProductoAdminController::class, 'destroy'])->name('destroy');
     });
+
+    // CRUD DE ESTILOS
+    Route::prefix('estilos')->name('estilos.')->group(function () {
+        Route::get('/', [EstiloAdminController::class, 'index'])->name('index');
+        Route::get('/crear', [EstiloAdminController::class, 'create'])->name('create');
+        Route::post('/guardar', [EstiloAdminController::class, 'store'])->name('store');
+        Route::get('/{id}/editar', [EstiloAdminController::class, 'edit'])->name('edit');
+        Route::put('/{id}/actualizar', [EstiloAdminController::class, 'update'])->name('update');
+        Route::delete('/{id}/eliminar', [EstiloAdminController::class, 'destroy'])->name('destroy');
+    });
+
+    // CRUD DE TALLAS
+    Route::resource('tallas', App\Http\Controllers\Admin\TallaController::class);
+
+    // CRUD DE COLORES
+    Route::resource('colores', App\Http\Controllers\Admin\ColorController::class);
+
+    // CRUD DE ESTILOS CAMISA
+    Route::resource('estilos-camisa', App\Http\Controllers\Admin\EstiloCamisaController::class);
 });
 
 /**

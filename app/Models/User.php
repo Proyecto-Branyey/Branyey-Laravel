@@ -6,14 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class User extends Authenticatable
 {
     protected $table = 'usuarios';
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable,Softdeletes;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -21,15 +20,15 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'username',         // Cambiamos de 'name' a 'username'
+        'name',
+        'username',
         'email',
-        'password',
-        'rol_id',
         'telefono',
-        'nombre_completo',
         'direccion_defecto',
         'ciudad_defecto',
         'departamento_defecto',
+        'password',
+        'rol_id',
     ];
 
     /**
@@ -41,8 +40,6 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-
-    protected $dates = ['deleted_at'];
 
     /**
      * Get the attributes that should be cast.

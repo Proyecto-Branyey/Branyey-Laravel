@@ -67,14 +67,14 @@
                                 <h6 class="mb-0 small fw-bold text-uppercase">{{ $item['name'] }}</h6>
                                 <small class="text-secondary">Talla: {{ $item['talla'] }} | Cant: {{ $item['quantity'] }}</small>
                             </div>
-                            <span class="fw-bold small">${{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</span>
+                            <span class="fw-bold small">${{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }} COP</span>
                         </div>
                         @endforeach
                     </div>
 
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-secondary">Subtotal</span>
-                        <span>${{ number_format($total, 0, ',', '.') }}</span>
+                        <span>${{ number_format($total, 0, ',', '.') }} COP</span>
                     </div>
                     <div class="d-flex justify-content-between mb-4">
                         <span class="text-secondary">Envío (Bogotá)</span>
@@ -85,7 +85,7 @@
 
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <span class="h5 mb-0 fw-bold">TOTAL A PAGAR</span>
-                        <span class="h3 mb-0 fw-black italic text-warning">${{ number_format($total, 0, ',', '.') }}</span>
+                        <span class="h3 mb-0 fw-black italic text-warning">${{ number_format($total, 0, ',', '.') }} COP</span>
                     </div>
 
                     <button type="submit" class="btn btn-warning btn-lg w-100 rounded-pill fw-black text-uppercase py-3 shadow">

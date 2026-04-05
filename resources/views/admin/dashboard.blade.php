@@ -34,6 +34,31 @@
                                 </li>
                             </ul>
                         </div>
+                    <li class="nav-item">
+                        <a class="nav-link text-white d-flex justify-content-between align-items-center" 
+                           data-bs-toggle="collapse" href="#menuCatalogos" role="button" aria-expanded="false">
+                            <span><i class="bi bi-tags me-2"></i> Catálogos</span>
+                            <i class="bi bi-chevron-down small"></i>
+                        </a>
+                        <div class="collapse" id="menuCatalogos">
+                            <ul class="nav flex-column ms-3 mt-1">
+                                <li class="nav-item">
+                                    <a class="nav-link text-secondary py-1" href="{{ route('admin.tallas.index') }}">
+                                        <i class="bi bi-rulers me-2"></i> Tallas
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-secondary py-1" href="{{ route('admin.colores.index') }}">
+                                        <i class="bi bi-palette me-2"></i> Colores
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-secondary py-1" href="{{ route('admin.estilos-camisa.index') }}">
+                                        <i class="bi bi-brush me-2"></i> Estilos
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
 
                     <hr class="text-secondary mx-3">
@@ -62,7 +87,7 @@
                 <div class="col-md-3">
                     <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-success border-4">
                         <small class="text-muted fw-bold">INGRESOS TOTALES</small>
-                        <h3 class="fw-black">${{ number_format($stats['ingresos_total'], 0, ',', '.') }}</h3>
+                        <h3 class="fw-black">${{ number_format($stats['ingresos_total'], 0, ',', '.') }} COP</h3>
                     </div>
                 </div>
                 <div class="col-md-3">

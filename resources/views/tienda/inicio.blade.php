@@ -29,9 +29,9 @@
                         <img src="{{ $producto->imagenes->first()->url_completa ?? 'https://via.placeholder.com/400x500' }}" 
                              class="card-img-top" style="height: 400px; object-fit: cover;">
                         <div class="card-body text-center">
-                            <h5 class="fw-bold mb-2">{{ $producto->nombre_comercial }}</h5>
+                            <h5 class="fw-bold mb-2">{{ $producto->nombre }}</h5>
                             <p class="text-primary fw-bold fs-5">
-                                ${{ number_format($producto->estilo->precio_base_minorista, 0, ',', '.') }}
+                                ${{ number_format($producto->estilo->precio_base_minorista, 0, ',', '.') }} COP
                             </p>
                             <a href="{{ route('tienda.producto.detalle', $producto->id) }}" class="btn btn-outline-dark rounded-pill px-4">
                                 Ver detalles

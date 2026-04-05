@@ -30,16 +30,15 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>${{ number_format($details['price'], 0, ',', '.') }}</td>
+                            <td>${{ number_format($details['price'], 0, ',', '.') }} COP</td>
                             <td style="width: 150px;">
                                 <form action="{{ route('tienda.cart.update', $id) }}" method="POST" class="d-flex align-items-center">
                                     @csrf
-                                    @method('PATCH')
                                     <input type="number" name="quantity" value="{{ $details['quantity'] }}" min="1" class="form-control form-control-sm me-2">
                                     <button type="submit" class="btn btn-sm btn-dark"><i class="bi bi-arrow-clockwise"></i></button>
                                 </form>
                             </td>
-                            <td class="fw-bold">${{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}</td>
+                            <td class="fw-bold">${{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }} COP</td>
                             <td class="text-end">
                                 <form action="{{ route('tienda.cart.remove', $id) }}" method="POST">
                                     @csrf
@@ -60,7 +59,7 @@
                 </a>
                 <div class="text-end">
                     <p class="text-muted mb-0 small">Total a pagar:</p>
-                    <h3 class="fw-black mb-3">${{ number_format($total, 0, ',', '.') }}</h3>
+                    <h3 class="fw-black mb-3">${{ number_format($total, 0, ',', '.') }} COP</h3>
                     <a href="{{ route('tienda.checkout') }}" class="btn btn-dark btn-lg rounded-pill px-5 text-uppercase fw-black shadow-lg">
                         Finalizar Compra
                     </a>

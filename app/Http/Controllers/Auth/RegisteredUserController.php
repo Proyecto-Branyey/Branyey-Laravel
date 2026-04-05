@@ -49,7 +49,7 @@ class RegisteredUserController extends Controller
         // 3. CREACIÓN DEL USUARIO EN LA DB
         // Mapeamos cada dato validado a su columna correspondiente en la tabla 'usuarios'
         $user = User::create([
-            'nombre_completo'      => $request->nombre_completo,
+            'name'                 => $request->nombre_completo,
             'username'             => $request->username,
             'email'                => $request->email,
             'password'             => Hash::make($request->password),

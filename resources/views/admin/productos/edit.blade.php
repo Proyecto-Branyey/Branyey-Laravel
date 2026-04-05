@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Nuevo Producto - Branyey')
+@section('title', 'Editar Producto - Branyey')
 
 @section('content')
 <div class="container py-4">
@@ -12,31 +12,32 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.productos.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.productos.update', $producto) }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT')
         <div class="card border-0 shadow-lg rounded-4">
             <div class="card-header bg-dark text-white p-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i> Nuevo Producto Branyey</h5>
+                <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i> Editar Producto: {{ $producto->nombre }}</h5>
                 <button type="button" id="add-variant" class="btn btn-sm btn-success shadow-sm">
                     <i class="bi bi-plus-circle me-1"></i> Agregar Color/Talla
                 </button>
             </div>
-            
+
             <div class="card-body p-4">
                 <div class="row g-3 mb-4">
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Nombre</label>
-                        <input type="text" name="nombre" class="form-control" placeholder="Ej: Camisa Polo Premium" required>
+                        <input type="text" name="nombre" class="form-control" placeholder="Ej: Camisa Polo Premium" value="{{ $producto->nombre }}" required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Descripción</label>
-                        <textarea name="descripcion" class="form-control" rows="2" placeholder="Descripción del producto"></textarea>
+                        <textarea name="descripcion" class="form-control" rows="2" placeholder="Descripción del producto">{{ $producto->descripcion }}</textarea>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Estilo</label>
                         <select name="estilo_camisa_id" class="form-select" required>
                             @foreach($estilos as $estilo)
-                                <option value="{{ $estilo->id }}">{{ $estilo->nombre }}</option>
+                                <option value="{{ $estilo->id }}" {{ $producto->estilo_camisa_id == $estilo->id ? 'selected' : '' }}>{{ $estilo->nombre }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -45,7 +46,7 @@
                         <select name="clasificacion_talla_id" id="clasificacion_talla_id" class="form-select" required>
                             <option value="">Seleccione clasificación</option>
                             @foreach($clasificaciones as $clasif)
-                                <option value="{{ $clasif->id }}">{{ $clasif->nombre }}</option>
+                                <option value="{{ $clasif->id }}" {{ $producto->clasificacion_talla_id == $clasif->id ? 'selected' : '' }}>{{ $clasif->nombre }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -55,43 +56,51 @@
                 <h6 class="fw-bold text-secondary text-uppercase mb-3 small">Configuración de Variantes (Foto por color)</h6>
 
                 <div id="variants-container">
+                    @foreach($producto->variantes as $index => $variante)
                     <div class="variant-row border rounded-3 p-3 mb-3 bg-light shadow-sm">
+                        <input type="hidden" name="variantes[{{ $index }}][id]" value="{{ $variante->id }}">
                         <div class="row g-3">
                             <div class="col-md-2">
                                 <label class="small fw-bold">1. Talla</label>
-                                <select name="variantes[0][talla_id]" class="form-select talla-select" required>
+                                <select name="variantes[{{ $index }}][talla_id]" class="form-select talla-select" required>
                                     <option value="">-- Seleccione clasificación primero --</option>
+                                    @foreach($tallas->where('clasificacion_id', $producto->clasificacion_talla_id) as $talla)
+                                        <option value="{{ $talla->id }}" {{ $variante->talla_id == $talla->id ? 'selected' : '' }}>{{ $talla->nombre }}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
                             <div class="col-md-2">
                                 <label class="small fw-bold">2. Color</label>
-                                <select name="variantes[0][color_id]" class="form-select" required>
+                                <select name="variantes[{{ $index }}][color_id]" class="form-select" required>
                                     <option value="">-- Color --</option>
                                     @foreach($colores as $color)
-                                        <option value="{{ $color->id }}">{{ strtoupper($color->nombre) }}</option>
+                                        <option value="{{ $color->id }}" {{ $variante->colores->first()?->id == $color->id ? 'selected' : '' }}>{{ strtoupper($color->nombre) }}</option>
                                     @endforeach
                                 </select>
                             </div>
 
                             <div class="col-md-2">
                                 <label class="small fw-bold text-success">Precio Minorista</label>
-                                <input type="number" name="variantes[0][precio_minorista]" class="form-control" step="0.01" min="0" required>
+                                <input type="number" name="variantes[{{ $index }}][precio_minorista]" class="form-control" step="0.01" min="0" value="{{ $variante->precio_minorista }}" required>
                             </div>
 
                             <div class="col-md-2">
                                 <label class="small fw-bold text-warning">Precio Mayorista</label>
-                                <input type="number" name="variantes[0][precio_mayorista]" class="form-control" step="0.01" min="0" required>
+                                <input type="number" name="variantes[{{ $index }}][precio_mayorista]" class="form-control" step="0.01" min="0" value="{{ $variante->precio_mayorista }}" required>
                             </div>
 
                             <div class="col-md-1">
                                 <label class="small fw-bold text-info">Stock</label>
-                                <input type="number" name="variantes[0][stock]" class="form-control" min="0" required>
+                                <input type="number" name="variantes[{{ $index }}][stock]" class="form-control" min="0" value="{{ $variante->stock }}" required>
                             </div>
 
                             <div class="col-md-2">
                                 <label class="small fw-bold">Fotografía</label>
-                                <input type="file" name="variantes[0][foto]" class="form-control form-control-sm" accept="image/*" required>
+                                <input type="file" name="variantes[{{ $index }}][foto]" class="form-control form-control-sm" accept="image/*">
+                                @if($producto->imagenes->where('orden', $index)->first())
+                                    <small class="text-muted">Imagen actual: <a href="{{ asset('storage/' . $producto->imagenes->where('orden', $index)->first()->ruta) }}" target="_blank">Ver</a></small>
+                                @endif
                             </div>
 
                             <div class="col-md-1 d-flex align-items-end">
@@ -99,11 +108,12 @@
                             </div>
                         </div>
                     </div>
+                    @endforeach
                 </div>
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-dark btn-lg w-100 shadow-lg fw-bold">
-                        <i class="bi bi-save2 me-2"></i> GUARDAR PRODUCTO COMPLETO
+                        <i class="bi bi-save2 me-2"></i> ACTUALIZAR PRODUCTO
                     </button>
                 </div>
             </div>
@@ -112,7 +122,7 @@
 </div>
 
 <script>
-let variantIndex = 1;
+let variantIndex = {{ count($producto->variantes) }};
 
 // Datos de tallas por clasificación
 const tallasPorClasificacion = {
@@ -130,6 +140,7 @@ function updateTallaSelects(clasificacionId) {
     const selects = document.querySelectorAll('.talla-select');
 
     selects.forEach(select => {
+        const currentValue = select.value;
         select.innerHTML = '<option value="">-- Talla --</option>';
 
         if (clasificacionId && tallasPorClasificacion[clasificacionId]) {
@@ -137,6 +148,7 @@ function updateTallaSelects(clasificacionId) {
                 const option = document.createElement('option');
                 option.value = talla.id;
                 option.textContent = talla.nombre;
+                if (currentValue == talla.id) option.selected = true;
                 select.appendChild(option);
             });
         }
@@ -152,22 +164,28 @@ document.getElementById('clasificacion_talla_id').addEventListener('change', fun
 document.getElementById('add-variant').addEventListener('click', function() {
     const container = document.getElementById('variants-container');
     const firstRow = document.querySelector('.variant-row');
+
+    // Crear nueva fila basada en la primera
     const newRow = firstRow.cloneNode(true);
 
     // Limpiar valores de inputs
+    newRow.querySelectorAll('input[type="hidden"]').forEach(input => input.remove()); // Remover ID de variante existente
     newRow.querySelectorAll('input, select').forEach(input => {
         if(input.type === 'file') {
             input.value = '';
         } else if(input.type === 'number') {
             input.value = '';
         } else if(input.classList.contains('talla-select')) {
-            // El select de tallas se actualizará automáticamente por updateTallaSelects
             input.value = '';
         } else {
             input.value = '';
         }
         input.name = input.name.replace(/\[\d+\]/, `[${variantIndex}]`);
     });
+
+    // Limpiar texto de imagen actual
+    const smallText = newRow.querySelector('small');
+    if (smallText) smallText.remove();
 
     container.appendChild(newRow);
 
@@ -180,8 +198,19 @@ document.getElementById('add-variant').addEventListener('click', function() {
 
 document.addEventListener('click', function(e) {
     if (e.target.closest('.remove-row')) {
-        if (document.querySelectorAll('.variant-row').length > 1) e.target.closest('.variant-row').remove();
-        else alert("Debe haber al menos una variante.");
+        if (document.querySelectorAll('.variant-row').length > 1) {
+            e.target.closest('.variant-row').remove();
+        } else {
+            alert("Debe haber al menos una variante.");
+        }
+    }
+});
+
+// Inicializar tallas al cargar
+document.addEventListener('DOMContentLoaded', function() {
+    const clasificacionId = document.getElementById('clasificacion_talla_id').value;
+    if (clasificacionId) {
+        updateTallaSelects(clasificacionId);
     }
 });
 </script>

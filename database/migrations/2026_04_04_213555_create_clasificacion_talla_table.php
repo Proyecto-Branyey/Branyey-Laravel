@@ -6,17 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('clasificacion_talla', function (Blueprint $table) {
-            $table->id(); // BIGINT
-
+            $table->id();
             $table->enum('nombre', ['Niño', 'Dama', 'Adulto'])->unique();
-
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('clasificacion_talla');

@@ -16,22 +16,16 @@ class EstilosCamisaSeeder extends Seeder
         DB::table('estilos_camisa')->insert([
             [
                 'nombre' => 'estampado',
-                'precio_base_minorista' => 0,
-                'precio_base_mayorista' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'nombre' => 'raya',
-                'precio_base_minorista' => 0,
-                'precio_base_mayorista' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'nombre' => 'unicolor',
-                'precio_base_minorista' => 0,
-                'precio_base_mayorista' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

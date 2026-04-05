@@ -39,7 +39,7 @@
                         <td class="ps-4">
                             @php $img = $producto->imagenes->where('es_principal', true)->first(); @endphp
                             @if($img)
-                                <img src="{{ asset('storage/' . $img->url) }}" class="rounded-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+                                <img src="{{ asset('storage/' . $img->ruta) }}" class="rounded-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
                             @else
                                 <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
                                     <i class="bi bi-image text-muted"></i>
@@ -47,7 +47,7 @@
                             @endif
                         </td>
                         <td>
-                            <div class="fw-bold text-dark">{{ $producto->nombre_comercial }}</div>
+                            <div class="fw-bold text-dark">{{ $producto->nombre }}</div>
                             <small class="text-muted">ID: #{{ $producto->id }}</small>
                         </td>
                         <td><span class="badge bg-secondary-subtle text-secondary border">{{ $producto->estilo->nombre }}</span></td>
@@ -60,10 +60,10 @@
                         </td>
                         <td class="text-end pe-4">
                             <div class="btn-group shadow-sm">
-                                <a href="#" class="btn btn-sm btn-white border"><i class="bi bi-pencil"></i></a>
+                                <a href="{{ route('admin.productos.edit', $producto->id) }}" class="btn btn-sm btn-white border" title="Editar producto"><i class="bi bi-pencil"></i></a>
                                 <form action="{{ route('admin.productos.destroy', $producto->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este producto?')">
                                     @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-white border text-danger"><i class="bi bi-trash"></i></button>
+                                    <button class="btn btn-sm btn-white border text-danger" title="Eliminar producto"><i class="bi bi-trash"></i></button>
                                 </form>
                             </div>
                         </td>

@@ -20,16 +20,12 @@ class EstiloCamisa extends Model
      */
     protected $fillable = [
         'nombre',
-        'precio_base_minorista',
-        'precio_base_mayorista'
     ];
 
     /**
      * Los atributos que deben ser convertidos a tipos nativos.
      */
     protected $casts = [
-        'precio_base_minorista' => 'float',
-        'precio_base_mayorista' => 'float',
     ];
 
     // Desactivamos timestamps si no los tienes en la migración de estilos

@@ -11,15 +11,15 @@ class Producto extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'estilo_id', 'clasificacion_id', 'nombre_comercial', 'descripcion', 'activo'
+        'nombre', 'descripcion', 'estilo_camisa_id', 'clasificacion_talla_id'
     ];
 
     public function estilo(): BelongsTo {
-        return $this->belongsTo(EstiloCamisa::class, 'estilo_id');
+        return $this->belongsTo(EstiloCamisa::class, 'estilo_camisa_id');
     }
 
-    public function clasificacion(): BelongsTo {
-        return $this->belongsTo(ClasificacionTalla::class, 'clasificacion_id');
+    public function clasificacionTalla(): BelongsTo {
+        return $this->belongsTo(ClasificacionTalla::class, 'clasificacion_talla_id');
     }
 
     public function variantes(): HasMany {
@@ -28,13 +28,5 @@ class Producto extends Model
 
     public function imagenes(): HasMany {
         return $this->hasMany(ImagenProducto::class, 'producto_id');
-    }
-
-    public function scopeActivos($query) {
-        return $query->where('activo', true);
-    }
-
-    public function imagenPrincipalPorColor($colorId) {
-        return $this->imagenes()->where('color_id', $colorId)->where('es_principal', 1)->first();
     }
 }

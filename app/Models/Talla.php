@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Talla extends Model
 {
@@ -10,13 +11,11 @@ class Talla extends Model
     
     protected $fillable = [
         'nombre',
-        'recargo_minorista',
-        'recargo_mayorista'
+        'clasificacion_id'
     ];
     
     protected $casts = [
-        'recargo_minorista' => 'float',
-        'recargo_mayorista' => 'float',
+        //
     ];
 
     // Se eliminó SoftDeletes y la propiedad $dates para evitar conflictos con la DB
@@ -25,25 +24,10 @@ class Talla extends Model
     {
         return $this->hasMany(Variante::class);
     }
-    
-    public function tieneRecargos(): bool
+
+    public function clasificacion(): BelongsTo
     {
-        return $this->recargo_minorista > 0 || $this->recargo_mayorista > 0;
-    }
-    
-    public function getRecargo(string $tipo = 'minorista'): float
-    {
-        if ($tipo === 'mayorista') {
-            return $this->recargo_mayorista;
-        }
-        return $this->recargo_minorista;
-    }
-    
-    // Scope para filtrar tallas con recargos
-    public function scopeConRecargos($query)
-    {
-        return $query->where('recargo_minorista', '>', 0)
-                     ->orWhere('recargo_mayorista', '>', 0);
+        return $this->belongsTo(ClasificacionTalla::class, 'clasificacion_id');
     }
     
     // Scope para ordenar (Ajustado para mayor compatibilidad)

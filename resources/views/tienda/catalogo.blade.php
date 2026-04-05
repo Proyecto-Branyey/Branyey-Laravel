@@ -10,37 +10,41 @@
             <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 100px; border-radius: 15px;">
                 <h5 class="fw-bold mb-4 italic">FILTRAR</h5>
                 <form action="{{ route('tienda.catalogo') }}" method="GET">
-                    {{-- Clasificación --}}
-                    <div class="mb-4">
-                        <label class="form-label small fw-bold text-uppercase text-muted">Categoría</label>
-                        <select name="clasificacion_id" class="form-select border-0 bg-light shadow-none" onchange="this.form.submit()" style="border-radius: 10px;">
-                            <option value="">Todas</option>
-                            @foreach($clasificaciones as $clas)
-                                <option value="{{ $clas->id }}" {{ request('clasificacion_id') == $clas->id ? 'selected' : '' }}>
-                                    {{ $clas->nombre }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
                     {{-- Estilo --}}
                     <div class="mb-4">
                         <label class="form-label small fw-bold text-uppercase text-muted">Estilo de Prenda</label>
                         <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-sm">
-                            <label class="list-group-item list-group-item-action border-0 {{ !request('estilo_id') ? 'active bg-dark text-white' : '' }} cursor-pointer">
-                                <input type="radio" name="estilo_id" value="" class="d-none" onchange="this.form.submit()" {{ !request('estilo_id') ? 'checked' : '' }}>
+                            <label class="list-group-item list-group-item-action border-0 {{ !request('estilo_camisa_id') ? 'active bg-dark text-white' : '' }} cursor-pointer">
+                                <input type="radio" name="estilo_camisa_id" value="" class="d-none" onchange="this.form.submit()" {{ !request('estilo_camisa_id') ? 'checked' : '' }}>
                                 Todos los estilos
                             </label>
                             @foreach($estilos as $estilo)
-                                <label class="list-group-item list-group-item-action border-0 {{ request('estilo_id') == $estilo->id ? 'active bg-dark text-white' : '' }} cursor-pointer">
-                                    <input type="radio" name="estilo_id" value="{{ $estilo->id }}" class="d-none" onchange="this.form.submit()" {{ request('estilo_id') == $estilo->id ? 'checked' : '' }}>
+                                <label class="list-group-item list-group-item-action border-0 {{ request('estilo_camisa_id') == $estilo->id ? 'active bg-dark text-white' : '' }} cursor-pointer">
+                                    <input type="radio" name="estilo_camisa_id" value="{{ $estilo->id }}" class="d-none" onchange="this.form.submit()" {{ request('estilo_camisa_id') == $estilo->id ? 'checked' : '' }}>
                                     {{ $estilo->nombre }}
                                 </label>
                             @endforeach
                         </div>
                     </div>
 
-                    @if(request()->anyFilled(['estilo_id', 'clasificacion_id']))
+                    {{-- Clasificación de Talla (Género) --}}
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Categoría</label>
+                        <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-sm">
+                            <label class="list-group-item list-group-item-action border-0 {{ !request('clasificacion_talla_id') ? 'active bg-dark text-white' : '' }} cursor-pointer">
+                                <input type="radio" name="clasificacion_talla_id" value="" class="d-none" onchange="this.form.submit()" {{ !request('clasificacion_talla_id') ? 'checked' : '' }}>
+                                Todas las categorías
+                            </label>
+                            @foreach($clasificaciones as $clasif)
+                                <label class="list-group-item list-group-item-action border-0 {{ request('clasificacion_talla_id') == $clasif->id ? 'active bg-dark text-white' : '' }} cursor-pointer">
+                                    <input type="radio" name="clasificacion_talla_id" value="{{ $clasif->id }}" class="d-none" onchange="this.form.submit()" {{ request('clasificacion_talla_id') == $clasif->id ? 'checked' : '' }}>
+                                    {{ $clasif->nombre }}
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    @if(request()->anyFilled(['estilo_camisa_id', 'clasificacion_talla_id']))
                         <a href="{{ route('tienda.catalogo') }}" class="btn btn-link btn-sm text-decoration-none text-danger p-0 fw-bold mt-2">
                             × LIMPIAR FILTROS
                         </a>
@@ -64,7 +68,7 @@
                                 <a href="{{ route('tienda.producto.detalle', $producto->id) }}">
                                     @php $img = $producto->imagenes->first(); @endphp
                                     @if($img)
-                                        <img src="{{ Storage::url($img->url) }}" class="w-100 h-100 img-zoom" style="object-fit: cover; object-position: top;" alt="{{ $producto->nombre_comercial }}">
+                                        <img src="{{ Storage::url($img->ruta) }}" class="w-100 h-100 img-zoom" style="object-fit: cover; object-position: top;" alt="{{ $producto->nombre }}">
                                     @else
                                         <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted small fw-bold italic" style="background: #eee;">NO IMAGE</div>
                                     @endif
@@ -73,17 +77,20 @@
 
                             <div class="card-body text-center">
                                 <span class="text-uppercase text-muted fw-bold mb-1 d-block small" style="letter-spacing: 2px;">
-                                    {{ $producto->clasificacion->nombre ?? 'Colección' }}
+                                    {{ $producto->estilo->nombre ?? 'Colección' }}
                                 </span>
-                                <h6 class="card-title fw-bold text-dark text-uppercase mb-3">{{ $producto->nombre_comercial }}</h6>
+                                <h6 class="card-title fw-bold text-dark text-uppercase mb-3">{{ $producto->nombre }}</h6>
                                 <h5 class="fw-bold text-dark mb-3">
                                     @php
-                                        $minPrecio = $producto->variantes->min('precio_base');
-                                        $maxPrecio = $producto->variantes->max('precio_base');
+                                        $precios = $producto->variantes->map(function($v) {
+                                            return $v->getPrecioActual();
+                                        });
+                                        $minPrecio = $precios->min();
+                                        $maxPrecio = $precios->max();
                                     @endphp
-                                    ${{ number_format($minPrecio, 2) }}
+                                    ${{ number_format($minPrecio, 0, ',', '.') }} COP
                                     @if($minPrecio != $maxPrecio)
-                                        - ${{ number_format($maxPrecio, 2) }}
+                                        - ${{ number_format($maxPrecio, 0, ',', '.') }} COP
                                     @endif
                                 </h5>
                                 <a href="{{ route('tienda.producto.detalle', $producto->id) }}" class="btn btn-dark w-100 rounded-pill py-2 fw-bold text-uppercase small">

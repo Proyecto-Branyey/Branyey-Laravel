@@ -82,7 +82,7 @@ class Venta extends Model
 
     public function getTotalFormateadoAttribute(): string
     {
-        return '$' . number_format($this->total, 0, ',', '.'); // Formato moneda colombiana
+        return formatPriceCOP($this->total); // Formato moneda colombiana
     }
 
     public function getEstadoBadgeAttribute(): string

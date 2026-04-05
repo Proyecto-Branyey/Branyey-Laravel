@@ -12,8 +12,7 @@ class ProductoController extends Controller
 {
     public function inicio()
     {
-        $destacados = Producto::activos()
-            ->with(['imagenes', 'estilo'])
+        $destacados = Producto::with(['imagenes', 'estilo'])
             ->latest()
             ->take(3)
             ->get();
@@ -23,61 +22,33 @@ class ProductoController extends Controller
 
     public function index(Request $request)
     {
-        $query = Producto::activos()->with(['imagenes', 'estilo', 'clasificacion']);
+        $query = Producto::with(['imagenes', 'estilo', 'variantes']);
 
-        if ($request->filled('clasificacion_id')) {
-            $query->where('clasificacion_id', $request->clasificacion_id);
+        if ($request->filled('estilo_camisa_id')) {
+            $query->where('estilo_camisa_id', $request->estilo_camisa_id);
         }
 
-        if ($request->filled('estilo_id')) {
-            $query->where('estilo_id', $request->estilo_id);
+        if ($request->filled('clasificacion_talla_id')) {
+            $query->where('clasificacion_talla_id', $request->clasificacion_talla_id);
         }
 
         $productos = $query->latest()->paginate(12);
-        $clasificaciones = ClasificacionTalla::all();
         $estilos = EstiloCamisa::all();
+        $clasificaciones = ClasificacionTalla::all();
 
-        return view('tienda.catalogo', compact('productos', 'clasificaciones', 'estilos'));
+        return view('tienda.catalogo', compact('productos', 'estilos', 'clasificaciones'));
     }
 
     public function show($id)
     {
-        $producto = Producto::activos()->with([
+        $producto = Producto::with([
             'imagenes', 
             'estilo', 
-            'clasificacion', 
             'variantes.talla', 
             'variantes.colores'
         ])->findOrFail($id);
 
-        $tipoPrecio = 'minorista';
-        if (Auth::check() && Auth::user()->rol && strtolower(Auth::user()->rol->nombre) === 'mayorista') {
-            $tipoPrecio = 'mayorista';
-        }
-
-        $variantesPreparadas = $producto->variantes->map(function($variante) use ($tipoPrecio, $producto) {
-            $precioBase = $tipoPrecio === 'mayorista'
-                ? ($producto->estilo->precio_base_mayorista ?? 0)
-                : ($producto->estilo->precio_base_minorista ?? 0);
-
-            $recargoTalla = method_exists($variante->talla, 'getRecargo')
-                ? $variante->talla->getRecargo($tipoPrecio)
-                : 0;
-
-            $precioFinal = $precioBase + $recargoTalla;
-
-            return [
-                'id' => $variante->id,
-                'sku' => $variante->sku,
-                'stock' => $variante->stock,
-                'talla' => $variante->talla->nombre ?? 'Única',
-                'color' => $variante->colores->pluck('nombre')->implode(' + '),
-                'precio_final' => $precioFinal,
-                'precio_formateado' => '$' . number_format($precioFinal, 0, ',', '.')
-            ];
-        });
-
-        return view('tienda.producto_detalle', compact('producto', 'variantesPreparadas', 'tipoPrecio'));
+        return view('tienda.producto_detalle', compact('producto'));
     }
 
     public function buscar(Request $request)

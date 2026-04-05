@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Tienda;
 use App\Http\Controllers\Controller;
 use App\Models\Variante;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
@@ -15,14 +14,13 @@ class CartController extends Controller
     public function index()
     {
         $cart = session()->get('cart', []);
-        $user = Auth::user();
         
         $total = 0;
         foreach($cart as $item) {
             $total += $item['price'] * $item['quantity'];
         }
 
-        return view('tienda.carrito.index', compact('cart', 'user', 'total'));
+        return view('tienda.carrito.index', compact('cart', 'total'));
     }
 
     /**
@@ -33,27 +31,16 @@ class CartController extends Controller
         // 1. Buscamos la variante con sus relaciones
         $variante = Variante::with(['producto.estilo', 'producto.imagenes', 'talla'])->findOrFail($request->variante_id);
 
-        // --- INICIO VALIDACIÓN DE STOCK CRÍTICO ---
+        // --- VALIDACIÓN DE STOCK CRÍTICO (HU-014) ---
         if ($variante->stock <= 0) {
             return redirect()->back()->with('error', 'Lo sentimos, esta talla se encuentra agotada actualmente.');
         }
         // --- FIN VALIDACIÓN ---
 
         $cart = session()->get('cart', []);
-        $user = Auth::user();
         
-        // Lógica de precios Branyey (Mayorista vs Minorista)
-        $esMayorista = ($user && $user->rol && $user->rol->nombre === 'mayorista');
-
-        $precioBase = $esMayorista 
-            ? $variante->producto->estilo->precio_base_mayorista 
-            : $variante->producto->estilo->precio_base_minorista;
-        
-        $recargo = $esMayorista
-            ? $variante->talla->recargo_mayorista
-            : $variante->talla->recargo_minorista;
-
-        $precioFinal = $precioBase + $recargo;
+        // El precio viene directamente de la variante (ya considera rol del usuario)
+        $precioFinal = $variante->getPrecioActual();
 
         // Si ya está en el carrito, verificamos que la nueva cantidad no supere el stock
         if(isset($cart[$variante->id])) {
@@ -63,11 +50,11 @@ class CartController extends Controller
             $cart[$variante->id]['quantity']++;
         } else {
             $cart[$variante->id] = [
-                "name"     => $variante->producto->nombre_comercial,
+                "name"     => $variante->producto->nombre,
                 "quantity" => 1,
                 "price"    => $precioFinal,
                 "talla"    => $variante->talla->nombre,
-                "image"    => $variante->producto->imagenes->first()->url ?? 'default.jpg'
+                "image"    => $variante->producto->imagenes->first()->ruta ?? 'default.jpg'
             ];
         }
 
