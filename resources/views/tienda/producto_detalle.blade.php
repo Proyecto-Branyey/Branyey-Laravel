@@ -43,11 +43,11 @@
             <div class="col-lg-5">
                 <div class="ps-lg-4">
                     <span class="badge bg-dark rounded-pill px-3 py-2 mb-3 text-uppercase tracking-widest" style="font-size: 10px;">
-                        {{ $producto->estilo->nombre ?? 'Colección' }} • Colección 2026
+                        {{ $producto->estilo?->nombre ?? 'Colección' }} • Colección 2026
                     </span>
 
                     <h1 class="display-4 fw-black text-uppercase italic tracking-tighter mb-2">{{ $producto->nombre_comercial }}</h1>
-                    <p class="text-muted fw-bold mb-4 small tracking-widest">REF: {{ $producto->estilo->nombre ?? '' }}</p>
+                    <p class="text-muted fw-bold mb-4 small tracking-widest">REF: {{ $producto->estilo?->nombre ?? '' }}</p>
 
                     <h2 class="fw-bold mb-5 display-6 text-dark">
                         <span id="price-display">Selecciona color y talla</span>
@@ -82,7 +82,7 @@
                                                    class="btn-check talla-radio" data-precio="{{ $v->precio_formateado }}" 
                                                    data-stock="{{ $v->stock }}" required>
                                             <label class="btn btn-outline-dark rounded-pill px-4 py-2 fw-bold" for="v-{{ $v->id }}">
-                                                {{ $v->talla->nombre }}
+                                                {{ $v->talla?->nombre ?? 'Sin talla' }}
                                             </label>
                                         </div>
                                     @endforeach

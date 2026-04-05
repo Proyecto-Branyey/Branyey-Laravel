@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $producto->nombre . ' - Admin')
+@section('title', $producto->nombre_comercial . ' - Admin')
 
 @section('content')
 <div class="container py-5">
@@ -9,7 +9,7 @@
             <div class="card border-0 shadow-lg rounded-4">
                 <div class="card-header bg-dark text-white p-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="mb-0 fw-bold">{{ $producto->nombre }}</h3>
+                        <h3 class="mb-0 fw-bold">{{ $producto->nombre_comercial }}</h3>
                         <a href="{{ route('admin.productos.index') }}" class="btn btn-light btn-sm">
                             <i class="bi bi-arrow-left me-2"></i>Volver
                         </a>
@@ -21,7 +21,7 @@
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <h6 class="text-muted fw-bold small text-uppercase">Estilo</h6>
-                            <p class="fw-bold">{{ $producto->estilo->nombre ?? 'N/A' }}</p>
+                            <p class="fw-bold">{{ $producto->estilo?->nombre ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-6">
                             <h6 class="text-muted fw-bold small text-uppercase">Clasificación de Talla</h6>
@@ -44,7 +44,7 @@
                             <div class="row g-3">
                                 @foreach($producto->imagenes as $imagen)
                                     <div class="col-md-4">
-                                        <img src="{{ Storage::url($imagen->ruta) }}" class="img-fluid rounded-3 shadow-sm" alt="{{ $producto->nombre }}">
+                                        <img src="{{ Storage::url($imagen->url) }}" class="img-fluid rounded-3 shadow-sm" alt="{{ $producto->nombre_comercial }}">
                                     </div>
                                 @endforeach
                             </div>
@@ -68,7 +68,7 @@
                                 <tbody>
                                     @foreach($producto->variantes as $variante)
                                         <tr>
-                                            <td class="fw-bold">{{ $variante->talla->nombre }}</td>
+                                            <td class="fw-bold">{{ $variante->talla?->nombre ?? 'Sin talla' }}</td>
                                             <td>
                                                 @foreach($variante->colores as $color)
                                                     <span class="badge" style="background-color: {{ $color->codigo_hex }}; color: {{ $color->codigo_hex == '#ffffff' || $color->codigo_hex == '#fff' ? '#000' : '#fff' }}">

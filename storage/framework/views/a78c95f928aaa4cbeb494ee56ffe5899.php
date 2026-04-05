@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -40,7 +38,7 @@
                         <td class="ps-4">
                             <?php $img = $producto->imagenes->where('es_principal', true)->first(); ?>
                             <?php if($img): ?>
-                                <img src="<?php echo e(asset('storage/' . $img->ruta)); ?>" class="rounded-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+                                <img src="<?php echo e(asset('storage/' . $img->url)); ?>" class="rounded-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
                             <?php else: ?>
                                 <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
                                     <i class="bi bi-image text-muted"></i>
@@ -48,10 +46,14 @@
                             <?php endif; ?>
                         </td>
                         <td>
-                            <div class="fw-bold text-dark"><?php echo e($producto->nombre); ?></div>
-                            <small class="text-muted">ID: #<?php echo e($producto->id); ?></small>
+                            <a href="<?php echo e(route('admin.productos.show', $producto->id)); ?>" class="d-block p-2 rounded-2 fw-bold text-dark text-decoration-none hover-bg-light position-relative" style="transition:background 0.2s;">
+                                <?php echo e($producto->nombre_comercial); ?>
+
+                                <small class="text-muted d-block fw-normal" style="font-size: 0.85em;">ID: #<?php echo e($producto->id); ?></small>
+                                <span class="stretched-link"></span>
+                            </a>
                         </td>
-                        <td><span class="badge bg-secondary-subtle text-secondary border"><?php echo e($producto->estilo->nombre); ?></span></td>
+                        <td><span class="badge bg-secondary-subtle text-secondary border"><?php echo e($producto->estilo?->nombre ?? 'Sin estilo'); ?></span></td>
                         <td>
                             <?php if($producto->activo): ?>
                                 <span class="badge bg-success-subtle text-success">Activo</span>

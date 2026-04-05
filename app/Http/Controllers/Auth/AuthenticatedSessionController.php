@@ -32,14 +32,14 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
 
         // Accedemos al nombre del rol a través de la relación que definimos en el modelo User
-        $rol = $user->rol->nombre; 
+        $rol = $user?->rol?->nombre;
 
         if ($rol === 'administrador') {
             return redirect()->intended(route('admin.dashboard'));
         }
 
-        // Si es mayorista o minorista, van al catálogo de compras
-        return redirect()->intended(route('tienda.catalogo'));
+        // Si no es administrador, usa dashboard general (compatibilidad con auth estándar)
+        return redirect()->intended(route('dashboard'));
     }
 
     /**

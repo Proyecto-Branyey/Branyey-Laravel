@@ -35,7 +35,7 @@
                             <tr>
                                 <td>{{ $talla->id }}</td>
                                 <td>{{ $talla->nombre }}</td>
-                                <td>{{ $talla->clasificacion->nombre }}</td>
+                                <td>{{ $talla->clasificacion?->nombre ?? 'Sin clasificación' }}</td>
                                 <td>
                                     <a href="{{ route('admin.tallas.edit', $talla) }}" class="btn btn-sm btn-warning">
                                         <i class="bi bi-pencil"></i> Editar

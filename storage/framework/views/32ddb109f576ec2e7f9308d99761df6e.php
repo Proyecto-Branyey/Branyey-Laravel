@@ -1,6 +1,6 @@
 
 
-<?php $__env->startSection('title', $producto->nombre . ' - Admin'); ?>
+<?php $__env->startSection('title', $producto->nombre_comercial . ' - Admin'); ?>
 
 <?php $__env->startSection('content'); ?>
 <div class="container py-5">
@@ -9,7 +9,7 @@
             <div class="card border-0 shadow-lg rounded-4">
                 <div class="card-header bg-dark text-white p-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="mb-0 fw-bold"><?php echo e($producto->nombre); ?></h3>
+                        <h3 class="mb-0 fw-bold"><?php echo e($producto->nombre_comercial); ?></h3>
                         <a href="<?php echo e(route('admin.productos.index')); ?>" class="btn btn-light btn-sm">
                             <i class="bi bi-arrow-left me-2"></i>Volver
                         </a>
@@ -21,7 +21,7 @@
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <h6 class="text-muted fw-bold small text-uppercase">Estilo</h6>
-                            <p class="fw-bold"><?php echo e($producto->estilo->nombre ?? 'N/A'); ?></p>
+                            <p class="fw-bold"><?php echo e($producto->estilo?->nombre ?? 'N/A'); ?></p>
                         </div>
                         <div class="col-md-6">
                             <h6 class="text-muted fw-bold small text-uppercase">Clasificación de Talla</h6>
@@ -44,7 +44,7 @@
                             <div class="row g-3">
                                 <?php $__currentLoopData = $producto->imagenes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $imagen): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="col-md-4">
-                                        <img src="<?php echo e(Storage::url($imagen->ruta)); ?>" class="img-fluid rounded-3 shadow-sm" alt="<?php echo e($producto->nombre); ?>">
+                                        <img src="<?php echo e(Storage::url($imagen->url)); ?>" class="img-fluid rounded-3 shadow-sm" alt="<?php echo e($producto->nombre_comercial); ?>">
                                     </div>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
@@ -68,7 +68,7 @@
                                 <tbody>
                                     <?php $__currentLoopData = $producto->variantes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $variante): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <tr>
-                                            <td class="fw-bold"><?php echo e($variante->talla->nombre); ?></td>
+                                            <td class="fw-bold"><?php echo e($variante->talla?->nombre ?? 'Sin talla'); ?></td>
                                             <td>
                                                 <?php $__currentLoopData = $variante->colores; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <span class="badge" style="background-color: <?php echo e($color->codigo_hex); ?>; color: <?php echo e($color->codigo_hex == '#ffffff' || $color->codigo_hex == '#fff' ? '#000' : '#fff'); ?>">

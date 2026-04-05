@@ -152,7 +152,7 @@
                             </div>
                             <div class="p-4">
                                 <div class="mb-2">
-                                    <small class="text-muted">{{ $producto->estilo->nombre ?? 'Estilo' }}</small>
+                                    <small class="text-muted">{{ $producto->estilo?->nombre ?? 'Estilo' }}</small>
                                 </div>
                                 <h5 class="fw-bold mb-3">{{ $producto->nombre_comercial }}</h5>
                                 
@@ -176,7 +176,7 @@
                                         <p class="text-primary fw-bold fs-5 mb-1">
                                             ${{ number_format($producto->variantes->first()?->precio_minorista ?? 0, 0, ',', '.') }} COP
                                         </p>
-                                        @if(auth()->check() && auth()->user()->rol->nombre === 'mayorista')
+                                        @if(auth()->check() && auth()->user()?->rol?->nombre === 'mayorista')
                                             <small class="text-success">Mayorista: ${{ number_format($producto->variantes->first()?->precio_mayorista ?? 0, 0, ',', '.') }}</small>
                                         @endif
                                     </div>

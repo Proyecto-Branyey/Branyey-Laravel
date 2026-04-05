@@ -1,4 +1,4 @@
-<?php $__env->startSection('title', $producto->nombre . ' - Branyey'); ?>
+<?php $__env->startSection('title', $producto->nombre_comercial . ' - Branyey'); ?>
 
 <?php $__env->startSection('content'); ?>
 <div class="bg-white min-h-screen py-5">
@@ -7,7 +7,7 @@
             <ol class="breadcrumb small text-uppercase fw-black italic tracking-widest mb-0">
                 <li class="breadcrumb-item"><a href="/" class="text-muted text-decoration-none">Inicio</a></li>
                 <li class="breadcrumb-item"><a href="<?php echo e(route('tienda.catalogo')); ?>" class="text-muted text-decoration-none">Catálogo</a></li>
-                <li class="breadcrumb-item active text-dark"><?php echo e($producto->nombre); ?></li>
+                <li class="breadcrumb-item active text-dark"><?php echo e($producto->nombre_comercial); ?></li>
             </ol>
         </nav>
 
@@ -17,21 +17,19 @@
                     <?php $primeraImg = $producto->imagenes->first(); ?>
                     <div class="rounded-5 overflow-hidden shadow-sm bg-light mb-3">
                         <img id="main-product-image" 
-                             src="<?php echo e($primeraImg ? Storage::url($primeraImg->ruta) : asset('img/placeholder.jpg')); ?>" 
+                             src="<?php echo e($primeraImg ? Storage::url($primeraImg->url) : asset('img/placeholder.jpg')); ?>" 
                              class="img-fluid w-100 object-cover" style="min-height: 550px; object-position: top;">
                     </div>
 
                     <div class="d-flex gap-2 overflow-auto pb-2" id="gallery-thumbs">
-                        <?php $colorIndex = 0; ?>
                         <?php $__currentLoopData = $producto->variantes->flatMap->colores->unique('id'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <?php
-                                $imagenColor = $producto->imagenes->skip($colorIndex)->first();
-                                $colorIndex++;
+                                $imagenColor = $producto->imagenes->firstWhere('color_id', $color->id);
                             ?>
                             <?php if($imagenColor): ?>
-                                <img src="<?php echo e(Storage::url($imagenColor->ruta)); ?>" class="rounded-4 thumb-img border cursor-pointer"
+                                <img src="<?php echo e(Storage::url($imagenColor->url)); ?>" class="rounded-4 thumb-img border cursor-pointer"
                                      style="width: 80px; height: 100px; object-fit: cover;"
-                                     data-full="<?php echo e(Storage::url($imagenColor->ruta)); ?>"
+                                     data-full="<?php echo e(Storage::url($imagenColor->url)); ?>"
                                      data-color-id="<?php echo e($color->id); ?>"
                                      onclick="document.getElementById('main-product-image').src = this.dataset.full">
                             <?php endif; ?>
@@ -43,11 +41,11 @@
             <div class="col-lg-5">
                 <div class="ps-lg-4">
                     <span class="badge bg-dark rounded-pill px-3 py-2 mb-3 text-uppercase tracking-widest" style="font-size: 10px;">
-                        <?php echo e($producto->estilo->nombre ?? 'Colección'); ?> • Colección 2026
+                        <?php echo e($producto->estilo?->nombre ?? 'Colección'); ?> • Colección 2026
                     </span>
 
-                    <h1 class="display-4 fw-black text-uppercase italic tracking-tighter mb-2"><?php echo e($producto->nombre); ?></h1>
-                    <p class="text-muted fw-bold mb-4 small tracking-widest">REF: <?php echo e($producto->estilo->nombre ?? ''); ?></p>
+                    <h1 class="display-4 fw-black text-uppercase italic tracking-tighter mb-2"><?php echo e($producto->nombre_comercial); ?></h1>
+                    <p class="text-muted fw-bold mb-4 small tracking-widest">REF: <?php echo e($producto->estilo?->nombre ?? ''); ?></p>
 
                     <h2 class="fw-bold mb-5 display-6 text-dark">
                         <span id="price-display">Selecciona color y talla</span>
@@ -82,7 +80,7 @@
                                                    class="btn-check talla-radio" data-precio="<?php echo e($v->precio_formateado); ?>" 
                                                    data-stock="<?php echo e($v->stock); ?>" required>
                                             <label class="btn btn-outline-dark rounded-pill px-4 py-2 fw-bold" for="v-<?php echo e($v->id); ?>">
-                                                <?php echo e($v->talla->nombre); ?>
+                                                <?php echo e($v->talla?->nombre ?? 'Sin talla'); ?>
 
                                             </label>
                                         </div>

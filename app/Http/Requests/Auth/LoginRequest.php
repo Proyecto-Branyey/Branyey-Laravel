@@ -25,8 +25,9 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Cambiamos 'email' por 'login' para aceptar cualquier string
-            'login' => ['required', 'string'], 
+            // Compatibilidad: permite login (nuevo) o email (tests/formularios legacy)
+            'login' => ['nullable', 'string', 'required_without:email'],
+            'email' => ['nullable', 'string', 'required_without:login'],
             'password' => ['required', 'string'],
         ];
     }
@@ -38,10 +39,8 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        // LÓGICA DE DETECCIÓN:
-        // Si el input tiene formato de email, buscamos por la columna 'email'.
-        // De lo contrario, buscamos por la columna 'username'.
-        $login = $this->input('login');
+        // Acepta login o email como campo de entrada para autenticar.
+        $login = $this->input('login', $this->input('email'));
         $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         // Intentamos el login usando el campo detectado dinámicamente
@@ -50,6 +49,7 @@ class LoginRequest extends FormRequest
 
             throw ValidationException::withMessages([
                 'login' => trans('auth.failed'),
+                'email' => trans('auth.failed'),
             ]);
         }
 
@@ -83,7 +83,8 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        // Cambiamos 'email' por 'login' para que el bloqueo por intentos funcione correctamente
-        return Str::transliterate(Str::lower($this->string('login')).'|'.$this->ip());
+        $login = $this->input('login', $this->input('email', ''));
+
+        return Str::transliterate(Str::lower($login).'|'.$this->ip());
     }
 }

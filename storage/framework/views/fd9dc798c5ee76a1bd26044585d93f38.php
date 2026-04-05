@@ -85,60 +85,74 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo e(request()->routeIs('tienda.inicio') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('tienda.inicio')); ?>">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo e(request()->routeIs('tienda.catalogo') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('tienda.catalogo')); ?>">Catálogo</a>
-                    </li>
-
-                    <?php if(auth()->guard()->check()): ?>
-                        <li class="nav-item dropdown ms-lg-3">
-                            <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-2 fs-5"></i>
-                                <?php echo e(Auth::user()->username); ?>
-
-                                <span class="badge bg-primary nav-role-badge">
-                                    <?php echo e(Auth::user()->rol->nombre ?? 'Cliente'); ?>
-
-                                </span> 
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                                <?php if(Auth::user()->rol && Auth::user()->rol->nombre == 'administrador'): ?>
-                                    <li><a class="dropdown-item fw-bold text-primary" href="<?php echo e(route('admin.dashboard')); ?>">Panel Admin</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                <?php endif; ?>
-                                <li><a class="dropdown-item" href="<?php echo e(route('profile.edit')); ?>">Mi Perfil</a></li>
-                                <li><a class="dropdown-item" href="#">Mis Pedidos</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="<?php echo e(route('logout')); ?>">
-                                        <?php echo csrf_field(); ?>
-                                        <button type="submit" class="dropdown-item text-danger">Cerrar Sesión</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
+                    <?php if(request()->routeIs('admin.*')): ?>
+                        <?php if(auth()->guard()->check()): ?>
+                            <li class="nav-item">
+                                <a class="nav-link <?php echo e(request()->routeIs('admin.dashboard') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('admin.dashboard')); ?>">Panel Admin</a>
+                            </li>
+                            <li class="nav-item ms-lg-3">
+                                <form method="POST" action="<?php echo e(route('logout')); ?>" class="d-inline">
+                                    <?php echo csrf_field(); ?>
+                                    <button type="submit" class="nav-link btn btn-link text-danger p-0">Cerrar Sesión</button>
+                                </form>
+                            </li>
+                        <?php endif; ?>
                     <?php else: ?>
-                        <li class="nav-item ms-lg-3">
-                            <a class="nav-link" href="<?php echo e(route('login')); ?>">Iniciar Sesión</a>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo e(request()->routeIs('tienda.inicio') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('tienda.inicio')); ?>">Inicio</a>
                         </li>
-                        <li class="nav-item ms-lg-2">
-                            <a class="btn btn-primary btn-sm rounded-pill px-4 fw-600" href="<?php echo e(route('register')); ?>">Registrarse</a>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo e(request()->routeIs('tienda.catalogo') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('tienda.catalogo')); ?>">Catálogo</a>
+                        </li>
+
+                        <?php if(auth()->guard()->check()): ?>
+                            <li class="nav-item dropdown ms-lg-3">
+                                <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle me-2 fs-5"></i>
+                                    <?php echo e(Auth::user()->username); ?>
+
+                                    <span class="badge bg-primary nav-role-badge">
+                                        <?php echo e(Auth::user()?->rol?->nombre ?? 'Cliente'); ?>
+
+                                    </span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                    <?php if(Auth::user()?->rol?->nombre === 'administrador'): ?>
+                                        <li><a class="dropdown-item fw-bold text-primary" href="<?php echo e(route('admin.dashboard')); ?>">Panel Admin</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                    <?php endif; ?>
+                                    <li><a class="dropdown-item" href="<?php echo e(route('profile.edit')); ?>">Mi Perfil</a></li>
+                                    <li><a class="dropdown-item" href="#">Mis Pedidos</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form method="POST" action="<?php echo e(route('logout')); ?>">
+                                            <?php echo csrf_field(); ?>
+                                            <button type="submit" class="dropdown-item text-danger">Cerrar Sesión</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        <?php else: ?>
+                            <li class="nav-item ms-lg-3">
+                                <a class="nav-link" href="<?php echo e(route('login')); ?>">Iniciar Sesión</a>
+                            </li>
+                            <li class="nav-item ms-lg-2">
+                                <a class="btn btn-primary btn-sm rounded-pill px-4 fw-600" href="<?php echo e(route('register')); ?>">Registrarse</a>
+                            </li>
+                        <?php endif; ?>
+
+                        <li class="nav-item ms-lg-4">
+                            <a class="btn btn-light position-relative rounded-pill px-3 d-flex align-items-center" href="<?php echo e(route('tienda.cart.index')); ?>">
+                                <i class="bi bi-bag-fill me-2"></i>
+                                <span class="d-none d-lg-inline small fw-bold">CARRITO</span>
+                                <?php $count = session('cart') ? count(session('cart')) : 0; ?>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white" style="font-size: 0.7rem;">
+                                    <?php echo e($count); ?>
+
+                                </span>
+                            </a>
                         </li>
                     <?php endif; ?>
-
-                    <li class="nav-item ms-lg-4">
-                        <a class="btn btn-light position-relative rounded-pill px-3 d-flex align-items-center" href="<?php echo e(route('tienda.cart.index')); ?>">
-                            <i class="bi bi-bag-fill me-2"></i>
-                            <span class="d-none d-lg-inline small fw-bold">CARRITO</span>
-                            <?php $count = session('cart') ? count(session('cart')) : 0; ?> 
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white" style="font-size: 0.7rem;">
-                                <?php echo e($count); ?>
-
-                            </span>
-                        </a>
-                    </li>
                 </ul>
             </div>
         </div>

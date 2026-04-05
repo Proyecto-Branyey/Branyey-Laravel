@@ -85,57 +85,71 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('tienda.inicio') ? 'active fw-bold' : '' }}" href="{{ route('tienda.inicio') }}">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('tienda.catalogo') ? 'active fw-bold' : '' }}" href="{{ route('tienda.catalogo') }}">Catálogo</a>
-                    </li>
-
-                    @auth
-                        <li class="nav-item dropdown ms-lg-3">
-                            <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-2 fs-5"></i>
-                                {{ Auth::user()->username }}
-                                <span class="badge bg-primary nav-role-badge">
-                                    {{ Auth::user()->rol->nombre ?? 'Cliente' }}
-                                </span> {{-- Corregido aquí --}}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                                @if(Auth::user()->rol && Auth::user()->rol->nombre == 'administrador')
-                                    <li><a class="dropdown-item fw-bold text-primary" href="{{ route('admin.dashboard') }}">Panel Admin</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                @endif
-                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Mi Perfil</a></li>
-                                <li><a class="dropdown-item" href="#">Mis Pedidos</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item text-danger">Cerrar Sesión</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
+                    @if(request()->routeIs('admin.*'))
+                        @auth
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active fw-bold' : '' }}" href="{{ route('admin.dashboard') }}">Panel Admin</a>
+                            </li>
+                            <li class="nav-item ms-lg-3">
+                                <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="nav-link btn btn-link text-danger p-0">Cerrar Sesión</button>
+                                </form>
+                            </li>
+                        @endauth
                     @else
-                        <li class="nav-item ms-lg-3">
-                            <a class="nav-link" href="{{ route('login') }}">Iniciar Sesión</a>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('tienda.inicio') ? 'active fw-bold' : '' }}" href="{{ route('tienda.inicio') }}">Inicio</a>
                         </li>
-                        <li class="nav-item ms-lg-2">
-                            <a class="btn btn-primary btn-sm rounded-pill px-4 fw-600" href="{{ route('register') }}">Registrarse</a>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('tienda.catalogo') ? 'active fw-bold' : '' }}" href="{{ route('tienda.catalogo') }}">Catálogo</a>
                         </li>
-                    @endauth
 
-                    <li class="nav-item ms-lg-4">
-                        <a class="btn btn-light position-relative rounded-pill px-3 d-flex align-items-center" href="{{ route('tienda.cart.index') }}">
-                            <i class="bi bi-bag-fill me-2"></i>
-                            <span class="d-none d-lg-inline small fw-bold">CARRITO</span>
-                            @php $count = session('cart') ? count(session('cart')) : 0; @endphp {{-- Corregido el @php --}}
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white" style="font-size: 0.7rem;">
-                                {{ $count }}
-                            </span>
-                        </a>
-                    </li>
+                        @auth
+                            <li class="nav-item dropdown ms-lg-3">
+                                <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle me-2 fs-5"></i>
+                                    {{ Auth::user()->username }}
+                                    <span class="badge bg-primary nav-role-badge">
+                                        {{ Auth::user()?->rol?->nombre ?? 'Cliente' }}
+                                    </span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                    @if(Auth::user()?->rol?->nombre === 'administrador')
+                                        <li><a class="dropdown-item fw-bold text-primary" href="{{ route('admin.dashboard') }}">Panel Admin</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                    @endif
+                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Mi Perfil</a></li>
+                                    <li><a class="dropdown-item" href="#">Mis Pedidos</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item text-danger">Cerrar Sesión</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        @else
+                            <li class="nav-item ms-lg-3">
+                                <a class="nav-link" href="{{ route('login') }}">Iniciar Sesión</a>
+                            </li>
+                            <li class="nav-item ms-lg-2">
+                                <a class="btn btn-primary btn-sm rounded-pill px-4 fw-600" href="{{ route('register') }}">Registrarse</a>
+                            </li>
+                        @endauth
+
+                        <li class="nav-item ms-lg-4">
+                            <a class="btn btn-light position-relative rounded-pill px-3 d-flex align-items-center" href="{{ route('tienda.cart.index') }}">
+                                <i class="bi bi-bag-fill me-2"></i>
+                                <span class="d-none d-lg-inline small fw-bold">CARRITO</span>
+                                @php $count = session('cart') ? count(session('cart')) : 0; @endphp
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white" style="font-size: 0.7rem;">
+                                    {{ $count }}
+                                </span>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </div>
         </div>

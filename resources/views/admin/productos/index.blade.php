@@ -47,10 +47,13 @@
                             @endif
                         </td>
                         <td>
-                            <div class="fw-bold text-dark">{{ $producto->nombre_comercial }}</div>
-                            <small class="text-muted">ID: #{{ $producto->id }}</small>
+                            <a href="{{ route('admin.productos.show', $producto->id) }}" class="d-block p-2 rounded-2 fw-bold text-dark text-decoration-none hover-bg-light position-relative" style="transition:background 0.2s;">
+                                {{ $producto->nombre_comercial }}
+                                <small class="text-muted d-block fw-normal" style="font-size: 0.85em;">ID: #{{ $producto->id }}</small>
+                                <span class="stretched-link"></span>
+                            </a>
                         </td>
-                        <td><span class="badge bg-secondary-subtle text-secondary border">{{ $producto->estilo->nombre }}</span></td>
+                        <td><span class="badge bg-secondary-subtle text-secondary border">{{ $producto->estilo?->nombre ?? 'Sin estilo' }}</span></td>
                         <td>
                             @if($producto->activo)
                                 <span class="badge bg-success-subtle text-success">Activo</span>

@@ -50,11 +50,11 @@ class CartController extends Controller
             $cart[$variante->id]['quantity']++;
         } else {
             $cart[$variante->id] = [
-                "name"     => $variante->producto->nombre_comercial,
+                "name"     => $variante->producto?->nombre_comercial ?? 'Producto',
                 "quantity" => 1,
                 "price"    => $precioFinal,
-                "talla"    => $variante->talla->nombre,
-                "image"    => $variante->producto->imagenes->first()->url ?? 'default.jpg'
+                "talla"    => $variante->talla?->nombre ?? 'Sin talla',
+                "image"    => $variante->producto?->imagenes->first()?->url ?? 'default.jpg'
             ];
         }
 
@@ -82,6 +82,10 @@ class CartController extends Controller
     {
         $cart = session()->get('cart', []);
         $variante = Variante::find($id);
+
+        if (!$variante) {
+            return redirect()->back()->with('error', 'La variante ya no existe.');
+        }
 
         if(isset($cart[$id]) && $request->quantity > 0) {
             // Validamos stock antes de actualizar cantidad en el input

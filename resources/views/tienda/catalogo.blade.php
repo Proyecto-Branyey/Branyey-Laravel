@@ -77,7 +77,7 @@
 
                             <div class="card-body text-center">
                                 <span class="text-uppercase text-muted fw-bold mb-1 d-block small" style="letter-spacing: 2px;">
-                                    {{ $producto->estilo->nombre ?? 'Colección' }}
+                                    {{ $producto->estilo?->nombre ?? 'Colección' }}
                                 </span>
                                 <h6 class="card-title fw-bold text-dark text-uppercase mb-3">{{ $producto->nombre_comercial }}</h6>
                                 <h5 class="fw-bold text-dark mb-3">

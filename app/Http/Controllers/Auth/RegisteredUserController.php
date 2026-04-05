@@ -28,49 +28,53 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        // 1. VALIDACIÓN COMPLETA
-        // Validamos cada campo que viene del formulario para asegurar la integridad de Branyey
         $request->validate([
-            'nombre_completo'      => ['required', 'string', 'max:255'],
-            'username'             => ['required', 'string', 'max:255', 'unique:usuarios,username'],
+            'name'                 => ['nullable', 'string', 'max:255'],
+            'nombre_completo'      => ['nullable', 'string', 'max:255'],
+            'username'             => ['nullable', 'string', 'max:255', 'unique:usuarios,username'],
             'email'                => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:usuarios,email'],
-            'telefono'             => ['required', 'string', 'max:20'],
-            'direccion_defecto'    => ['required', 'string', 'max:255'],
-            'ciudad_defecto'       => ['required', 'string', 'max:100'],
-            'departamento_defecto' => ['required', 'string', 'max:100'],
-            'password'             => ['required', 'confirmed', Rules\Password::defaults()],
+            'telefono'             => ['nullable', 'string', 'max:20'],
+            'direccion_defecto'    => ['nullable', 'string', 'max:255'],
+            'ciudad_defecto'       => ['nullable', 'string', 'max:100'],
+            'departamento_defecto' => ['nullable', 'string', 'max:100'],
+            'password'             => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        // 2. ASIGNACIÓN DE ROL
-        // Buscamos el rol 'minorista' (ID 3) para nuevos clientes
-        $rolInicial = Rol::where('nombre', 'minorista')->first();
-        $rolId = $rolInicial ? $rolInicial->id : 3;
+        $rolId = Rol::firstOrCreate(['nombre' => 'minorista'])->id;
 
-        // 3. CREACIÓN DEL USUARIO EN LA DB
-        // Mapeamos cada dato validado a su columna correspondiente en la tabla 'usuarios'
+        $nombreCompleto = $request->nombre_completo ?: ($request->name ?: 'Usuario');
+        $username = $request->username;
+
+        if (! $username) {
+            $baseUsername = strstr($request->email, '@', true) ?: 'usuario';
+            $candidate = $baseUsername;
+            $suffix = 1;
+
+            while (User::where('username', $candidate)->exists()) {
+                $suffix++;
+                $candidate = $baseUsername.$suffix;
+            }
+
+            $username = $candidate;
+        }
+
         $user = User::create([
-            'name'                 => $request->nombre_completo,
-            'username'             => $request->username,
+            'name'                 => $nombreCompleto,
+            'username'             => $username,
             'email'                => $request->email,
             'password'             => Hash::make($request->password),
             'rol_id'               => $rolId,
             'telefono'             => $request->telefono,
+            'nombre_completo'      => $nombreCompleto,
             'direccion_defecto'    => $request->direccion_defecto,
             'ciudad_defecto'       => $request->ciudad_defecto,
             'departamento_defecto' => $request->departamento_defecto,
         ]);
 
-        // 4. EVENTOS Y LOGUEO
         event(new Registered($user));
 
         Auth::login($user);
 
-        // 5. REDIRECCIÓN
-        // Si no tienes creada la ruta 'tienda.catalogo', cámbiala por '/' o 'dashboard'
-        if (view()->exists('tienda.catalogo')) {
-            return redirect(route('tienda.catalogo'));
-        }
-
-        return redirect('/');
+        return redirect()->route('dashboard');
     }
 }
