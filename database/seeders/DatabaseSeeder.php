@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
         
         // NO llamar a los seeders de Productos o Ventas aquí
 
-        // Ejemplo de venta completa
-        $this->call(EjemploVentaSeeder::class);
+        // Ejemplo de venta completa (eliminado para evitar productos de prueba)
     }
 }
