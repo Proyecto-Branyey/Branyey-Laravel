@@ -9,9 +9,65 @@ use App\Models\User;
 
 class VentaAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $ventas = Venta::with('usuario')->latest()->paginate(15);
+        $query = Venta::with('usuario');
+
+
+        // Filtro por nombre o email de cliente
+        if ($request->filled('cliente')) {
+            $cliente = $request->cliente;
+            $query->whereHas('usuario', function($q) use ($cliente) {
+                $q->where('nombre_completo', 'like', "%$cliente%")
+                  ->orWhere('name', 'like', "%$cliente%")
+                  ->orWhere('email', 'like', "%$cliente%")
+                  ->orWhere('telefono', 'like', "%$cliente%")
+                  ;
+            });
+        }
+
+        // Filtro por tipo de cliente (rol)
+        if ($request->filled('tipo_cliente')) {
+            $tipo = $request->tipo_cliente;
+            $query->whereHas('usuario.rol', function($q) use ($tipo) {
+                if ($tipo === 'mayorista') {
+                    $q->where('nombre', 'like', '%mayorista%');
+                } elseif ($tipo === 'minorista') {
+                    $q->where('nombre', 'like', '%minorista%');
+                } elseif ($tipo === 'admin') {
+                    $q->where('nombre', 'like', '%admin%');
+                }
+            });
+        } else {
+            // Por defecto, ocultar ventas de administradores (admin, administrador, etc.)
+            $query->whereHas('usuario.rol', function($q) {
+                $q->whereRaw("LOWER(nombre) NOT LIKE '%admin%'")
+                  ->whereRaw("LOWER(nombre) NOT LIKE '%administrador%'");
+            });
+        }
+
+        // Filtro por estado
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
+        }
+
+        // Filtro por fechas
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('created_at', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('created_at', '<=', $request->fecha_hasta);
+        }
+
+        // Filtro por total mínimo/máximo
+        if ($request->filled('total_min')) {
+            $query->where('total', '>=', $request->total_min);
+        }
+        if ($request->filled('total_max')) {
+            $query->where('total', '<=', $request->total_max);
+        }
+
+        $ventas = $query->latest()->paginate(15)->appends($request->all());
         return view('admin.ventas.index', compact('ventas'));
     }
 

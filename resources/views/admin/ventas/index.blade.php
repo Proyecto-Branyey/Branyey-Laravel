@@ -7,6 +7,55 @@
             <i class="bi bi-cash-coin me-2"></i> Listado de Ventas
         </h1>
     </div>
+    <!-- Filtros Mejorados -->
+    <div class="card mb-4 border-0 shadow-sm bg-light">
+        <div class="card-body py-3">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-md-4 col-lg-3">
+                    <label class="form-label mb-1"><i class="bi bi-person-circle me-1"></i>Cliente</label>
+                    <input type="text" name="cliente" value="{{ request('cliente') }}" class="form-control" placeholder="Nombre, email o teléfono">
+                </div>
+                <div class="col-md-4 col-lg-2">
+                    <label class="form-label mb-1"><i class="bi bi-people-fill me-1"></i>Tipo de cliente</label>
+                    <select name="tipo_cliente" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="mayorista" @if(request('tipo_cliente')=='mayorista') selected @endif>Mayorista</option>
+                        <option value="minorista" @if(request('tipo_cliente')=='minorista') selected @endif>Minorista</option>
+                    </select>
+                </div>
+                <div class="col-md-4 col-lg-2">
+                    <label class="form-label mb-1"><i class="bi bi-flag me-1"></i>Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="pendiente" @if(request('estado')=='pendiente') selected @endif>Pendiente</option>
+                        <option value="pagado" @if(request('estado')=='pagado') selected @endif>Pagado</option>
+                        <option value="enviado" @if(request('estado')=='enviado') selected @endif>Enviado</option>
+                        <option value="cancelado" @if(request('estado')=='cancelado') selected @endif>Cancelado</option>
+                    </select>
+                </div>
+                <div class="col-md-4 col-lg-2">
+                    <label class="form-label mb-1"><i class="bi bi-calendar me-1"></i>Fecha desde</label>
+                    <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="form-control">
+                </div>
+                <div class="col-md-4 col-lg-2">
+                    <label class="form-label mb-1"><i class="bi bi-calendar me-1"></i>Fecha hasta</label>
+                    <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="form-control">
+                </div>
+                <div class="col-md-4 col-lg-1">
+                    <label class="form-label mb-1"><i class="bi bi-currency-dollar me-1"></i>Total min</label>
+                    <input type="number" name="total_min" value="{{ request('total_min') }}" class="form-control" min="0" step="1000">
+                </div>
+                <div class="col-md-4 col-lg-1">
+                    <label class="form-label mb-1"><i class="bi bi-currency-dollar me-1"></i>Total max</label>
+                    <input type="number" name="total_max" value="{{ request('total_max') }}" class="form-control" min="0" step="1000">
+                </div>
+                <div class="col-12 col-lg-1 d-grid">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-funnel me-1"></i>Filtrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
