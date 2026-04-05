@@ -64,6 +64,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
         Route::get('/', [ProductoAdminController::class, 'index'])->name('index');
         Route::get('/crear', [ProductoAdminController::class, 'create'])->name('create');
         Route::post('/guardar', [ProductoAdminController::class, 'store'])->name('store');
+        Route::get('/{id}', [ProductoAdminController::class, 'show'])->name('show');
         Route::get('/{id}/editar', [ProductoAdminController::class, 'edit'])->name('edit');
         Route::put('/{id}/actualizar', [ProductoAdminController::class, 'update'])->name('update');
         Route::delete('/{id}/eliminar', [ProductoAdminController::class, 'destroy'])->name('destroy');
@@ -99,8 +100,5 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-use App\Http\Controllers\TiendaController;
 
-Route::get('/catalogo', [TiendaController::class, 'catalogo'])->name('tienda.catalogo');
-Route::get('/producto/{id}', [TiendaController::class, 'detalle'])->name('tienda.producto.detalle');
 require __DIR__.'/auth.php';

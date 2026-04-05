@@ -15,9 +15,34 @@
         .fw-black { font-weight: 900; }
         .italic { font-style: italic; }
         
-        .navbar { background-color: var(--primary-black) !important; padding: 1rem 0; }
-        .navbar-brand { font-weight: 900; letter-spacing: -1px; font-size: 1.5rem; }
-        .nav-link { font-weight: 500; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+        .navbar { 
+            background: linear-gradient(135deg, #0a0e27 0%, #111111 100%) !important; 
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar-brand { 
+            font-weight: 900; 
+            letter-spacing: -1px; 
+            font-size: 1.8rem; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-link { 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 0.8rem; 
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        .nav-link:hover { 
+            color: #667eea !important;
+        }
+        .nav-link.active { 
+            color: #667eea !important;
+        }
         
         .nav-role-badge { 
             font-size: 0.65rem; 
@@ -26,6 +51,23 @@
             border-radius: 50px; 
             font-weight: 700;
             margin-left: 5px;
+        }
+
+        /* Botones en navbar */
+        .navbar .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .navbar .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4) !important;
+        }
+
+        .fw-600 {
+            font-weight: 600 !important;
         }
 
         footer { background: var(--primary-black); color: rgba(255,255,255,0.6); padding: 40px 0; margin-top: 60px; }
@@ -79,10 +121,10 @@
                         </li>
                     <?php else: ?>
                         <li class="nav-item ms-lg-3">
-                            <a class="nav-link" href="<?php echo e(route('login')); ?>">Ingresar</a>
+                            <a class="nav-link" href="<?php echo e(route('login')); ?>">Iniciar Sesión</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="btn btn-outline-light btn-sm rounded-pill px-3 ms-lg-2" href="<?php echo e(route('register')); ?>">Registro</a>
+                        <li class="nav-item ms-lg-2">
+                            <a class="btn btn-primary btn-sm rounded-pill px-4 fw-600" href="<?php echo e(route('register')); ?>">Registrarse</a>
                         </li>
                     <?php endif; ?>
 

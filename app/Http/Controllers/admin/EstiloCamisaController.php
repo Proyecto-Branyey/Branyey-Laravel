@@ -36,7 +36,7 @@ class EstiloCamisaController extends Controller
 
         EstiloCamisa::create($request->only(['nombre']));
 
-        return redirect()->route('admin.estilos.index')->with('success', 'Estilo creado exitosamente.');
+        return redirect()->route('admin.estilos-camisa.index')->with('success', 'Estilo creado exitosamente.');
     }
 
     /**
@@ -44,7 +44,8 @@ class EstiloCamisaController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $estilo = EstiloCamisa::with('productos')->findOrFail($id);
+        return view('admin.estilos-camisa.show', compact('estilo'));
     }
 
     /**
@@ -66,7 +67,7 @@ class EstiloCamisaController extends Controller
 
         $estilo->update($request->only(['nombre']));
 
-        return redirect()->route('admin.estilos.index')->with('success', 'Estilo actualizado exitosamente.');
+        return redirect()->route('admin.estilos-camisa.index')->with('success', 'Estilo actualizado exitosamente.');
     }
 
     /**
@@ -75,6 +76,6 @@ class EstiloCamisaController extends Controller
     public function destroy(EstiloCamisa $estilo)
     {
         $estilo->delete();
-        return redirect()->route('admin.estilos.index')->with('success', 'Estilo eliminado exitosamente.');
+        return redirect()->route('admin.estilos-camisa.index')->with('success', 'Estilo eliminado exitosamente.');
     }
 }

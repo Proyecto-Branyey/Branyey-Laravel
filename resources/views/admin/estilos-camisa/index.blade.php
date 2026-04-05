@@ -35,6 +35,9 @@
                                 <td>{{ $estilo->id }}</td>
                                 <td>{{ $estilo->nombre }}</td>
                                 <td>
+                                    <a href="{{ route('admin.estilos-camisa.show', $estilo) }}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
                                     <a href="{{ route('admin.estilos-camisa.edit', $estilo) }}" class="btn btn-sm btn-warning">
                                         <i class="bi bi-pencil"></i> Editar
                                     </a>
