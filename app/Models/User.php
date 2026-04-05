@@ -73,4 +73,4 @@ class User extends Authenticatable
     {
         return $this->rol_id === 3;
     }
-}
+}   
