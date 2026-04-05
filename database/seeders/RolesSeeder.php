@@ -15,8 +15,6 @@ class RolesSeeder extends Seeder
     {
         DB::table('roles')->upsert([
             ['nombre' => 'administrador'],
-            ['nombre' => 'mayorista'],
-            ['nombre' => 'minorista'],
         ], ['nombre']);
     }
 }

@@ -5,14 +5,28 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Venta;
+
 use App\Models\User;
 
 class VentaAdminController extends Controller
 {
+    /**
+     * Mostrar y descargar la factura de una venta (PDF).
+     */
+    public function factura(Venta $venta)
+    {
+        $venta->load(['usuario', 'detallesVenta.variante.producto', 'detallesOrden']);
+        // Si se solicita ?pdf=1, descargar PDF, si no, mostrar en pantalla
+        if (request('pdf')) {
+            $pdf = \PDF::loadView('admin.ventas.factura', compact('venta'));
+            return $pdf->download('factura_venta_'.$venta->id.'.pdf');
+        }
+        return view('admin.ventas.factura', compact('venta'));
+    }
+
     public function index(Request $request)
     {
         $query = Venta::with('usuario');
-
 
         // Filtro por nombre o email de cliente
         if ($request->filled('cliente')) {

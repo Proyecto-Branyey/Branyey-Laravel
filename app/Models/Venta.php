@@ -8,8 +8,57 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Venta extends Model
-{
+
+class Venta extends Model {
+
+    /**
+     * Filtros avanzados para reportes y listados de ventas.
+     */
+    public function scopeFiltros($query, $filtros)
+    {
+        // Filtrar por cliente (nombre, email, teléfono)
+        if (!empty($filtros['cliente'])) {
+            $query->whereHas('usuario', function ($q) use ($filtros) {
+                $q->where('name', 'like', '%'.$filtros['cliente'].'%')
+                  ->orWhere('email', 'like', '%'.$filtros['cliente'].'%')
+                  ->orWhere('telefono', 'like', '%'.$filtros['cliente'].'%');
+            });
+        }
+
+        // Filtrar por tipo de cliente
+        if (!empty($filtros['tipo_cliente'])) {
+            $query->whereHas('usuario', function ($q) use ($filtros) {
+                $q->where('tipo_cliente', $filtros['tipo_cliente']);
+            });
+        }
+
+        // Filtrar por estado
+        if (!empty($filtros['estado'])) {
+            $query->where('estado', $filtros['estado']);
+        }
+
+        // Filtrar por fecha desde
+        if (!empty($filtros['fecha_desde'])) {
+            $query->whereDate('created_at', '>=', $filtros['fecha_desde']);
+        }
+
+        // Filtrar por fecha hasta
+        if (!empty($filtros['fecha_hasta'])) {
+            $query->whereDate('created_at', '<=', $filtros['fecha_hasta']);
+        }
+
+        // Filtrar por total mínimo
+        if (!empty($filtros['total_min'])) {
+            $query->where('total', '>=', $filtros['total_min']);
+        }
+
+        // Filtrar por total máximo
+        if (!empty($filtros['total_max'])) {
+            $query->where('total', '<=', $filtros['total_max']);
+        }
+
+        return $query;
+    }
     // Solo úsalo si agregaste la columna deleted_at a la tabla 'ventas'
     use SoftDeletes; 
 

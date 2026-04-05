@@ -6,6 +6,20 @@
         <h1 class="h3 mb-0">
             <i class="bi bi-cash-coin me-2"></i> Listado de Ventas
         </h1>
+        <div>
+            <form method="GET" action="{{ route('admin.ventas.reporte', ['formato' => 'pdf']) }}" class="d-inline">
+                @foreach(request()->except('page') as $key => $value)
+                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @endforeach
+                <button type="submit" class="btn btn-outline-danger btn-sm me-2"><i class="bi bi-file-earmark-pdf"></i> PDF</button>
+            </form>
+            <form method="GET" action="{{ route('admin.ventas.reporte', ['formato' => 'excel']) }}" class="d-inline">
+                @foreach(request()->except('page') as $key => $value)
+                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @endforeach
+                <button type="submit" class="btn btn-outline-success btn-sm"><i class="bi bi-file-earmark-excel"></i> Excel</button>
+            </form>
+        </div>
     </div>
     <!-- Filtros Mejorados -->
     <div class="card mb-4 border-0 shadow-sm bg-light">
@@ -96,6 +110,7 @@
                                 </td>
                                 <td>
                                     <a href="{{ route('admin.ventas.show', $venta) }}" class="btn btn-sm btn-primary px-3 shadow-sm">Ver</a>
+                                    <a href="{{ route('admin.ventas.factura', $venta) }}?pdf=1" class="btn btn-sm btn-secondary px-3 shadow-sm ms-1"><i class="bi bi-file-earmark-arrow-down"></i> Descargar factura</a>
                                 </td>
                             </tr>
                         @empty

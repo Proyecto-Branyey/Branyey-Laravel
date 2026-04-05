@@ -92,11 +92,7 @@
 
                     <hr class="text-secondary mx-3">
 
-                    <li class="nav-item">
-                        <a class="nav-link text-warning fw-bold" href="{{ route('admin.reportes.ventas') }}">
-                            <i class="bi bi-file-earmark-pdf me-2"></i> Reporte de Ventas
-                        </a>
-                    </li>
+
                 </ul>
             </div>
         </nav>

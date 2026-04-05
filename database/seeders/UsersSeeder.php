@@ -13,11 +13,11 @@ class UsersSeeder extends Seeder
         // 👇 Usuario administrador
         User::create([
             'name' => 'Admin',
-            'username' => 'admin', // 👈 obligatorio
+            'username' => 'admin',
             'email' => 'admin@example.com',
             'email_verified_at' => now(),
             'password' => Hash::make('admin123'),
-            'rol_id' => 1,
+            'rol_id' => 1, // administrador
         ]);
-        }
     }
+}

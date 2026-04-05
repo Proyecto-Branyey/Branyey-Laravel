@@ -6,6 +6,20 @@
         <h1 class="h3 mb-0">
             <i class="bi bi-cash-coin me-2"></i> Listado de Ventas
         </h1>
+        <div>
+            <form method="GET" action="<?php echo e(route('admin.ventas.reporte', ['formato' => 'pdf'])); ?>" class="d-inline">
+                <?php $__currentLoopData = request()->except('page'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <input type="hidden" name="<?php echo e($key); ?>" value="<?php echo e($value); ?>">
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <button type="submit" class="btn btn-outline-danger btn-sm me-2"><i class="bi bi-file-earmark-pdf"></i> PDF</button>
+            </form>
+            <form method="GET" action="<?php echo e(route('admin.ventas.reporte', ['formato' => 'excel'])); ?>" class="d-inline">
+                <?php $__currentLoopData = request()->except('page'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <input type="hidden" name="<?php echo e($key); ?>" value="<?php echo e($value); ?>">
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <button type="submit" class="btn btn-outline-success btn-sm"><i class="bi bi-file-earmark-excel"></i> Excel</button>
+            </form>
+        </div>
     </div>
     <!-- Filtros Mejorados -->
     <div class="card mb-4 border-0 shadow-sm bg-light">
@@ -94,6 +108,7 @@
                                 </td>
                                 <td>
                                     <a href="<?php echo e(route('admin.ventas.show', $venta)); ?>" class="btn btn-sm btn-primary px-3 shadow-sm">Ver</a>
+                                    <a href="<?php echo e(route('admin.ventas.factura', $venta)); ?>?pdf=1" class="btn btn-sm btn-secondary px-3 shadow-sm ms-1"><i class="bi bi-file-earmark-arrow-down"></i> Descargar factura</a>
                                 </td>
                             </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>

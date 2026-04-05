@@ -52,12 +52,17 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
  * Cumple con Ítem 2 (Carga Inicial) e Ítem 4 (PDF) del SENA
  */
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:administrador'])->group(function () {
+    // Factura de venta (ver y descargar PDF)
+    Route::get('ventas/{venta}/factura', [\App\Http\Controllers\Admin\VentaAdminController::class, 'factura'])
+        ->name('ventas.factura');
+
+        // Reportes de ventas PDF/Excel
+        Route::get('ventas/reporte/{formato?}', [\App\Http\Controllers\Admin\ReporteVentasController::class, 'descargar'])
+            ->name('ventas.reporte');
     
     // Panel Principal (Estadísticas)
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    // Reportes (Requerimiento Técnico SENA - Ítem 4)
-    Route::get('/reporte-ventas', [ReporteController::class, 'ventasPdf'])->name('reportes.ventas');
     
     // CRUD DE PRODUCTOS (Gestión de Catálogo e Imágenes - Ítem 8)
     Route::prefix('productos')->name('productos.')->group(function () {
