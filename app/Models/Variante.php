@@ -25,12 +25,24 @@ class Variante extends Model
         return $this->belongsTo(Producto::class, 'producto_id');
     }
 
+
     public function talla(): BelongsTo {
         return $this->belongsTo(Talla::class, 'talla_id');
     }
 
+    // Relación solo con tallas activas
+    public function tallaActiva(): BelongsTo {
+        return $this->belongsTo(Talla::class, 'talla_id')->where('activo', true);
+    }
+
+
     public function colores(): BelongsToMany {
         return $this->belongsToMany(Color::class, 'variante_color', 'variante_id', 'color_id');
+    }
+
+    // Relación solo con colores activos
+    public function coloresActivos(): BelongsToMany {
+        return $this->belongsToMany(Color::class, 'variante_color', 'variante_id', 'color_id')->where('activo', true);
     }
 
     public function getPrecioFormateadoAttribute(): string {

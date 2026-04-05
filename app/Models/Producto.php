@@ -28,8 +28,14 @@ class Producto extends Model
         return $this->belongsTo(ClasificacionTalla::class, 'clasificacion_id');
     }
 
+
     public function variantes(): HasMany {
         return $this->hasMany(Variante::class, 'producto_id');
+    }
+
+    // Relación solo con variantes activas
+    public function variantesActivas(): HasMany {
+        return $this->hasMany(Variante::class, 'producto_id')->where('activo', true);
     }
 
     public function imagenes(): HasMany {

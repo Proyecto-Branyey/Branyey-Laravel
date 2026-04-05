@@ -10,12 +10,11 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductoController extends Controller
 {
+
     public function inicio()
     {
         $destacados = Producto::activos()
-            ->with(['imagenes', 'estilo', 'variantes' => function($q) {
-                $q->activos();
-            }])
+            ->with(['imagenes', 'estilo', 'variantesActivas.tallaActiva', 'variantesActivas.coloresActivos'])
             ->latest()
             ->take(3)
             ->get();
@@ -26,9 +25,7 @@ class ProductoController extends Controller
     public function index(Request $request)
     {
         $query = Producto::activos()
-            ->with(['imagenes', 'estilo', 'variantes' => function($q) {
-                $q->activos();
-            }]);
+            ->with(['imagenes', 'estilo', 'variantesActivas.tallaActiva', 'variantesActivas.coloresActivos']);
 
         if ($request->filled('estilo_id')) {
             $query->where('estilo_id', $request->estilo_id);
