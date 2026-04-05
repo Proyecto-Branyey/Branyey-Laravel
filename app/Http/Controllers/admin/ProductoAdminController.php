@@ -74,9 +74,7 @@ class ProductoAdminController extends Controller
 
             foreach ($request->variantes as $index => $v) {
 
-                $sku = 'P' . str_pad($producto->id, 4, '0', STR_PAD_LEFT)
-                     . 'T' . str_pad($v['talla_id'], 2, '0', STR_PAD_LEFT)
-                     . 'C' . str_pad($v['color_id'], 2, '0', STR_PAD_LEFT);
+                $sku = Variante::generarSku($producto->id, $v['talla_id'], $v['color_id']);
 
                 // Crear variante
                 $variante = Variante::create([
@@ -139,8 +137,11 @@ class ProductoAdminController extends Controller
         $producto = Producto::with(['estilo', 'imagenes', 'variantes.talla', 'variantes.colores'])
             ->findOrFail($id);
 
+        $imagenesPorColor = $producto->imagenes->keyBy('color_id');
+
         return view('admin.productos.edit', [
             'producto' => $producto,
+            'imagenesPorColor' => $imagenesPorColor,
             'estilos' => EstiloCamisa::all(),
             'tallas' => Talla::with('clasificacion')->get(),
             'clasificaciones' => \App\Models\ClasificacionTalla::all(),
@@ -227,9 +228,7 @@ class ProductoAdminController extends Controller
 
                     $updatedVariantIds[] = $v['id'];
                 } else {
-                    $sku = 'P' . str_pad($producto->id, 4, '0', STR_PAD_LEFT)
-                         . 'T' . str_pad($v['talla_id'], 2, '0', STR_PAD_LEFT)
-                         . 'C' . str_pad($v['color_id'], 2, '0', STR_PAD_LEFT);
+                    $sku = Variante::generarSku($producto->id, $v['talla_id'], $v['color_id']);
 
                     $variante = Variante::create([
                         'producto_id' => $producto->id,
@@ -264,10 +263,9 @@ class ProductoAdminController extends Controller
             foreach ($variantsToDelete as $variantId) {
                 $variante = Variante::find($variantId);
                 if ($variante) {
-                    $colorId = $variante->colores->first()?->id;
-                    if ($colorId) {
+                    foreach ($variante->colores as $color) {
                         $imagen = ImagenProducto::where('producto_id', $producto->id)
-                            ->where('color_id', $colorId)
+                            ->where('color_id', $color->id)
                             ->first();
                         if ($imagen) {
                             Storage::disk('public')->delete($imagen->url);

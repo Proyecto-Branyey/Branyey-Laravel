@@ -45,4 +45,19 @@ class Variante extends Model
         }
         return $this->precio_minorista ?? 0;
     }
+
+    public static function generarSku(int $productoId, int $tallaId, int $colorId): string
+    {
+        $base = 'P' . str_pad($productoId, 4, '0', STR_PAD_LEFT)
+              . 'T' . str_pad($tallaId, 2, '0', STR_PAD_LEFT)
+              . 'C' . str_pad($colorId, 2, '0', STR_PAD_LEFT);
+
+        $sku = $base;
+        $counter = 1;
+        while (static::withTrashed()->where('sku', $sku)->exists()) {
+            $sku = $base . '-' . $counter;
+            $counter++;
+        }
+        return $sku;
+    }
 }

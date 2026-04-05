@@ -98,7 +98,7 @@
                             <div class="col-md-2">
                                 <label class="small fw-bold">Fotografía</label>
                                 <input type="file" name="variantes[{{ $index }}][foto]" class="form-control form-control-sm" accept="image/*">
-                                @php $imagenColor = $producto->imagenes->firstWhere('color_id', $variante->colores->first()?->id); @endphp
+                                @php $imagenColor = $imagenesPorColor[$variante->colores->first()?->id] ?? null; @endphp
                                 @if($imagenColor)
                                     <small class="text-muted">Imagen actual: <a href="{{ Storage::url($imagenColor->url) }}" target="_blank">Ver</a></small>
                                 @endif
