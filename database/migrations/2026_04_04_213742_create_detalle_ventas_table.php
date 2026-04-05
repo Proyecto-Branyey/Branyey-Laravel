@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('detalle_ventas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('venta_id')->constrained('ventas')->onDelete('cascade');
-            $table->foreignId('variante_id')->constrained('variantes')->onDelete('cascade');
+            $table->foreignId('variante_id')->constrained('variantes');
             $table->integer('cantidad');
-            $table->decimal('precio_unitario', 10, 2);
-            $table->decimal('subtotal', 12, 2);
+            $table->decimal('precio_cobrado', 12, 2);
             $table->timestamps();
         });
     }

@@ -10,12 +10,22 @@ class ImagenProducto extends Model
 
     protected $fillable = [
         'producto_id',
-        'ruta',
-        'orden'
+        'color_id',
+        'url',
+        'es_principal',
+    ];
+
+    protected $casts = [
+        'es_principal' => 'boolean',
     ];
 
     public function producto()
     {
         return $this->belongsTo(Producto::class, 'producto_id');
+    }
+
+    public function color()
+    {
+        return $this->belongsTo(Color::class, 'color_id');
     }
 }

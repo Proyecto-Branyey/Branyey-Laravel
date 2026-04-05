@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('imagenes_producto', function (Blueprint $table) {
             $table->id();
             $table->foreignId('producto_id')->constrained('productos')->onDelete('cascade');
-            $table->string('ruta');
-            $table->integer('orden')->default(0);
+            $table->foreignId('color_id')->constrained('colores');
+            $table->string('url', 500);
+            $table->boolean('es_principal')->default(false);
             $table->timestamps();
+            $table->unique(['producto_id', 'color_id']);
         });
     }
 

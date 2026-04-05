@@ -17,7 +17,6 @@ return new class extends Migration
             $table->decimal('total', 12, 2);
             $table->enum('estado', ['pendiente', 'pagado', 'enviado', 'cancelado'])->default('pendiente');
             $table->softDeletes();
-            $table->timestamp('fecha')->useCurrent();
             $table->timestamps();
         });
     }

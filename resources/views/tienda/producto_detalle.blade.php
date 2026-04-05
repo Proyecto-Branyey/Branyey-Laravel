@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $producto->nombre . ' - Branyey')
+@section('title', $producto->nombre_comercial . ' - Branyey')
 
 @section('content')
 <div class="bg-white min-h-screen py-5">
@@ -9,7 +9,7 @@
             <ol class="breadcrumb small text-uppercase fw-black italic tracking-widest mb-0">
                 <li class="breadcrumb-item"><a href="/" class="text-muted text-decoration-none">Inicio</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('tienda.catalogo') }}" class="text-muted text-decoration-none">Catálogo</a></li>
-                <li class="breadcrumb-item active text-dark">{{ $producto->nombre }}</li>
+                <li class="breadcrumb-item active text-dark">{{ $producto->nombre_comercial }}</li>
             </ol>
         </nav>
 
@@ -19,21 +19,19 @@
                     @php $primeraImg = $producto->imagenes->first(); @endphp
                     <div class="rounded-5 overflow-hidden shadow-sm bg-light mb-3">
                         <img id="main-product-image" 
-                             src="{{ $primeraImg ? Storage::url($primeraImg->ruta) : asset('img/placeholder.jpg') }}" 
+                             src="{{ $primeraImg ? Storage::url($primeraImg->url) : asset('img/placeholder.jpg') }}" 
                              class="img-fluid w-100 object-cover" style="min-height: 550px; object-position: top;">
                     </div>
 
                     <div class="d-flex gap-2 overflow-auto pb-2" id="gallery-thumbs">
-                        @php $colorIndex = 0; @endphp
                         @foreach($producto->variantes->flatMap->colores->unique('id') as $color)
                             @php
-                                $imagenColor = $producto->imagenes->skip($colorIndex)->first();
-                                $colorIndex++;
+                                $imagenColor = $producto->imagenes->firstWhere('color_id', $color->id);
                             @endphp
                             @if($imagenColor)
-                                <img src="{{ Storage::url($imagenColor->ruta) }}" class="rounded-4 thumb-img border cursor-pointer"
+                                <img src="{{ Storage::url($imagenColor->url) }}" class="rounded-4 thumb-img border cursor-pointer"
                                      style="width: 80px; height: 100px; object-fit: cover;"
-                                     data-full="{{ Storage::url($imagenColor->ruta) }}"
+                                     data-full="{{ Storage::url($imagenColor->url) }}"
                                      data-color-id="{{ $color->id }}"
                                      onclick="document.getElementById('main-product-image').src = this.dataset.full">
                             @endif
@@ -48,7 +46,7 @@
                         {{ $producto->estilo->nombre ?? 'Colección' }} • Colección 2026
                     </span>
 
-                    <h1 class="display-4 fw-black text-uppercase italic tracking-tighter mb-2">{{ $producto->nombre }}</h1>
+                    <h1 class="display-4 fw-black text-uppercase italic tracking-tighter mb-2">{{ $producto->nombre_comercial }}</h1>
                     <p class="text-muted fw-bold mb-4 small tracking-widest">REF: {{ $producto->estilo->nombre ?? '' }}</p>
 
                     <h2 class="fw-bold mb-5 display-6 text-dark">

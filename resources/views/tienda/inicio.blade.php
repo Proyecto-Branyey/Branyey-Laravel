@@ -29,7 +29,7 @@
                 <div class="hero-image-container">
                     @if($destacados->first() && $destacados->first()->imagenes->first())
                         @php
-                            $imagenUrl = asset('storage/' . $destacados->first()->imagenes->first()->ruta);
+                            $imagenUrl = Storage::url($destacados->first()->imagenes->first()->url);
                         @endphp
                         <img src="{{ $imagenUrl }}" 
                              alt="Colección Branyey" class="img-fluid animate-slide-right" style="max-width: 100%; filter: brightness(1.1); height: auto;">
@@ -138,11 +138,11 @@
                             <div class="product-image-wrapper position-relative overflow-hidden rounded-xl">
                                 @php
                                     $imagenUrl = $producto->imagenes->first() 
-                                        ? asset('storage/' . $producto->imagenes->first()->ruta)
+                                        ? Storage::url($producto->imagenes->first()->url)
                                         : 'https://via.placeholder.com/400x500'
                                 @endphp
                                 <img src="{{ $imagenUrl }}" 
-                                     alt="{{ $producto->nombre }}" class="w-100" style="height: 350px; object-fit: cover;">
+                                     alt="{{ $producto->nombre_comercial }}" class="w-100" style="height: 350px; object-fit: cover;">
                                 <div class="product-badge">⭐ BESTSELLER</div>
                                 <div class="product-overlay">
                                     <a href="{{ route('tienda.producto.detalle', $producto->id) }}" class="btn btn-light btn-lg rounded-circle shadow-lg">
@@ -154,7 +154,7 @@
                                 <div class="mb-2">
                                     <small class="text-muted">{{ $producto->estilo->nombre ?? 'Estilo' }}</small>
                                 </div>
-                                <h5 class="fw-bold mb-3">{{ $producto->nombre }}</h5>
+                                <h5 class="fw-bold mb-3">{{ $producto->nombre_comercial }}</h5>
                                 
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="text-warning">
