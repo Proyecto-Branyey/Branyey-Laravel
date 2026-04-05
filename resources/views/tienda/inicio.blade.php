@@ -26,12 +26,15 @@
             @foreach($destacados as $producto)
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 border-0 shadow-sm overflow-hidden product-card">
-                        <img src="{{ $producto->imagenes->first()->url_completa ?? 'https://via.placeholder.com/400x500' }}" 
+                        <img src="{{ $producto->imagenes->first() ? Storage::url($producto->imagenes->first()->url) : 'https://via.placeholder.com/400x500' }}" 
                              class="card-img-top" style="height: 400px; object-fit: cover;">
                         <div class="card-body text-center">
-                            <h5 class="fw-bold mb-2">{{ $producto->nombre }}</h5>
+                            <h5 class="fw-bold mb-2">{{ $producto->nombre_comercial }}</h5>
                             <p class="text-primary fw-bold fs-5">
-                                ${{ number_format($producto->estilo->precio_base_minorista, 0, ',', '.') }} COP
+                                @php
+                                    $precio = $producto->variantes->min('precio_minorista') ?? 0;
+                                @endphp
+                                ${{ number_format($precio, 0, ',', '.') }} COP
                             </p>
                             <a href="{{ route('tienda.producto.detalle', $producto->id) }}" class="btn btn-outline-dark rounded-pill px-4">
                                 Ver detalles

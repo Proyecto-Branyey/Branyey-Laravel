@@ -19,12 +19,10 @@ class Venta extends Model
         'usuario_id',
         'total',
         'estado',
-        'fecha'
     ];
     
     protected $casts = [
         'total' => 'float',
-        'fecha' => 'datetime',
         'usuario_id' => 'integer',
     ];
 
@@ -47,8 +45,7 @@ class Venta extends Model
     
     public function detallesOrden(): HasOne
     {
-        // Apuntamos al modelo que maneja la tabla 'detalles_orden'
-        return $this->hasOne(DetalleOrden::class, 'venta_id');
+        return $this->hasOne(DetallesOrden::class, 'venta_id');
     }
     
     public function detallesVenta(): HasMany

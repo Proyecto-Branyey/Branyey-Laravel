@@ -25,8 +25,8 @@
             <div class="card-body p-4">
                 <div class="row g-3 mb-4">
                     <div class="col-md-3">
-                        <label class="form-label fw-bold">Nombre</label>
-                        <input type="text" name="nombre" class="form-control" placeholder="Ej: Camisa Polo Premium" required>
+                        <label class="form-label fw-bold">Nombre Comercial</label>
+                        <input type="text" name="nombre_comercial" class="form-control" placeholder="Ej: Camisa Polo Premium" required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Descripción</label>
@@ -34,7 +34,7 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Estilo</label>
-                        <select name="estilo_camisa_id" class="form-select" required>
+                        <select name="estilo_id" class="form-select" required>
                             @foreach($estilos as $estilo)
                                 <option value="{{ $estilo->id }}">{{ $estilo->nombre }}</option>
                             @endforeach
@@ -42,7 +42,7 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Clasificación de Talla</label>
-                        <select name="clasificacion_talla_id" id="clasificacion_talla_id" class="form-select" required>
+                        <select name="clasificacion_id" id="clasificacion_id" class="form-select" required>
                             <option value="">Seleccione clasificación</option>
                             @foreach($clasificaciones as $clasif)
                                 <option value="{{ $clasif->id }}">{{ $clasif->nombre }}</option>
@@ -144,7 +144,7 @@ function updateTallaSelects(clasificacionId) {
 }
 
 // Event listener para cambio de clasificación
-document.getElementById('clasificacion_talla_id').addEventListener('change', function() {
+document.getElementById('clasificacion_id').addEventListener('change', function() {
     const clasificacionId = this.value;
     updateTallaSelects(clasificacionId);
 });
@@ -172,7 +172,7 @@ document.getElementById('add-variant').addEventListener('click', function() {
     container.appendChild(newRow);
 
     // Actualizar tallas en la nueva fila
-    const clasificacionId = document.getElementById('clasificacion_talla_id').value;
+    const clasificacionId = document.getElementById('clasificacion_id').value;
     updateTallaSelects(clasificacionId);
 
     variantIndex++;

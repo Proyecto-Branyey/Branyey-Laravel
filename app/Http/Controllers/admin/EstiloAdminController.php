@@ -20,11 +20,9 @@ class EstiloAdminController extends Controller
     public function store(Request $request) {
         $request->validate([
             'nombre' => 'required|string|max:255|unique:estilos_camisa,nombre',
-            'precio_base_minorista' => 'required|numeric|min:0',
-            'precio_base_mayorista' => 'required|numeric|min:0',
         ]);
 
-        EstiloCamisa::create($request->only(['nombre', 'precio_base_minorista', 'precio_base_mayorista']));
+        EstiloCamisa::create($request->only(['nombre']));
 
         return redirect()->route('admin.estilos.index')->with('success', 'Estilo creado correctamente.');
     }
@@ -39,11 +37,9 @@ class EstiloAdminController extends Controller
 
         $request->validate([
             'nombre' => 'required|string|max:255|unique:estilos_camisa,nombre,' . $id,
-            'precio_base_minorista' => 'required|numeric|min:0',
-            'precio_base_mayorista' => 'required|numeric|min:0',
         ]);
 
-        $estilo->update($request->only(['nombre', 'precio_base_minorista', 'precio_base_mayorista']));
+        $estilo->update($request->only(['nombre']));
 
         return redirect()->route('admin.estilos.index')->with('success', 'Estilo actualizado correctamente.');
     }

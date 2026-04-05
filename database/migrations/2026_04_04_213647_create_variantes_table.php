@@ -15,8 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('producto_id')->constrained('productos')->onDelete('cascade');
             $table->foreignId('talla_id')->constrained('tallas');
-            $table->decimal('precio_minorista', 10, 2);
-            $table->decimal('precio_mayorista', 10, 2);
+            $table->string('sku', 100)->unique();
+            $table->integer('stock')->default(0);
+            $table->decimal('precio_minorista', 10, 2)->default(0);
+            $table->decimal('precio_mayorista', 10, 2)->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

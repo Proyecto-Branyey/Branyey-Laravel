@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
+            $table->foreignId('estilo_id')->constrained('estilos_camisa');
+            $table->foreignId('clasificacion_id')->constrained('clasificacion_talla');
+            $table->string('nombre_comercial', 255);
             $table->text('descripcion')->nullable();
-            $table->foreignId('estilo_camisa_id')->constrained('estilos_camisa');
+            $table->boolean('activo')->default(true);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

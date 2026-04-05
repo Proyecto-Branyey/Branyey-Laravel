@@ -3,23 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
 class Producto extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'productos';
-    public $timestamps = false;
 
     protected $fillable = [
-        'nombre', 'descripcion', 'estilo_camisa_id', 'clasificacion_talla_id'
+        'nombre_comercial', 'descripcion', 'estilo_id', 'clasificacion_id', 'activo'
+    ];
+
+    protected $casts = [
+        'activo' => 'boolean',
     ];
 
     public function estilo(): BelongsTo {
-        return $this->belongsTo(EstiloCamisa::class, 'estilo_camisa_id');
+        return $this->belongsTo(EstiloCamisa::class, 'estilo_id');
     }
 
     public function clasificacionTalla(): BelongsTo {
-        return $this->belongsTo(ClasificacionTalla::class, 'clasificacion_talla_id');
+        return $this->belongsTo(ClasificacionTalla::class, 'clasificacion_id');
     }
 
     public function variantes(): HasMany {
@@ -28,5 +34,10 @@ class Producto extends Model
 
     public function imagenes(): HasMany {
         return $this->hasMany(ImagenProducto::class, 'producto_id');
+    }
+
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
     }
 }

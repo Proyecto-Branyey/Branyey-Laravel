@@ -13,9 +13,6 @@ class Color extends Model
     // Campos asignables
     protected $fillable = ['nombre', 'codigo_hex'];
 
-    // Desactivamos timestamps si no los tienes en la tabla colores
-    public $timestamps = false;
-
     /**
      * Relación con Variantes.
      * Se eliminó ->withPivot('orden') para evitar el error SQLSTATE[42S22]

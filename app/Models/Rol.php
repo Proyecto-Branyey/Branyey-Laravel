@@ -11,10 +11,9 @@ class Rol extends Model
 
     protected $table = 'roles';
 
-    // Agregué 'descripcion' por si quieres detallar los beneficios de cada rol
+    // Agregué solo campos presentes en la tabla
     protected $fillable = [
         'nombre',
-        'descripcion'
     ];
 
     /**
