@@ -2,28 +2,26 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable
 {
-    protected $table = 'usuarios';
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $table = 'usuarios';
+
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * Campos asignables
      */
     protected $fillable = [
         'name',
         'username',
         'email',
         'telefono',
+        'nombre_completo',
         'direccion_defecto',
         'ciudad_defecto',
         'departamento_defecto',
@@ -32,9 +30,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * Campos ocultos
      */
     protected $hidden = [
         'password',
@@ -42,9 +38,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Casts automáticos
      */
     protected function casts(): array
     {
@@ -55,10 +49,28 @@ class User extends Authenticatable
     }
 
     /**
-     * Relación con el modelo Rol
+     * Relación con Rol
      */
-    public function rol()
+    public function rol(): BelongsTo
     {
-        return $this->belongsTo(Rol::class);
+        return $this->belongsTo(Rol::class, 'rol_id');
+    }
+
+    /**
+     * Helpers para roles (MUY útil 🔥)
+     */
+    public function esAdmin(): bool
+    {
+        return $this->rol_id === 1;
+    }
+
+    public function esMayorista(): bool
+    {
+        return $this->rol_id === 2;
+    }
+
+    public function esMinorista(): bool
+    {
+        return $this->rol_id === 3;
     }
 }
