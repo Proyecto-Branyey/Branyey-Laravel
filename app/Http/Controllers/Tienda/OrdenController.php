@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Tienda;
 use App\Http\Controllers\Controller;
 use App\Models\Venta;
 use App\Models\DetalleVenta;
-use App\Models\DetalleOrden;
+use App\Models\DetallesOrden;
 use App\Models\Variante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -60,11 +60,10 @@ class OrdenController extends Controller
                 'usuario_id' => $user->id,
                 'total'      => $total,
                 'estado'     => 'pendiente',
-                'fecha'      => now(),
             ]);
 
             // 2. Crear los Datos de Envío (Tabla: detalles_orden)
-            DetalleOrden::create([
+            DetallesOrden::create([
                 'venta_id'         => $venta->id,
                 'nombre_cliente'   => $user->name,
                 'email_cliente'    => $user->email,

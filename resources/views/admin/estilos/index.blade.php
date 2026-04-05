@@ -18,8 +18,6 @@
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
-                        <th>Precio Minorista</th>
-                        <th>Precio Mayorista</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -28,8 +26,6 @@
                         <tr>
                             <td>{{ $estilo->id }}</td>
                             <td>{{ $estilo->nombre }}</td>
-                            <td>${{ number_format($estilo->precio_base_minorista, 0, ',', '.') }} COP</td>
-                            <td>${{ number_format($estilo->precio_base_mayorista, 0, ',', '.') }} COP</td>
                             <td>
                                 <a href="{{ route('admin.estilos.edit', $estilo->id) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-pencil"></i> Editar

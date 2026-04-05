@@ -14,13 +14,13 @@
                     <div class="mb-4">
                         <label class="form-label small fw-bold text-uppercase text-muted">Estilo de Prenda</label>
                         <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-sm">
-                            <label class="list-group-item list-group-item-action border-0 {{ !request('estilo_camisa_id') ? 'active bg-dark text-white' : '' }} cursor-pointer">
-                                <input type="radio" name="estilo_camisa_id" value="" class="d-none" onchange="this.form.submit()" {{ !request('estilo_camisa_id') ? 'checked' : '' }}>
+                            <label class="list-group-item list-group-item-action border-0 {{ !request('estilo_id') ? 'active bg-dark text-white' : '' }} cursor-pointer">
+                                <input type="radio" name="estilo_id" value="" class="d-none" onchange="this.form.submit()" {{ !request('estilo_id') ? 'checked' : '' }}>
                                 Todos los estilos
                             </label>
                             @foreach($estilos as $estilo)
-                                <label class="list-group-item list-group-item-action border-0 {{ request('estilo_camisa_id') == $estilo->id ? 'active bg-dark text-white' : '' }} cursor-pointer">
-                                    <input type="radio" name="estilo_camisa_id" value="{{ $estilo->id }}" class="d-none" onchange="this.form.submit()" {{ request('estilo_camisa_id') == $estilo->id ? 'checked' : '' }}>
+                                <label class="list-group-item list-group-item-action border-0 {{ request('estilo_id') == $estilo->id ? 'active bg-dark text-white' : '' }} cursor-pointer">
+                                    <input type="radio" name="estilo_id" value="{{ $estilo->id }}" class="d-none" onchange="this.form.submit()" {{ request('estilo_id') == $estilo->id ? 'checked' : '' }}>
                                     {{ $estilo->nombre }}
                                 </label>
                             @endforeach
@@ -31,20 +31,20 @@
                     <div class="mb-4">
                         <label class="form-label small fw-bold text-uppercase text-muted">Categoría</label>
                         <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-sm">
-                            <label class="list-group-item list-group-item-action border-0 {{ !request('clasificacion_talla_id') ? 'active bg-dark text-white' : '' }} cursor-pointer">
-                                <input type="radio" name="clasificacion_talla_id" value="" class="d-none" onchange="this.form.submit()" {{ !request('clasificacion_talla_id') ? 'checked' : '' }}>
+                            <label class="list-group-item list-group-item-action border-0 {{ !request('clasificacion_id') ? 'active bg-dark text-white' : '' }} cursor-pointer">
+                                <input type="radio" name="clasificacion_id" value="" class="d-none" onchange="this.form.submit()" {{ !request('clasificacion_id') ? 'checked' : '' }}>
                                 Todas las categorías
                             </label>
                             @foreach($clasificaciones as $clasif)
-                                <label class="list-group-item list-group-item-action border-0 {{ request('clasificacion_talla_id') == $clasif->id ? 'active bg-dark text-white' : '' }} cursor-pointer">
-                                    <input type="radio" name="clasificacion_talla_id" value="{{ $clasif->id }}" class="d-none" onchange="this.form.submit()" {{ request('clasificacion_talla_id') == $clasif->id ? 'checked' : '' }}>
+                                <label class="list-group-item list-group-item-action border-0 {{ request('clasificacion_id') == $clasif->id ? 'active bg-dark text-white' : '' }} cursor-pointer">
+                                    <input type="radio" name="clasificacion_id" value="{{ $clasif->id }}" class="d-none" onchange="this.form.submit()" {{ request('clasificacion_id') == $clasif->id ? 'checked' : '' }}>
                                     {{ $clasif->nombre }}
                                 </label>
                             @endforeach
                         </div>
                     </div>
 
-                    @if(request()->anyFilled(['estilo_camisa_id', 'clasificacion_talla_id']))
+                    @if(request()->anyFilled(['estilo_id', 'clasificacion_id']))
                         <a href="{{ route('tienda.catalogo') }}" class="btn btn-link btn-sm text-decoration-none text-danger p-0 fw-bold mt-2">
                             × LIMPIAR FILTROS
                         </a>
@@ -68,7 +68,7 @@
                                 <a href="{{ route('tienda.producto.detalle', $producto->id) }}">
                                     @php $img = $producto->imagenes->first(); @endphp
                                     @if($img)
-                                        <img src="{{ Storage::url($img->ruta) }}" class="w-100 h-100 img-zoom" style="object-fit: cover; object-position: top;" alt="{{ $producto->nombre }}">
+                                        <img src="{{ Storage::url($img->url) }}" class="w-100 h-100 img-zoom" style="object-fit: cover; object-position: top;" alt="{{ $producto->nombre_comercial }}">
                                     @else
                                         <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted small fw-bold italic" style="background: #eee;">NO IMAGE</div>
                                     @endif
@@ -79,7 +79,7 @@
                                 <span class="text-uppercase text-muted fw-bold mb-1 d-block small" style="letter-spacing: 2px;">
                                     {{ $producto->estilo->nombre ?? 'Colección' }}
                                 </span>
-                                <h6 class="card-title fw-bold text-dark text-uppercase mb-3">{{ $producto->nombre }}</h6>
+                                <h6 class="card-title fw-bold text-dark text-uppercase mb-3">{{ $producto->nombre_comercial }}</h6>
                                 <h5 class="fw-bold text-dark mb-3">
                                     @php
                                         $precios = $producto->variantes->map(function($v) {

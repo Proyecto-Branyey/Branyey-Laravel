@@ -12,7 +12,7 @@ class ProductoController extends Controller
 {
     public function inicio()
     {
-        $destacados = Producto::with(['imagenes', 'estilo'])
+        $destacados = Producto::with(['imagenes', 'estilo', 'variantes'])
             ->latest()
             ->take(3)
             ->get();
@@ -24,12 +24,12 @@ class ProductoController extends Controller
     {
         $query = Producto::with(['imagenes', 'estilo', 'variantes']);
 
-        if ($request->filled('estilo_camisa_id')) {
-            $query->where('estilo_camisa_id', $request->estilo_camisa_id);
+        if ($request->filled('estilo_id')) {
+            $query->where('estilo_id', $request->estilo_id);
         }
 
-        if ($request->filled('clasificacion_talla_id')) {
-            $query->where('clasificacion_talla_id', $request->clasificacion_talla_id);
+        if ($request->filled('clasificacion_id')) {
+            $query->where('clasificacion_id', $request->clasificacion_id);
         }
 
         $productos = $query->latest()->paginate(12);

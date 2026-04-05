@@ -50,11 +50,11 @@ class CartController extends Controller
             $cart[$variante->id]['quantity']++;
         } else {
             $cart[$variante->id] = [
-                "name"     => $variante->producto->nombre,
+                "name"     => $variante->producto->nombre_comercial,
                 "quantity" => 1,
                 "price"    => $precioFinal,
                 "talla"    => $variante->talla->nombre,
-                "image"    => $variante->producto->imagenes->first()->ruta ?? 'default.jpg'
+                "image"    => $variante->producto->imagenes->first()->url ?? 'default.jpg'
             ];
         }
 

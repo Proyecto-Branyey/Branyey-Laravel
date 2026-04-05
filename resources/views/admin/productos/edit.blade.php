@@ -17,7 +17,7 @@
         @method('PUT')
         <div class="card border-0 shadow-lg rounded-4">
             <div class="card-header bg-dark text-white p-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i> Editar Producto: {{ $producto->nombre }}</h5>
+                <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i> Editar Producto: {{ $producto->nombre_comercial }}</h5>
                 <button type="button" id="add-variant" class="btn btn-sm btn-success shadow-sm">
                     <i class="bi bi-plus-circle me-1"></i> Agregar Color/Talla
                 </button>
@@ -26,8 +26,8 @@
             <div class="card-body p-4">
                 <div class="row g-3 mb-4">
                     <div class="col-md-3">
-                        <label class="form-label fw-bold">Nombre</label>
-                        <input type="text" name="nombre" class="form-control" placeholder="Ej: Camisa Polo Premium" value="{{ $producto->nombre }}" required>
+                        <label class="form-label fw-bold">Nombre Comercial</label>
+                        <input type="text" name="nombre_comercial" class="form-control" placeholder="Ej: Camisa Polo Premium" value="{{ $producto->nombre_comercial }}" required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Descripción</label>
@@ -35,18 +35,18 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Estilo</label>
-                        <select name="estilo_camisa_id" class="form-select" required>
+                        <select name="estilo_id" class="form-select" required>
                             @foreach($estilos as $estilo)
-                                <option value="{{ $estilo->id }}" {{ $producto->estilo_camisa_id == $estilo->id ? 'selected' : '' }}>{{ $estilo->nombre }}</option>
+                                <option value="{{ $estilo->id }}" {{ $producto->estilo_id == $estilo->id ? 'selected' : '' }}>{{ $estilo->nombre }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Clasificación de Talla</label>
-                        <select name="clasificacion_talla_id" id="clasificacion_talla_id" class="form-select" required>
+                        <select name="clasificacion_id" id="clasificacion_id" class="form-select" required>
                             <option value="">Seleccione clasificación</option>
                             @foreach($clasificaciones as $clasif)
-                                <option value="{{ $clasif->id }}" {{ $producto->clasificacion_talla_id == $clasif->id ? 'selected' : '' }}>{{ $clasif->nombre }}</option>
+                                <option value="{{ $clasif->id }}" {{ $producto->clasificacion_id == $clasif->id ? 'selected' : '' }}>{{ $clasif->nombre }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -64,7 +64,7 @@
                                 <label class="small fw-bold">1. Talla</label>
                                 <select name="variantes[{{ $index }}][talla_id]" class="form-select talla-select" required>
                                     <option value="">-- Seleccione clasificación primero --</option>
-                                    @foreach($tallas->where('clasificacion_id', $producto->clasificacion_talla_id) as $talla)
+                                    @foreach($tallas->where('clasificacion_id', $producto->clasificacion_id) as $talla)
                                         <option value="{{ $talla->id }}" {{ $variante->talla_id == $talla->id ? 'selected' : '' }}>{{ $talla->nombre }}</option>
                                     @endforeach
                                 </select>
@@ -98,8 +98,9 @@
                             <div class="col-md-2">
                                 <label class="small fw-bold">Fotografía</label>
                                 <input type="file" name="variantes[{{ $index }}][foto]" class="form-control form-control-sm" accept="image/*">
-                                @if($producto->imagenes->where('orden', $index)->first())
-                                    <small class="text-muted">Imagen actual: <a href="{{ asset('storage/' . $producto->imagenes->where('orden', $index)->first()->ruta) }}" target="_blank">Ver</a></small>
+                                @php $imagenColor = $producto->imagenes->firstWhere('color_id', $variante->colores->first()?->id); @endphp
+                                @if($imagenColor)
+                                    <small class="text-muted">Imagen actual: <a href="{{ Storage::url($imagenColor->url) }}" target="_blank">Ver</a></small>
                                 @endif
                             </div>
 
@@ -156,7 +157,7 @@ function updateTallaSelects(clasificacionId) {
 }
 
 // Event listener para cambio de clasificación
-document.getElementById('clasificacion_talla_id').addEventListener('change', function() {
+document.getElementById('clasificacion_id').addEventListener('change', function() {
     const clasificacionId = this.value;
     updateTallaSelects(clasificacionId);
 });
@@ -190,7 +191,7 @@ document.getElementById('add-variant').addEventListener('click', function() {
     container.appendChild(newRow);
 
     // Actualizar tallas en la nueva fila
-    const clasificacionId = document.getElementById('clasificacion_talla_id').value;
+    const clasificacionId = document.getElementById('clasificacion_id').value;
     updateTallaSelects(clasificacionId);
 
     variantIndex++;
@@ -208,7 +209,7 @@ document.addEventListener('click', function(e) {
 
 // Inicializar tallas al cargar
 document.addEventListener('DOMContentLoaded', function() {
-    const clasificacionId = document.getElementById('clasificacion_talla_id').value;
+    const clasificacionId = document.getElementById('clasificacion_id').value;
     if (clasificacionId) {
         updateTallaSelects(clasificacionId);
     }

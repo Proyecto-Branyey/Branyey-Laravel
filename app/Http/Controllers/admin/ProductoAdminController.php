@@ -37,17 +37,17 @@ class ProductoAdminController extends Controller
     public function store(Request $request) {
 
         $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre_comercial' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
-            'estilo_camisa_id' => 'required|exists:estilos_camisa,id',
-            'clasificacion_talla_id' => 'required|exists:clasificacion_talla,id',
+            'estilo_id' => 'required|exists:estilos_camisa,id',
+            'clasificacion_id' => 'required|exists:clasificacion_talla,id',
             'variantes' => 'required|array|min:1',
             'variantes.*.talla_id' => [
                 'required',
                 'exists:tallas,id',
                 function ($attribute, $value, $fail) use ($request) {
                     $talla = Talla::find($value);
-                    if ($talla && $talla->clasificacion_id != $request->clasificacion_talla_id) {
+                    if ($talla && $talla->clasificacion_id != $request->clasificacion_id) {
                         $fail('La talla seleccionada no pertenece a la clasificación elegida.');
                     }
                 },
@@ -66,21 +66,26 @@ class ProductoAdminController extends Controller
 
             // Crear producto
             $producto = Producto::create([
-                'nombre' => $request->nombre,
+                'nombre_comercial' => $request->nombre_comercial,
                 'descripcion' => $request->descripcion,
-                'estilo_camisa_id' => $request->estilo_camisa_id,
-                'clasificacion_talla_id' => $request->clasificacion_talla_id,
+                'estilo_id' => $request->estilo_id,
+                'clasificacion_id' => $request->clasificacion_id,
             ]);
 
             foreach ($request->variantes as $index => $v) {
+
+                $sku = 'P' . str_pad($producto->id, 4, '0', STR_PAD_LEFT)
+                     . 'T' . str_pad($v['talla_id'], 2, '0', STR_PAD_LEFT)
+                     . 'C' . str_pad($v['color_id'], 2, '0', STR_PAD_LEFT);
 
                 // Crear variante
                 $variante = Variante::create([
                     'producto_id' => $producto->id,
                     'talla_id' => $v['talla_id'],
+                    'sku' => $sku,
+                    'stock' => $v['stock'],
                     'precio_minorista' => $v['precio_minorista'],
                     'precio_mayorista' => $v['precio_mayorista'],
-                    'stock' => $v['stock'],
                 ]);
 
                 // Relación variante-color
@@ -95,8 +100,9 @@ class ProductoAdminController extends Controller
 
                     ImagenProducto::create([
                         'producto_id' => $producto->id,
-                        'ruta' => $path,
-                        'orden' => $index,
+                        'color_id' => $v['color_id'],
+                        'url' => $path,
+                        'es_principal' => $index === 0,
                     ]);
                 }
             }
@@ -146,18 +152,18 @@ class ProductoAdminController extends Controller
         $producto = Producto::findOrFail($id);
 
         $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre_comercial' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
-            'estilo_camisa_id' => 'required|exists:estilos_camisa,id',
-            'clasificacion_talla_id' => 'required|exists:clasificacion_talla,id',
+            'estilo_id' => 'required|exists:estilos_camisa,id',
+            'clasificacion_id' => 'required|exists:clasificacion_talla,id',
             'variantes' => 'required|array|min:1',
-            'variantes.*.id' => 'nullable|exists:variantes,id', // Para variantes existentes
+            'variantes.*.id' => 'nullable|exists:variantes,id',
             'variantes.*.talla_id' => [
                 'required',
                 'exists:tallas,id',
                 function ($attribute, $value, $fail) use ($request) {
                     $talla = Talla::find($value);
-                    if ($talla && $talla->clasificacion_id != $request->clasificacion_talla_id) {
+                    if ($talla && $talla->clasificacion_id != $request->clasificacion_id) {
                         $fail('La talla seleccionada no pertenece a la clasificación elegida.');
                     }
                 },
@@ -166,7 +172,7 @@ class ProductoAdminController extends Controller
             'variantes.*.precio_minorista' => 'required|numeric|min:0',
             'variantes.*.precio_mayorista' => 'required|numeric|min:0',
             'variantes.*.stock' => 'required|integer|min:0',
-            'variantes.*.foto' => 'nullable|image|max:10240', // Opcional en edición
+            'variantes.*.foto' => 'nullable|image|max:10240',
         ]);
 
         $uploadedPaths = [];
@@ -176,13 +182,12 @@ class ProductoAdminController extends Controller
 
             // Actualizar producto
             $producto->update([
-                'nombre' => $request->nombre,
+                'nombre_comercial' => $request->nombre_comercial,
                 'descripcion' => $request->descripcion,
-                'estilo_camisa_id' => $request->estilo_camisa_id,
-                'clasificacion_talla_id' => $request->clasificacion_talla_id,
+                'estilo_id' => $request->estilo_id,
+                'clasificacion_id' => $request->clasificacion_id,
             ]);
 
-            // Obtener IDs de variantes existentes para eliminar las que no están en el request
             $existingVariantIds = $producto->variantes->pluck('id')->toArray();
             $updatedVariantIds = [];
 
@@ -192,9 +197,9 @@ class ProductoAdminController extends Controller
                     $variante = Variante::find($v['id']);
                     $variante->update([
                         'talla_id' => $v['talla_id'],
+                        'stock' => $v['stock'],
                         'precio_minorista' => $v['precio_minorista'],
                         'precio_mayorista' => $v['precio_mayorista'],
-                        'stock' => $v['stock'],
                     ]);
 
                     // Actualizar relación color
@@ -202,42 +207,41 @@ class ProductoAdminController extends Controller
 
                     // Actualizar imagen si se proporciona nueva
                     if ($request->hasFile("variantes.$index.foto")) {
-                        // Eliminar imagen anterior
                         $imagenAnterior = ImagenProducto::where('producto_id', $producto->id)
-                            ->where('orden', $index)
+                            ->where('color_id', $v['color_id'])
                             ->first();
                         if ($imagenAnterior) {
-                            Storage::disk('public')->delete($imagenAnterior->ruta);
+                            Storage::disk('public')->delete($imagenAnterior->url);
                             $imagenAnterior->delete();
                         }
 
-                        // Guardar nueva imagen
                         $path = $request->file("variantes.$index.foto")
                             ->store('productos', 'public');
                         $uploadedPaths[] = $path;
 
-                        ImagenProducto::create([
-                            'producto_id' => $producto->id,
-                            'ruta' => $path,
-                            'orden' => $index,
-                        ]);
+                        ImagenProducto::updateOrCreate(
+                            ['producto_id' => $producto->id, 'color_id' => $v['color_id']],
+                            ['url' => $path, 'es_principal' => $index === 0]
+                        );
                     }
 
                     $updatedVariantIds[] = $v['id'];
                 } else {
-                    // Crear nueva variante
+                    $sku = 'P' . str_pad($producto->id, 4, '0', STR_PAD_LEFT)
+                         . 'T' . str_pad($v['talla_id'], 2, '0', STR_PAD_LEFT)
+                         . 'C' . str_pad($v['color_id'], 2, '0', STR_PAD_LEFT);
+
                     $variante = Variante::create([
                         'producto_id' => $producto->id,
                         'talla_id' => $v['talla_id'],
+                        'sku' => $sku,
+                        'stock' => $v['stock'],
                         'precio_minorista' => $v['precio_minorista'],
                         'precio_mayorista' => $v['precio_mayorista'],
-                        'stock' => $v['stock'],
                     ]);
 
-                    // Relación variante-color
                     $variante->colores()->attach($v['color_id']);
 
-                    // Guardar imagen
                     if ($request->hasFile("variantes.$index.foto")) {
                         $path = $request->file("variantes.$index.foto")
                             ->store('productos', 'public');
@@ -245,8 +249,9 @@ class ProductoAdminController extends Controller
 
                         ImagenProducto::create([
                             'producto_id' => $producto->id,
-                            'ruta' => $path,
-                            'orden' => $index,
+                            'color_id' => $v['color_id'],
+                            'url' => $path,
+                            'es_principal' => $index === 0,
                         ]);
                     }
 
@@ -259,13 +264,15 @@ class ProductoAdminController extends Controller
             foreach ($variantsToDelete as $variantId) {
                 $variante = Variante::find($variantId);
                 if ($variante) {
-                    // Eliminar imágenes asociadas
-                    $imagenes = ImagenProducto::where('producto_id', $producto->id)
-                        ->where('orden', array_search($variantId, $existingVariantIds))
-                        ->get();
-                    foreach ($imagenes as $imagen) {
-                        Storage::disk('public')->delete($imagen->ruta);
-                        $imagen->delete();
+                    $colorId = $variante->colores->first()?->id;
+                    if ($colorId) {
+                        $imagen = ImagenProducto::where('producto_id', $producto->id)
+                            ->where('color_id', $colorId)
+                            ->first();
+                        if ($imagen) {
+                            Storage::disk('public')->delete($imagen->url);
+                            $imagen->delete();
+                        }
                     }
                     $variante->delete();
                 }
@@ -280,7 +287,6 @@ class ProductoAdminController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
 
-            // Borrar imágenes si falla
             foreach ($uploadedPaths as $p) {
                 Storage::disk('public')->delete($p);
             }

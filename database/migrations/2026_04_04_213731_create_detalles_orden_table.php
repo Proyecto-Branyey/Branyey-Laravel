@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('detalles_orden', function (Blueprint $table) {
             $table->id();
             $table->foreignId('venta_id')->constrained('ventas')->onDelete('cascade');
-            $table->foreignId('variante_id')->constrained('variantes')->onDelete('cascade');
-            $table->integer('cantidad');
-            $table->decimal('precio_unitario', 10, 2);
-            $table->decimal('subtotal', 12, 2);
+            $table->string('nombre_cliente', 255);
+            $table->string('email_cliente', 255);
+            $table->string('telefono_cliente', 50);
+            $table->text('direccion_envio');
+            $table->string('ciudad', 100);
+            $table->string('departamento', 100);
             $table->timestamps();
         });
     }
