@@ -1,6 +1,6 @@
 
 
-<?php $__env->startSection('content'); ?>
+<?php $__env->startSection('admin-content'); ?>
 <div class="container py-5">
     <div class="row mb-4">
         <div class="col-12">
@@ -82,4 +82,4 @@
 </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\resources\views/admin/estilos-camisa/show.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\resources\views/admin/estilos-camisa/show.blade.php ENDPATH**/ ?>

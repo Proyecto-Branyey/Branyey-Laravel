@@ -25,10 +25,15 @@ class Venta extends Model {
             });
         }
 
-        // Filtrar por tipo de cliente
+        // Filtrar por tipo de cliente (rol)
         if (!empty($filtros['tipo_cliente'])) {
-            $query->whereHas('usuario', function ($q) use ($filtros) {
-                $q->where('tipo_cliente', $filtros['tipo_cliente']);
+            $tipo = $filtros['tipo_cliente'];
+            $query->whereHas('usuario.rol', function ($q) use ($tipo) {
+                if ($tipo === 'mayorista') {
+                    $q->where('nombre', 'like', '%mayorista%');
+                } elseif ($tipo === 'minorista') {
+                    $q->where('nombre', 'like', '%minorista%');
+                }
             });
         }
 

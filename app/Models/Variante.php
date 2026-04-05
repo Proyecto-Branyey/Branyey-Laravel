@@ -9,6 +9,13 @@ class Variante extends Model
 {
     use SoftDeletes;
 
+    // Scope para variantes activas
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
+    }
+    use SoftDeletes;
+
     protected $table = 'variantes';
     public $timestamps = true;
     protected $fillable = [
