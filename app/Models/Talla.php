@@ -11,7 +11,8 @@ class Talla extends Model
     
     protected $fillable = [
         'nombre',
-        'clasificacion_id'
+        'clasificacion_id',
+        'activo',
     ];
     
     protected $casts = [
@@ -34,5 +35,10 @@ class Talla extends Model
     public function scopeOrdenNatural($query)
     {
         return $query->orderBy('nombre', 'asc');
+    }
+
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
     }
 }

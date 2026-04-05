@@ -25,7 +25,10 @@ return new class extends Migration
             $table->string('ciudad_defecto')->nullable();
             $table->string('departamento_defecto')->nullable();
 
-            $table->timestamps();
+            $table->boolean('activo')->default(true);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->index('activo', 'idx_usuarios_activo');
         });
     }
 

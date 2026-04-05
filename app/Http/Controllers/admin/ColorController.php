@@ -9,11 +9,31 @@ use App\Http\Controllers\Controller;
 class ColorController extends Controller
 {
     /**
+     * Muestra colores inactivos (papelera).
+     */
+    public function papelera()
+    {
+        $colores = Color::where('activo', false)->get();
+        return view('admin.colores.papelera', compact('colores'));
+    }
+
+    /**
+     * Reactiva un color inactivo.
+     */
+    public function activar($id)
+    {
+        $color = Color::findOrFail($id);
+        $color->activo = true;
+        $color->save();
+        return redirect()->route('admin.colores.index')->with('success', 'Color reactivado correctamente.');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $colores = Color::all();
+        $colores = Color::where('activo', true)->get();
         return view('admin.colores.index', compact('colores'));
     }
 
@@ -76,7 +96,8 @@ class ColorController extends Controller
      */
     public function destroy(Color $colore)
     {
-        $colore->delete();
-        return redirect()->route('admin.colores.index')->with('success', 'Color eliminado exitosamente.');
+        $colore->activo = false;
+        $colore->save();
+        return redirect()->route('admin.colores.index')->with('success', 'Color desactivado exitosamente.');
     }
 }

@@ -27,6 +27,7 @@ class User extends Authenticatable
         'departamento_defecto',
         'password',
         'rol_id',
+        'activo',
     ];
 
     /**

@@ -17,8 +17,35 @@ use Illuminate\Support\Facades\{DB, Storage};
 
 class ProductoAdminController extends Controller
 {
+    /**
+     * Muestra productos inactivos (papelera).
+     */
+    public function papelera()
+    {
+        $productos = Producto::with(['estilo', 'imagenes', 'variantes'])
+            ->where('activo', false)
+            ->orderBy('id', 'desc')
+            ->get();
+        return view('admin.productos.papelera', compact('productos'));
+    }
+    /**
+     * Reactiva un producto y sus variantes.
+     */
+    public function activar($id)
+    {
+        $producto = Producto::with('variantes')->findOrFail($id);
+        $producto->activo = true;
+        $producto->save();
+        foreach ($producto->variantes as $variante) {
+            $variante->activo = true;
+            $variante->save();
+        }
+        return redirect()->route('admin.productos.index')
+            ->with('success', 'Producto y variantes activados correctamente.');
+    }
     public function index() {
         $productos = Producto::with(['estilo', 'imagenes', 'variantes'])
+            ->where('activo', true)
             ->orderBy('id', 'desc')
             ->get();
 
@@ -27,10 +54,10 @@ class ProductoAdminController extends Controller
 
     public function create() {
         return view('admin.productos.create', [
-            'estilos' => EstiloCamisa::all(),
-            'tallas' => Talla::with('clasificacion')->get(),
+            'estilos' => EstiloCamisa::activos()->get(),
+            'tallas' => Talla::with('clasificacion')->activos()->get(),
             'clasificaciones' => \App\Models\ClasificacionTalla::all(),
-            'colores' => Color::orderBy('nombre', 'asc')->get()
+            'colores' => Color::activos()->orderBy('nombre', 'asc')->get()
         ]);
     }
 
@@ -142,10 +169,10 @@ class ProductoAdminController extends Controller
         return view('admin.productos.edit', [
             'producto' => $producto,
             'imagenesPorColor' => $imagenesPorColor,
-            'estilos' => EstiloCamisa::all(),
-            'tallas' => Talla::with('clasificacion')->get(),
+            'estilos' => EstiloCamisa::activos()->get(),
+            'tallas' => Talla::with('clasificacion')->activos()->get(),
             'clasificaciones' => \App\Models\ClasificacionTalla::all(),
-            'colores' => Color::orderBy('nombre', 'asc')->get()
+            'colores' => Color::activos()->orderBy('nombre', 'asc')->get()
         ]);
     }
 
@@ -276,6 +303,9 @@ class ProductoAdminController extends Controller
                 }
             }
 
+
+
+
             DB::commit();
 
             return redirect()
@@ -293,5 +323,38 @@ class ProductoAdminController extends Controller
                 ->withErrors(['error' => $e->getMessage()])
                 ->withInput();
         }
+    }
+
+    /**
+     * Elimina un producto si no tiene ventas registradas.
+     */
+    public function destroy($id)
+    {
+        $producto = Producto::with('variantes')->findOrFail($id);
+        $tieneVentas = false;
+        foreach ($producto->variantes as $variante) {
+            if (\App\Models\DetalleVenta::where('variante_id', $variante->id)->exists()) {
+                $tieneVentas = true;
+                break;
+            }
+        }
+        if ($tieneVentas) {
+            // Desactivar producto y variantes
+            $producto->activo = false;
+            $producto->save();
+            foreach ($producto->variantes as $variante) {
+                $variante->activo = false;
+                $variante->save();
+            }
+            return redirect()->route('admin.productos.index')
+                ->with('success', 'Producto desactivado correctamente porque tiene ventas registradas.');
+        }
+        // Eliminar producto y variantes si no tiene ventas
+        foreach ($producto->variantes as $variante) {
+            $variante->delete();
+        }
+        $producto->delete();
+        return redirect()->route('admin.productos.index')
+            ->with('success', 'Producto eliminado correctamente.');
     }
 }

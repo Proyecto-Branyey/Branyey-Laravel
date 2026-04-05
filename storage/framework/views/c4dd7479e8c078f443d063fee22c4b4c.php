@@ -1,6 +1,6 @@
 <?php $__env->startSection('title', 'Editar Producto - Branyey'); ?>
 
-<?php $__env->startSection('content'); ?>
+<?php $__env->startSection('admin-content'); ?>
 <div class="container py-4">
     <?php if($errors->any()): ?>
         <div class="alert alert-danger shadow-sm border-0 mb-4">
@@ -214,4 +214,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\resources\views/admin/productos/edit.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\resources\views/admin/productos/edit.blade.php ENDPATH**/ ?>

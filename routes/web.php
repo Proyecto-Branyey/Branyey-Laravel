@@ -62,12 +62,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
     // CRUD DE PRODUCTOS (Gestión de Catálogo e Imágenes - Ítem 8)
     Route::prefix('productos')->name('productos.')->group(function () {
         Route::get('/', [ProductoAdminController::class, 'index'])->name('index');
+        Route::get('/papelera', [ProductoAdminController::class, 'papelera'])->name('papelera');
         Route::get('/crear', [ProductoAdminController::class, 'create'])->name('create');
         Route::post('/guardar', [ProductoAdminController::class, 'store'])->name('store');
-        Route::get('/{id}', [ProductoAdminController::class, 'show'])->name('show');
-        Route::get('/{id}/editar', [ProductoAdminController::class, 'edit'])->name('edit');
-        Route::put('/{id}/actualizar', [ProductoAdminController::class, 'update'])->name('update');
-        Route::delete('/{id}/eliminar', [ProductoAdminController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}', [ProductoAdminController::class, 'show'])->whereNumber('id')->name('show');
+        Route::get('/{id}/editar', [ProductoAdminController::class, 'edit'])->whereNumber('id')->name('edit');
+        Route::put('/{id}/actualizar', [ProductoAdminController::class, 'update'])->whereNumber('id')->name('update');
+        Route::delete('/{id}/eliminar', [ProductoAdminController::class, 'destroy'])->whereNumber('id')->name('destroy');
+        Route::put('/{id}/activar', [ProductoAdminController::class, 'activar'])->whereNumber('id')->name('activar');
     });
 
     // CRUD DE ESTILOS
@@ -81,13 +83,43 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
     });
 
     // CRUD DE TALLAS
+    Route::get('tallas/papelera', [App\Http\Controllers\Admin\TallaController::class, 'papelera'])->name('tallas.papelera');
+    Route::put('tallas/{id}/activar', [App\Http\Controllers\Admin\TallaController::class, 'activar'])->name('tallas.activar');
     Route::resource('tallas', App\Http\Controllers\Admin\TallaController::class);
 
     // CRUD DE COLORES
+    Route::get('colores/papelera', [App\Http\Controllers\Admin\ColorController::class, 'papelera'])->name('colores.papelera');
+    Route::put('colores/{id}/activar', [App\Http\Controllers\Admin\ColorController::class, 'activar'])->name('colores.activar');
     Route::resource('colores', App\Http\Controllers\Admin\ColorController::class);
 
     // CRUD DE ESTILOS CAMISA
+    Route::get('estilos-camisa/papelera', [App\Http\Controllers\Admin\EstiloCamisaController::class, 'papelera'])->name('estilos-camisa.papelera');
+    Route::put('estilos-camisa/{id}/activar', [App\Http\Controllers\Admin\EstiloCamisaController::class, 'activar'])->name('estilos-camisa.activar');
     Route::resource('estilos-camisa', App\Http\Controllers\Admin\EstiloCamisaController::class);
+
+    // CRUD DE USUARIOS
+    Route::prefix('usuarios')->name('usuarios.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\UserAdminController::class, 'index'])->name('index');
+        Route::get('/crear', [\App\Http\Controllers\Admin\UserAdminController::class, 'create'])->name('create');
+        Route::post('/guardar', [\App\Http\Controllers\Admin\UserAdminController::class, 'store'])->name('store');
+        Route::get('/{id}/editar', [\App\Http\Controllers\Admin\UserAdminController::class, 'edit'])->name('edit');
+        Route::put('/{id}/actualizar', [\App\Http\Controllers\Admin\UserAdminController::class, 'update'])->name('update');
+        Route::delete('/{id}/eliminar', [\App\Http\Controllers\Admin\UserAdminController::class, 'destroy'])->name('destroy');
+    });
+    Route::get('usuarios/papelera', [App\Http\Controllers\Admin\UserAdminController::class, 'papelera'])->name('usuarios.papelera');
+    Route::put('usuarios/{id}/activar', [App\Http\Controllers\Admin\UserAdminController::class, 'activar'])->name('usuarios.activar');
+
+    // Solo consulta de ventas (no CRUD)
+    Route::get('ventas', [App\Http\Controllers\Admin\VentaAdminController::class, 'index'])->name('ventas.index');
+    Route::get('ventas/{venta}', [App\Http\Controllers\Admin\VentaAdminController::class, 'show'])->name('ventas.show');
+
+    // Cambiar estado de venta
+    Route::post('ventas/{venta}/estado', [App\Http\Controllers\Admin\VentaAdminController::class, 'cambiarEstado'])->name('ventas.cambiarEstado');
+
+    // CRUD DE ÓRDENES
+    Route::resource('ordenes', App\Http\Controllers\Admin\OrdenAdminController::class);
+
+    // Notificaciones eliminadas
 });
 
 /**

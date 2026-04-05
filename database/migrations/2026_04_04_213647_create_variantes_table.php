@@ -19,8 +19,12 @@ return new class extends Migration
             $table->integer('stock')->default(0);
             $table->decimal('precio_minorista', 10, 2)->default(0);
             $table->decimal('precio_mayorista', 10, 2)->default(0);
-            $table->softDeletes();
-            $table->timestamps();
+            $table->boolean('activo')->default(true);
+            $table->timestamp('deleted_at')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->index('activo', 'idx_variantes_activo');
+            $table->index('sku', 'idx_variantes_sku');
         });
     }
 

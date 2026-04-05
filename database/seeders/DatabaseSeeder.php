@@ -23,5 +23,8 @@ class DatabaseSeeder extends Seeder
         $this->call(EstilosCamisaSeeder::class);
         
         // NO llamar a los seeders de Productos o Ventas aquí
+
+        // Ejemplo de venta completa
+        $this->call(EjemploVentaSeeder::class);
     }
 }

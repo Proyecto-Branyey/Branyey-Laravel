@@ -51,21 +51,21 @@ class EstiloCamisaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(EstiloCamisa $estilo)
+    public function edit(EstiloCamisa $estilos_camisa)
     {
-        return view('admin.estilos-camisa.edit', compact('estilo'));
+        return view('admin.estilos-camisa.edit', ['estilos_camisa' => $estilos_camisa]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, EstiloCamisa $estilo)
+    public function update(Request $request, EstiloCamisa $estilos_camisa)
     {
         $request->validate([
-            'nombre' => 'required|string|max:100|unique:estilos_camisa,nombre,' . $estilo->id,
+            'nombre' => 'required|string|max:100|unique:estilos_camisa,nombre,' . $estilos_camisa->id,
         ]);
 
-        $estilo->update($request->only(['nombre']));
+        $estilos_camisa->update($request->only(['nombre']));
 
         return redirect()->route('admin.estilos-camisa.index')->with('success', 'Estilo actualizado exitosamente.');
     }
@@ -73,9 +73,30 @@ class EstiloCamisaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(EstiloCamisa $estilo)
+    public function destroy(EstiloCamisa $estilos_camisa)
     {
-        $estilo->delete();
-        return redirect()->route('admin.estilos-camisa.index')->with('success', 'Estilo eliminado exitosamente.');
+        $estilos_camisa->activo = false;
+        $estilos_camisa->save();
+        return redirect()->route('admin.estilos-camisa.index')->with('success', 'Estilo desactivado exitosamente.');
+    }
+
+    /**
+     * Muestra estilos inactivos (papelera).
+     */
+    public function papelera()
+    {
+        $estilos = EstiloCamisa::where('activo', false)->get();
+        return view('admin.estilos-camisa.papelera', compact('estilos'));
+    }
+
+    /**
+     * Reactiva un estilo inactivo.
+     */
+    public function activar($id)
+    {
+        $estilo = EstiloCamisa::findOrFail($id);
+        $estilo->activo = true;
+        $estilo->save();
+        return redirect()->route('admin.estilos-camisa.index')->with('success', 'Estilo reactivado correctamente.');
     }
 }

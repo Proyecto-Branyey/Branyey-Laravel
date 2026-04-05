@@ -1,11 +1,14 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
+@section('admin-content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold"><i class="bi bi-stack me-2"></i>Inventario de Branyey</h2>
         <a href="{{ route('admin.productos.create') }}" class="btn btn-dark shadow-sm">
             <i class="bi bi-plus-lg me-2"></i>Nueva Prenda
+        </a>
+        <a href="{{ route('admin.productos.papelera') }}" class="btn btn-outline-danger ms-2 shadow-sm">
+            <i class="bi bi-trash3"></i> Papelera
         </a>
     </div>
 
@@ -64,6 +67,15 @@
                         <td class="text-end pe-4">
                             <div class="btn-group shadow-sm">
                                 <a href="{{ route('admin.productos.edit', $producto->id) }}" class="btn btn-sm btn-white border" title="Editar producto"><i class="bi bi-pencil"></i></a>
+                                @if(!$producto->activo)
+                                    <form action="{{ route('admin.productos.activar', $producto->id) }}" method="POST" style="display:inline-block;">
+                                        @csrf
+                                        @method('PUT')
+                                        <button class="btn btn-sm btn-success border" title="Reactivar producto">
+                                            <i class="bi bi-arrow-repeat"></i> Reactivar
+                                        </button>
+                                    </form>
+                                @endif
                                 <form action="{{ route('admin.productos.destroy', $producto->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este producto?')">
                                     @csrf @method('DELETE')
                                     <button class="btn btn-sm btn-white border text-danger" title="Eliminar producto"><i class="bi bi-trash"></i></button>

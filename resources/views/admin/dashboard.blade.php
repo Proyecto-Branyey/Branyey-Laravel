@@ -15,6 +15,11 @@
                     </li>
 
                     <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ route('admin.ventas.index') }}">
+                            <i class="bi bi-receipt me-2"></i> Ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link text-white d-flex justify-content-between align-items-center" 
                            data-bs-toggle="collapse" href="#menuProductos" role="button" aria-expanded="false">
                             <span><i class="bi bi-box-seam me-2"></i> Productos</span>
@@ -34,6 +39,30 @@
                                 </li>
                             </ul>
                         </div>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link text-white d-flex justify-content-between align-items-center" 
+                           data-bs-toggle="collapse" href="#menuUsuarios" role="button" aria-expanded="false">
+                            <span><i class="bi bi-people me-2"></i> Usuarios</span>
+                            <i class="bi bi-chevron-down small"></i>
+                        </a>
+                        <div class="collapse" id="menuUsuarios">
+                            <ul class="nav flex-column ms-3 mt-1">
+                                <li class="nav-item">
+                                    <a class="nav-link text-secondary py-1" href="{{ route('admin.usuarios.index') }}">
+                                        <i class="bi bi-list-ul me-2"></i> Ver Usuarios
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-success py-1" href="{{ route('admin.usuarios.create') }}">
+                                        <i class="bi bi-plus-lg me-2"></i> Añadir Usuario
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link text-white d-flex justify-content-between align-items-center" 
                            data-bs-toggle="collapse" href="#menuCatalogos" role="button" aria-expanded="false">
@@ -120,4 +149,4 @@
     .nav-link[aria-expanded="true"] { background: rgba(255,255,255,0.05); }
     hr { opacity: 0.2; }
 </style>
-@endsection 
+@endsection

@@ -38,6 +38,12 @@ class Producto extends Model
 
     public function scopeActivos($query)
     {
-        return $query->where('activo', true);
+        return $query->where('activo', true)
+            ->whereHas('estilo', function($q) { $q->where('activo', true); })
+            ->whereHas('variantes', function($q) {
+                $q->where('activo', true)
+                  ->whereHas('talla', function($t) { $t->where('activo', true); })
+                  ->whereHas('colores', function($c) { $c->where('activo', true); });
+            });
     }
 }

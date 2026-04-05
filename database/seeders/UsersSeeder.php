@@ -19,8 +19,5 @@ class UsersSeeder extends Seeder
             'password' => Hash::make('admin123'),
             'rol_id' => 1,
         ]);
-
-        // 👇 Usuarios de prueba con factory
-        User::factory()->count(10)->create();
+        }
     }
-}

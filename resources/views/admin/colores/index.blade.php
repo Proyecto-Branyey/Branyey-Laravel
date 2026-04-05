@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Gestión de Colores - Branyey')
 
-@section('content')
+@section('admin-content')
 <div class="container py-4">
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -13,9 +13,14 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0"><i class="bi bi-palette me-2"></i>Gestión de Colores</h2>
-        <a href="{{ route('admin.colores.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-1"></i> Nuevo Color
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.colores.papelera') }}" class="btn btn-outline-danger">
+                <i class="bi bi-trash3 me-1"></i> Papelera
+            </a>
+            <a href="{{ route('admin.colores.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Nuevo Color
+            </a>
+        </div>
     </div>
 
     <div class="card">

@@ -1,9 +1,12 @@
-<?php $__env->startSection('content'); ?>
+<?php $__env->startSection('admin-content'); ?>
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold"><i class="bi bi-stack me-2"></i>Inventario de Branyey</h2>
         <a href="<?php echo e(route('admin.productos.create')); ?>" class="btn btn-dark shadow-sm">
             <i class="bi bi-plus-lg me-2"></i>Nueva Prenda
+        </a>
+        <a href="<?php echo e(route('admin.productos.papelera')); ?>" class="btn btn-outline-danger ms-2 shadow-sm">
+            <i class="bi bi-trash3"></i> Papelera
         </a>
     </div>
 
@@ -64,6 +67,15 @@
                         <td class="text-end pe-4">
                             <div class="btn-group shadow-sm">
                                 <a href="<?php echo e(route('admin.productos.edit', $producto->id)); ?>" class="btn btn-sm btn-white border" title="Editar producto"><i class="bi bi-pencil"></i></a>
+                                <?php if(!$producto->activo): ?>
+                                    <form action="<?php echo e(route('admin.productos.activar', $producto->id)); ?>" method="POST" style="display:inline-block;">
+                                        <?php echo csrf_field(); ?>
+                                        <?php echo method_field('PUT'); ?>
+                                        <button class="btn btn-sm btn-success border" title="Reactivar producto">
+                                            <i class="bi bi-arrow-repeat"></i> Reactivar
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
                                 <form action="<?php echo e(route('admin.productos.destroy', $producto->id)); ?>" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este producto?')">
                                     <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                                     <button class="btn btn-sm btn-white border text-danger" title="Eliminar producto"><i class="bi bi-trash"></i></button>
@@ -82,4 +94,4 @@
     </div>
 </div>
 <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\resources\views/admin/productos/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\resources\views/admin/productos/index.blade.php ENDPATH**/ ?>

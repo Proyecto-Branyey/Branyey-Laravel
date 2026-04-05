@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -11,8 +10,15 @@ class Color extends Model
     protected $table = 'colores';
 
     // Campos asignables
-    protected $fillable = ['nombre', 'codigo_hex'];
+    protected $fillable = ['nombre', 'codigo_hex', 'activo'];
 
+    /**
+     * Query scope to get only active colors.
+     */
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
+    }
     /**
      * Relación con Variantes.
      * Se eliminó ->withPivot('orden') para evitar el error SQLSTATE[42S22]

@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Editar Producto - Branyey')
 
-@section('content')
+@section('admin-content')
 <div class="container py-4">
     @if($errors->any())
         <div class="alert alert-danger shadow-sm border-0 mb-4">

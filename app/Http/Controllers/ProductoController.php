@@ -12,7 +12,10 @@ class ProductoController extends Controller
 {
     public function inicio()
     {
-        $destacados = Producto::with(['imagenes', 'estilo', 'variantes'])
+        $destacados = Producto::activos()
+            ->with(['imagenes', 'estilo', 'variantes' => function($q) {
+                $q->activos();
+            }])
             ->latest()
             ->take(3)
             ->get();
@@ -22,7 +25,10 @@ class ProductoController extends Controller
 
     public function index(Request $request)
     {
-        $query = Producto::with(['imagenes', 'estilo', 'variantes']);
+        $query = Producto::activos()
+            ->with(['imagenes', 'estilo', 'variantes' => function($q) {
+                $q->activos();
+            }]);
 
         if ($request->filled('estilo_id')) {
             $query->where('estilo_id', $request->estilo_id);
@@ -33,7 +39,7 @@ class ProductoController extends Controller
         }
 
         $productos = $query->latest()->paginate(12);
-        $estilos = EstiloCamisa::all();
+        $estilos = EstiloCamisa::activos()->get();
         $clasificaciones = ClasificacionTalla::all();
 
         return view('tienda.catalogo', compact('productos', 'estilos', 'clasificaciones'));
@@ -41,12 +47,14 @@ class ProductoController extends Controller
 
     public function show($id)
     {
-        $producto = Producto::with([
-            'imagenes', 
-            'estilo', 
-            'variantes.talla', 
-            'variantes.colores'
-        ])->findOrFail($id);
+        $producto = Producto::activos()
+            ->with([
+                'imagenes', 
+                'estilo', 
+                'variantes' => function($q) {
+                    $q->activos()->with(['talla', 'colores']);
+                }
+            ])->findOrFail($id);
 
         return view('tienda.producto_detalle', compact('producto'));
     }

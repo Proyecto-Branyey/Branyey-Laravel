@@ -10,11 +10,31 @@ use App\Http\Controllers\Controller;
 class TallaController extends Controller
 {
     /**
+     * Muestra tallas inactivas (papelera).
+     */
+    public function papelera()
+    {
+        $tallas = Talla::with('clasificacion')->where('activo', false)->get();
+        return view('admin.tallas.papelera', compact('tallas'));
+    }
+
+    /**
+     * Reactiva una talla inactiva.
+     */
+    public function activar($id)
+    {
+        $talla = Talla::findOrFail($id);
+        $talla->activo = true;
+        $talla->save();
+        return redirect()->route('admin.tallas.index')->with('success', 'Talla reactivada correctamente.');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $tallas = Talla::with('clasificacion')->get();
+        $tallas = Talla::with('clasificacion')->where('activo', true)->get();
         return view('admin.tallas.index', compact('tallas'));
     }
 
@@ -102,7 +122,8 @@ class TallaController extends Controller
      */
     public function destroy(Talla $talla)
     {
-        $talla->delete();
-        return redirect()->route('admin.tallas.index')->with('success', 'Talla eliminada exitosamente.');
+        $talla->activo = false;
+        $talla->save();
+        return redirect()->route('admin.tallas.index')->with('success', 'Talla desactivada exitosamente.');
     }
 }

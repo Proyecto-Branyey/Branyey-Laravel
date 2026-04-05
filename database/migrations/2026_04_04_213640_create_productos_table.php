@@ -18,8 +18,10 @@ return new class extends Migration
             $table->string('nombre_comercial', 255);
             $table->text('descripcion')->nullable();
             $table->boolean('activo')->default(true);
-            $table->softDeletes();
-            $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->index('activo', 'idx_productos_activo');
         });
     }
 

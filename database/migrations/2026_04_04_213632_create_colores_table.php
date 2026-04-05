@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('nombre', 50);
             $table->string('codigo_hex', 7)->nullable();
-            $table->timestamps();
+            $table->boolean('activo')->default(true);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->index('activo', 'idx_colores_activo');
         });
     }
 

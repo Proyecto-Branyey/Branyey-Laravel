@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('nombre', 10);
             $table->foreignId('clasificacion_id')->constrained('clasificacion_talla');
-            $table->timestamps();
+            $table->boolean('activo')->default(true);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->index('activo', 'idx_tallas_activo');
         });
     }
 

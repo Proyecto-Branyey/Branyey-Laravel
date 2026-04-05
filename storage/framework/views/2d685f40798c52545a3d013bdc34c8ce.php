@@ -2,7 +2,7 @@
 
 <?php $__env->startSection('title', 'Gestión de Colores - Branyey'); ?>
 
-<?php $__env->startSection('content'); ?>
+<?php $__env->startSection('admin-content'); ?>
 <div class="container py-4">
     <?php if(session('success')): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -14,9 +14,14 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0"><i class="bi bi-palette me-2"></i>Gestión de Colores</h2>
-        <a href="<?php echo e(route('admin.colores.create')); ?>" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-1"></i> Nuevo Color
-        </a>
+        <div class="d-flex gap-2">
+            <a href="<?php echo e(route('admin.colores.papelera')); ?>" class="btn btn-outline-danger">
+                <i class="bi bi-trash3 me-1"></i> Papelera
+            </a>
+            <a href="<?php echo e(route('admin.colores.create')); ?>" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Nuevo Color
+            </a>
+        </div>
     </div>
 
     <div class="card">
@@ -68,4 +73,4 @@
     </div>
 </div>
 <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\resources\views/admin/colores/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\resources\views/admin/colores/index.blade.php ENDPATH**/ ?>

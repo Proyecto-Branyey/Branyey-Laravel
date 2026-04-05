@@ -16,9 +16,15 @@ class EstiloCamisa extends Model
         'nombre',
     ];
 
+
     public function productos(): HasMany
     {
         return $this->hasMany(Producto::class, 'estilo_id');
+    }
+
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
     }
 
     public function scopeNombre($query, $nombre)
