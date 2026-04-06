@@ -32,7 +32,7 @@ class ReporteVentasController extends Controller
                         $venta->usuario->rol->nombre ?? '-',
                         ' ' . $venta->created_at->format('Y-m-d H:i:s'),
                         $venta->total,
-                        ucfirst($venta->estado),
+                        $venta->estado_label,
                     ], ';');
                 }
                 fclose($handle);

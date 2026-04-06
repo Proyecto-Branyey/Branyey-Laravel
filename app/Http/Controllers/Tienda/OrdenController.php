@@ -54,19 +54,21 @@ class OrdenController extends Controller
         try {
             $user = Auth::user();
             $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+            $nombreCliente = $user->nombre_completo ?: ($user->username ?: $user->email);
+            $emailCliente = $user->email ?: 'sin-correo@local.test';
 
             // 1. Crear la Cabecera de la Venta (Tabla: ventas)
             $venta = Venta::create([
                 'usuario_id' => $user->id,
                 'total'      => $total,
-                'estado'     => 'pendiente',
+                'estado'     => 'pagado',
             ]);
 
             // 2. Crear los Datos de Envío (Tabla: detalles_orden)
             DetallesOrden::create([
                 'venta_id'         => $venta->id,
-                'nombre_cliente'   => $user->name,
-                'email_cliente'    => $user->email,
+                'nombre_cliente'   => $nombreCliente,
+                'email_cliente'    => $emailCliente,
                 'telefono_cliente' => $request->telefono,
                 'direccion_envio'  => $request->direccion,
                 'ciudad'           => $request->ciudad,
