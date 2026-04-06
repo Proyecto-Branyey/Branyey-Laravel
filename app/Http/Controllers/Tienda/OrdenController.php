@@ -45,9 +45,10 @@ class OrdenController extends Controller
 
         // Validación de campos obligatorios para el envío
         $request->validate([
-            'direccion' => 'required|string|max:255',
-            'telefono'  => 'required|string|max:20',
-            'ciudad'    => 'required|string|max:100',
+            'direccion'    => 'required|string|max:255',
+            'telefono'     => 'required|string|max:20',
+            'departamento' => 'required|string|max:100',
+            'ciudad'       => 'required|string|max:100',
         ]);
 
         // Iniciamos transacción para asegurar la integridad de los datos
@@ -74,7 +75,7 @@ class OrdenController extends Controller
                 'telefono_cliente' => $request->telefono,
                 'direccion_envio'  => $request->direccion,
                 'ciudad'           => $request->ciudad,
-                'departamento'     => $request->departamento ?? 'Bogotá',
+                'departamento'     => $request->departamento,
             ]);
 
             // 3. Procesar Productos y Restar Stock (HU-014)
@@ -103,8 +104,8 @@ class OrdenController extends Controller
             // Limpiamos la sesión del carrito al finalizar con éxito
             session()->forget('cart');
 
-            // Enviar correo de confirmación al cliente
-            $venta->load(['usuario', 'detallesVenta.variante.producto', 'detallesOrden']);
+            // Enviar correo de confirmación al cliente con factura adjunta en PDF
+            $venta->load(['usuario', 'detallesVenta.variante.producto', 'detallesVenta.variante.talla', 'detallesOrden']);
             Mail::to($emailCliente)->send(new ConfirmacionOrdenMail($venta));
 
             return redirect()->route('tienda.inicio')->with('success', '¡Orden #'.$venta->id.' generada con éxito! Pronto recibirás tus prendas Branyey.');
