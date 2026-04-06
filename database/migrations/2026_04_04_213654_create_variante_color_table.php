@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('variante_color', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('variante_id')->constrained('variantes')->onDelete('cascade');
-            $table->foreignId('color_id')->constrained('colores');
+            $table->foreignId('variante_id')->constrained('variantes')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('color_id')->constrained('colores')->onUpdate('cascade')->onDelete('restrict');
             $table->integer('orden')->default(1);
-            $table->timestamps();
-            $table->unique(['variante_id', 'color_id']);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->unique(['variante_id', 'color_id'], 'unique_variante_color');
         });
     }
 

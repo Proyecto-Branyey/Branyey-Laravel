@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('estilo_id')->constrained('estilos_camisa');
-            $table->foreignId('clasificacion_id')->constrained('clasificacion_talla');
-            $table->string('nombre_comercial', 255);
+            $table->foreignId('estilo_id')->constrained('estilos_camisa')->onUpdate('cascade')->onDelete('restrict');
+            $table->foreignId('clasificacion_id')->constrained('clasificacion_talla')->onUpdate('cascade')->onDelete('restrict');
+            $table->string('nombre_comercial', 255)->notNullable();
             $table->text('descripcion')->nullable();
             $table->boolean('activo')->default(true);
             $table->timestamp('deleted_at')->nullable();

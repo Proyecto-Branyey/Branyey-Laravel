@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('tallas', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 10);
-            $table->foreignId('clasificacion_id')->constrained('clasificacion_talla');
+            $table->string('nombre', 10)->notNullable();
+            $table->foreignId('clasificacion_id')->constrained('clasificacion_talla')->onUpdate('cascade')->onDelete('restrict');
             $table->boolean('activo')->default(true);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();

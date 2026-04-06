@@ -58,6 +58,9 @@
                         <input type="hidden" name="producto_id" value="{{ $producto->id }}">
 
                         <div class="mb-5">
+                            <div class="mb-2">
+                                <span class="badge bg-info text-dark">Stock actual: <span id="stock-actual">Seleccione talla</span></span>
+                            </div>
                             <label class="form-label fw-black text-uppercase small tracking-widest mb-3">1. Elige Color</label>
                             <div class="d-flex flex-wrap gap-3">
                                 @foreach($producto->variantes->flatMap->colores->unique('id') as $color)
@@ -92,7 +95,7 @@
 
                         <div class="row g-2">
                             <div class="col-3">
-                                <input type="number" name="quantity" value="1" min="1" class="form-control form-control-lg rounded-pill text-center fw-bold border-dark">
+                                <input type="number" name="quantity" id="input-quantity" value="1" min="1" class="form-control form-control-lg rounded-pill text-center fw-bold border-dark">
                             </div>
                             <div class="col-9">
                                 <button type="submit" id="btn-add" class="btn btn-dark btn-lg rounded-pill w-100 py-3 fw-black text-uppercase tracking-widest shadow-lg" disabled>
@@ -114,6 +117,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const tallaRadios = document.querySelectorAll('.talla-radio');
     const btnAdd = document.getElementById('btn-add');
     const priceDisplay = document.getElementById('price-display');
+    const inputQuantity = document.getElementById('input-quantity');
+    const stockActual = document.getElementById('stock-actual');
+    // Obtener cantidades del carrito desde backend (si existe)
+    const cantidadesCarrito = @json(session('cart', []));
 
     colorRadios.forEach(radio => {
         radio.addEventListener('click', function() {
@@ -137,7 +144,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const stock = parseInt(this.dataset.stock);
             priceDisplay.innerText = this.dataset.precio;
 
-            if (stock > 0) {
+            // Obtener cantidad en carrito para esta variante
+            let cantidadEnCarrito = 0;
+            if (cantidadesCarrito[this.value] && cantidadesCarrito[this.value]['quantity']) {
+                cantidadEnCarrito = parseInt(cantidadesCarrito[this.value]['quantity']);
+            }
+            const stockDisponible = Math.max(stock - cantidadEnCarrito, 0);
+            inputQuantity.max = stockDisponible;
+            inputQuantity.value = stockDisponible > 0 ? 1 : 0;
+            stockActual.innerText = stockDisponible;
+
+            if (stockDisponible > 0) {
                 btnAdd.disabled = false;
                 document.getElementById('stock-warning').classList.add('d-none');
             } else {

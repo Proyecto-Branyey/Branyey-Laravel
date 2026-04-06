@@ -10,14 +10,13 @@ class UsersSeeder extends Seeder
 {
     public function run(): void
     {
-        // 👇 Usuario administrador
         User::create([
-            'name' => 'Admin',
+            'nombre_completo' => 'admin juan',
             'username' => 'admin',
             'email' => 'admin@example.com',
-            'email_verified_at' => now(),
             'password' => Hash::make('admin123'),
-            'rol_id' => 1, // administrador
+            'rol_id' => 1,
+            'activo' => true,
         ]);
     }
 }

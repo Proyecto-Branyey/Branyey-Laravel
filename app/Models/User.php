@@ -11,13 +11,20 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    /**
+     * Relación: historial de ventas del usuario
+     */
+    public function ventas()
+    {
+        return $this->hasMany(\App\Models\Venta::class, 'usuario_id');
+    }
+
     protected $table = 'usuarios';
 
     /**
      * Campos asignables
      */
     protected $fillable = [
-        'name',
         'username',
         'email',
         'telefono',
@@ -29,7 +36,6 @@ class User extends Authenticatable
         'rol_id',
         'activo',
     ];
-
     /**
      * Campos ocultos
      */

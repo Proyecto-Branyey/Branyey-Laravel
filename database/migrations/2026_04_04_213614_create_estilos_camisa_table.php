@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('estilos_camisa', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 100)->unique();
+            $table->string('nombre', 100)->unique()->notNullable();
             $table->boolean('activo')->default(true);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();

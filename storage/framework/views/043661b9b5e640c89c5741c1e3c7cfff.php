@@ -25,7 +25,7 @@
             <?php $__currentLoopData = $usuarios; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $usuario): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
                     <td><?php echo e($usuario->id); ?></td>
-                    <td><?php echo e($usuario->name); ?></td>
+                    <td><?php echo e($usuario->nombre_completo); ?></td>
                     <td><?php echo e($usuario->username); ?></td>
                     <td><?php echo e($usuario->email); ?></td>
                     <td><?php echo e($usuario->rol->nombre ?? '-'); ?></td>

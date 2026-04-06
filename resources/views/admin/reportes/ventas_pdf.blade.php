@@ -68,15 +68,7 @@
                         <td>{{ $venta->usuario->name ?? 'N/A' }}</td>
                         <td>{{ $venta->usuario->email ?? 'N/A' }}</td>
                         <td><strong>${{ number_format($venta->total, 0, ',', '.') }} COP</strong></td>
-                        <td>
-                            @if($venta->estado === 'completada')
-                                <strong style="color: green;">✓ Completada</strong>
-                            @elseif($venta->estado === 'pendiente')
-                                <strong style="color: orange;">⏱ Pendiente</strong>
-                            @else
-                                <strong style="color: red;">✗ Cancelada</strong>
-                            @endif
-                        </td>
+                        <td>{{ $venta->estado_label }}</td>
                         <td>{{ $venta->fecha ? $venta->fecha->format('d/m/Y H:i') : 'N/A' }}</td>
                     </tr>
                 @empty

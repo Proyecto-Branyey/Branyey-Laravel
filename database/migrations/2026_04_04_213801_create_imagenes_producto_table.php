@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('imagenes_producto', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('producto_id')->constrained('productos')->onDelete('cascade');
-            $table->foreignId('color_id')->constrained('colores');
-            $table->string('url', 500);
+            $table->foreignId('producto_id')->constrained('productos')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('color_id')->constrained('colores')->onUpdate('cascade')->onDelete('restrict');
+            $table->string('url', 500)->notNullable();
             $table->boolean('es_principal')->default(false);
-            $table->timestamps();
-            $table->unique(['producto_id', 'color_id']);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->unique(['producto_id', 'color_id'], 'unique_producto_color');
         });
     }
 

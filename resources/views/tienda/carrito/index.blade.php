@@ -23,7 +23,11 @@
                         <tr>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <img src="{{ asset($details['image']) }}" width="60" class="rounded-3 me-3">
+                                    @php
+                                        $img = $details['image'] ?? 'default.jpg';
+                                        $imgUrl = Str::startsWith($img, ['http', 'storage/', '/storage/']) ? asset($img) : Storage::url($img);
+                                    @endphp
+                                    <img src="{{ $imgUrl }}" width="60" class="rounded-3 me-3">
                                     <div>
                                         <p class="mb-0 fw-bold">{{ $details['name'] }}</p>
                                         <small class="text-muted">TALLA: {{ $details['talla'] }}</small>

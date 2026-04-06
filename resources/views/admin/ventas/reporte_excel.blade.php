@@ -15,7 +15,7 @@
                 <td>{{ $venta->usuario->nombre_completo ?? $venta->usuario->name ?? '-' }}</td>
                 <td>{{ $venta->created_at->format('Y-m-d H:i') }}</td>
                 <td>${{ number_format($venta->total, 0, ',', '.') }}</td>
-                <td>{{ ucfirst($venta->estado) }}</td>
+                <td>{{ $venta->estado_label }}</td>
             </tr>
         @endforeach
     </tbody>

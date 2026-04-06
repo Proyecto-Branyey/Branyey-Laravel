@@ -34,6 +34,16 @@
                                         <i class="bi bi-plus-lg me-2"></i> Añadir Nuevo
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger py-1 {{ request()->routeIs('admin.productos.papelera') ? 'fw-bold' : '' }}" href="{{ route('admin.productos.papelera') }}">
+                                        <i class="bi bi-trash3 me-2"></i> Papelera Productos
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger py-1 {{ request()->routeIs('admin.variantes.papelera') ? 'fw-bold' : '' }}" href="{{ route('admin.variantes.papelera') }}">
+                                        <i class="bi bi-trash3 me-2"></i> Papelera Variantes
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </li>

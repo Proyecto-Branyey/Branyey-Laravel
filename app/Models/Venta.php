@@ -16,10 +16,10 @@ class Venta extends Model {
      */
     public function scopeFiltros($query, $filtros)
     {
-        // Filtrar por cliente (nombre, email, teléfono)
+        // Filtrar por cliente (nombre_completo, email, teléfono)
         if (!empty($filtros['cliente'])) {
             $query->whereHas('usuario', function ($q) use ($filtros) {
-                $q->where('name', 'like', '%'.$filtros['cliente'].'%')
+                $q->where('nombre_completo', 'like', '%'.$filtros['cliente'].'%')
                   ->orWhere('email', 'like', '%'.$filtros['cliente'].'%')
                   ->orWhere('telefono', 'like', '%'.$filtros['cliente'].'%');
             });
@@ -80,11 +80,23 @@ class Venta extends Model {
         'usuario_id' => 'integer',
     ];
 
-    // Constantes de Estado (Excelentes para mantener orden)
-    const ESTADO_PENDIENTE = 'pendiente';
+    // Estados de venta para el flujo operativo del negocio
     const ESTADO_PAGADO = 'pagado';
+    const ESTADO_EN_PROCESO = 'en_proceso';
     const ESTADO_ENVIADO = 'enviado';
+    const ESTADO_ENTREGADO = 'entregado';
     const ESTADO_CANCELADO = 'cancelado';
+
+    public static function estadosDisponibles(): array
+    {
+        return [
+            self::ESTADO_PAGADO => 'Pagado',
+            self::ESTADO_EN_PROCESO => 'En proceso',
+            self::ESTADO_ENVIADO => 'Enviado',
+            self::ESTADO_ENTREGADO => 'Entregado',
+            self::ESTADO_CANCELADO => 'Cancelado',
+        ];
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -136,16 +148,22 @@ class Venta extends Model {
         return formatPriceCOP($this->total); // Formato moneda colombiana
     }
 
+    public function getEstadoLabelAttribute(): string
+    {
+        return self::estadosDisponibles()[$this->estado] ?? ucfirst(str_replace('_', ' ', $this->estado));
+    }
+
     public function getEstadoBadgeAttribute(): string
     {
         $clases = [
-            self::ESTADO_PENDIENTE => 'warning',
             self::ESTADO_PAGADO => 'success',
-            self::ESTADO_ENVIADO => 'info',
+            self::ESTADO_EN_PROCESO => 'warning',
+            self::ESTADO_ENVIADO => 'primary',
+            self::ESTADO_ENTREGADO => 'info',
             self::ESTADO_CANCELADO => 'danger',
         ];
         
         $clase = $clases[$this->estado] ?? 'secondary';
-        return "<span class='badge bg-{$clase}'>" . ucfirst($this->estado) . "</span>";
+        return "<span class='badge bg-{$clase}'>" . $this->estado_label . "</span>";
     }
 }

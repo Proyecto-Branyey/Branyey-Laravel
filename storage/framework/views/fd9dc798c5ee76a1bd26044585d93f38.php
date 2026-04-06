@@ -122,7 +122,7 @@
                                         <li><hr class="dropdown-divider"></li>
                                     <?php endif; ?>
                                     <li><a class="dropdown-item" href="<?php echo e(route('profile.edit')); ?>">Mi Perfil</a></li>
-                                    <li><a class="dropdown-item" href="#">Mis Pedidos</a></li>
+                                    <li><a class="dropdown-item" href="<?php echo e(route('tienda.pedidos')); ?>">Mis Pedidos</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form method="POST" action="<?php echo e(route('logout')); ?>">
@@ -200,6 +200,9 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Alpine.js para modales y componentes interactivos -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     
 

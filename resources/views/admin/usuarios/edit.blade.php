@@ -7,8 +7,22 @@
         @csrf
         @method('PUT')
         <div class="mb-3">
-            <label for="name" class="form-label">Nombre</label>
-            <input type="text" name="name" id="name" class="form-control" value="{{ old('name', $usuario->name) }}" required>
+            <label for="nombre_completo" class="form-label">Nombre completo</label>
+            <input type="text" name="nombre_completo" id="nombre_completo" class="form-control" value="{{ old('nombre_completo', $usuario->nombre_completo) }}">
+        </div>
+        <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="text" name="telefono" id="telefono" class="form-control" value="{{ old('telefono', $usuario->telefono) }}">
+        </div>
+        <div class="mb-3">
+            <label for="direccion_defecto" class="form-label">Dirección</label>
+            <input type="text" name="direccion_defecto" id="direccion_defecto" class="form-control" value="{{ old('direccion_defecto', $usuario->direccion_defecto) }}">
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="ciudad_defecto" class="form-label">Ciudad</label>
+                <input type="text" name="ciudad_defecto" id="ciudad_defecto" class="form-control" value="{{ old('ciudad_defecto', $usuario->ciudad_defecto) }}">
+            </div>
         </div>
         <div class="mb-3">
             <label for="username" class="form-label">Usuario</label>

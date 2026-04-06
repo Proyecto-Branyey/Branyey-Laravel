@@ -21,7 +21,7 @@
             <strong>Email:</strong> <?php echo e($venta->usuario->email ?? '-'); ?><br>
             <strong>Teléfono:</strong> <?php echo e($venta->usuario->telefono ?? '-'); ?><br>
             <strong>Fecha:</strong> <?php echo e($venta->created_at->format('Y-m-d H:i')); ?><br>
-            <strong>Estado:</strong> <?php echo e(ucfirst($venta->estado)); ?><br>
+            <strong>Estado:</strong> <?php echo e($venta->estado_label); ?><br>
             <?php if($venta->detallesOrden): ?>
                 <strong>Dirección de envío:</strong> <?php echo e($venta->detallesOrden->direccion ?? '-'); ?><br>
                 <strong>Ciudad:</strong> <?php echo e($venta->detallesOrden->ciudad ?? '-'); ?><br>

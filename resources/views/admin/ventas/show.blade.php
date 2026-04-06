@@ -1,16 +1,31 @@
 @extends('layouts.admin')
 @section('title', 'Detalle de Venta')
 @section('admin-content')
+@php
+    $estadoOpciones = [
+        'pagado' => 'Pagado',
+        'en_proceso' => 'En proceso',
+        'enviado' => 'Enviado',
+        'entregado' => 'Entregado',
+        'cancelado' => 'Cancelado',
+    ];
+
+    $estadoClases = [
+        'pagado' => 'success',
+        'en_proceso' => 'warning',
+        'enviado' => 'primary',
+        'entregado' => 'info',
+        'cancelado' => 'danger',
+    ];
+
+    $estadoClase = $estadoClases[$venta->estado] ?? 'secondary';
+@endphp
 <div class="container py-4">
     <div class="d-flex align-items-center mb-4">
         <h1 class="h3 mb-0 me-3">
             <i class="bi bi-receipt me-2"></i> Detalle de Venta
         </h1>
-        <span class="badge bg-{{
-            $venta->estado === 'pagado' ? 'success' :
-            ($venta->estado === 'pendiente' ? 'warning' :
-            ($venta->estado === 'cancelado' ? 'danger' : 'secondary'))
-        }} text-capitalize px-3 py-2">{{ $venta->estado }}</span>
+        <span class="badge bg-{{ $estadoClase }} text-capitalize px-3 py-2">{{ $venta->estado_label }}</span>
     </div>
     <div class="row g-3 mb-3">
         <div class="col-md-6">
@@ -31,12 +46,8 @@
                             <form action="{{ route('admin.ventas.cambiarEstado', $venta) }}" method="POST" class="d-inline align-middle estado-form">
                                 @csrf
                                 <div class="position-relative d-inline-block">
-                                    <select name="estado" class="form-select form-select-sm estado-select fw-semibold text-capitalize bg-{{
-                                        $venta->estado === 'pagado' ? 'success' :
-                                        ($venta->estado === 'pendiente' ? 'warning' :
-                                        ($venta->estado === 'cancelado' ? 'danger' : 'secondary'))
-                                    }} text-white border-0 px-2 py-1 pe-4 shadow-sm" onchange="this.form.submit()" style="min-width: 110px; cursor:pointer; transition: background 0.2s;">
-                                        @foreach(['pendiente' => 'Pendiente', 'pagado' => 'Pagado', 'enviado' => 'Enviado', 'cancelado' => 'Cancelado'] as $key => $label)
+                                    <select name="estado" class="form-select form-select-sm estado-select fw-semibold text-capitalize bg-{{ $estadoClase }} text-white border-0 px-2 py-1 pe-4 shadow-sm" onchange="this.form.submit()" style="min-width: 125px; cursor:pointer; transition: background 0.2s;">
+                                        @foreach($estadoOpciones as $key => $label)
                                             <option value="{{ $key }}" @if($venta->estado === $key) selected @endif>{{ $label }}</option>
                                         @endforeach
                                     </select>
@@ -190,6 +201,8 @@
         }
         .estado-form .estado-select.bg-success { background: #198754 !important; }
         .estado-form .estado-select.bg-warning { background: #ffc107 !important; color: #212529 !important; }
+        .estado-form .estado-select.bg-primary { background: #0d6efd !important; }
+        .estado-form .estado-select.bg-info { background: #0dcaf0 !important; color: #0b2f3a !important; }
         .estado-form .estado-select.bg-danger { background: #dc3545 !important; }
         .estado-form .estado-select.bg-secondary { background: #6c757d !important; }
         .estado-form .estado-select:focus { outline: 2px solid #0d6efd; box-shadow: 0 0 0 0.15rem #0d6efd33; }

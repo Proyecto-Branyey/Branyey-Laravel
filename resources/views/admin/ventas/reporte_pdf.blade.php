@@ -17,6 +17,7 @@
             <tr>
                 <th>ID</th>
                 <th>Cliente</th>
+                <th>Tipo de cliente</th>
                 <th>Fecha</th>
                 <th>Total</th>
                 <th>Estado</th>
@@ -27,9 +28,10 @@
                 <tr>
                     <td>{{ $venta->id }}</td>
                     <td>{{ $venta->usuario->nombre_completo ?? $venta->usuario->name ?? '-' }}</td>
+                    <td>{{ $venta->usuario->rol->nombre ?? '-' }}</td>
                     <td>{{ $venta->created_at->format('Y-m-d H:i') }}</td>
                     <td>${{ number_format($venta->total, 0, ',', '.') }}</td>
-                    <td>{{ ucfirst($venta->estado) }}</td>
+                    <td>{{ $venta->estado_label }}</td>
                 </tr>
             @endforeach
         </tbody>

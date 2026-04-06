@@ -1,14 +1,31 @@
 
 <?php $__env->startSection('title', 'Detalle de Venta'); ?>
 <?php $__env->startSection('admin-content'); ?>
+<?php
+    $estadoOpciones = [
+        'pagado' => 'Pagado',
+        'en_proceso' => 'En proceso',
+        'enviado' => 'Enviado',
+        'entregado' => 'Entregado',
+        'cancelado' => 'Cancelado',
+    ];
+
+    $estadoClases = [
+        'pagado' => 'success',
+        'en_proceso' => 'warning',
+        'enviado' => 'primary',
+        'entregado' => 'info',
+        'cancelado' => 'danger',
+    ];
+
+    $estadoClase = $estadoClases[$venta->estado] ?? 'secondary';
+?>
 <div class="container py-4">
     <div class="d-flex align-items-center mb-4">
         <h1 class="h3 mb-0 me-3">
             <i class="bi bi-receipt me-2"></i> Detalle de Venta
         </h1>
-        <span class="badge bg-<?php echo e($venta->estado === 'pagado' ? 'success' :
-            ($venta->estado === 'pendiente' ? 'warning' :
-            ($venta->estado === 'cancelado' ? 'danger' : 'secondary'))); ?> text-capitalize px-3 py-2"><?php echo e($venta->estado); ?></span>
+        <span class="badge bg-<?php echo e($estadoClase); ?> text-capitalize px-3 py-2"><?php echo e($venta->estado_label); ?></span>
     </div>
     <div class="row g-3 mb-3">
         <div class="col-md-6">
@@ -29,10 +46,8 @@
                             <form action="<?php echo e(route('admin.ventas.cambiarEstado', $venta)); ?>" method="POST" class="d-inline align-middle estado-form">
                                 <?php echo csrf_field(); ?>
                                 <div class="position-relative d-inline-block">
-                                    <select name="estado" class="form-select form-select-sm estado-select fw-semibold text-capitalize bg-<?php echo e($venta->estado === 'pagado' ? 'success' :
-                                        ($venta->estado === 'pendiente' ? 'warning' :
-                                        ($venta->estado === 'cancelado' ? 'danger' : 'secondary'))); ?> text-white border-0 px-2 py-1 pe-4 shadow-sm" onchange="this.form.submit()" style="min-width: 110px; cursor:pointer; transition: background 0.2s;">
-                                        <?php $__currentLoopData = ['pendiente' => 'Pendiente', 'pagado' => 'Pagado', 'enviado' => 'Enviado', 'cancelado' => 'Cancelado']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <select name="estado" class="form-select form-select-sm estado-select fw-semibold text-capitalize bg-<?php echo e($estadoClase); ?> text-white border-0 px-2 py-1 pe-4 shadow-sm" onchange="this.form.submit()" style="min-width: 125px; cursor:pointer; transition: background 0.2s;">
+                                        <?php $__currentLoopData = $estadoOpciones; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <option value="<?php echo e($key); ?>" <?php if($venta->estado === $key): ?> selected <?php endif; ?>><?php echo e($label); ?></option>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
@@ -188,6 +203,8 @@
         }
         .estado-form .estado-select.bg-success { background: #198754 !important; }
         .estado-form .estado-select.bg-warning { background: #ffc107 !important; color: #212529 !important; }
+        .estado-form .estado-select.bg-primary { background: #0d6efd !important; }
+        .estado-form .estado-select.bg-info { background: #0dcaf0 !important; color: #0b2f3a !important; }
         .estado-form .estado-select.bg-danger { background: #dc3545 !important; }
         .estado-form .estado-select.bg-secondary { background: #6c757d !important; }
         .estado-form .estado-select:focus { outline: 2px solid #0d6efd; box-shadow: 0 0 0 0.15rem #0d6efd33; }

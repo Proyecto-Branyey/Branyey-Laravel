@@ -1,6 +1,23 @@
 @extends('layouts.admin')
 @section('title', 'Ventas')
 @section('admin-content')
+@php
+    $estadoOpciones = [
+        'pagado' => 'Pagado',
+        'en_proceso' => 'En proceso',
+        'enviado' => 'Enviado',
+        'entregado' => 'Entregado',
+        'cancelado' => 'Cancelado',
+    ];
+
+    $estadoClases = [
+        'pagado' => 'success',
+        'en_proceso' => 'warning',
+        'enviado' => 'primary',
+        'entregado' => 'info',
+        'cancelado' => 'danger',
+    ];
+@endphp
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0">
@@ -13,15 +30,15 @@
                 @endforeach
                 <button type="submit" class="btn btn-outline-danger btn-sm me-2"><i class="bi bi-file-earmark-pdf"></i> PDF</button>
             </form>
-            <form method="GET" action="{{ route('admin.ventas.reporte', ['formato' => 'excel']) }}" class="d-inline">
+            <form method="GET" action="{{ route('admin.ventas.reporte', ['formato' => 'csv']) }}" class="d-inline">
                 @foreach(request()->except('page') as $key => $value)
                     <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                 @endforeach
-                <button type="submit" class="btn btn-outline-success btn-sm"><i class="bi bi-file-earmark-excel"></i> Excel</button>
+                <button type="submit" class="btn btn-outline-success btn-sm"><i class="bi bi-file-earmark-spreadsheet"></i> CSV</button>
             </form>
         </div>
     </div>
-    <!-- Filtros Mejorados -->
+
     <div class="card mb-4 border-0 shadow-sm bg-light">
         <div class="card-body py-3">
             <form method="GET" class="row g-3 align-items-end">
@@ -41,19 +58,18 @@
                     <label class="form-label mb-1"><i class="bi bi-flag me-1"></i>Estado</label>
                     <select name="estado" class="form-select">
                         <option value="">Todos</option>
-                        <option value="pendiente" @if(request('estado')=='pendiente') selected @endif>Pendiente</option>
-                        <option value="pagado" @if(request('estado')=='pagado') selected @endif>Pagado</option>
-                        <option value="enviado" @if(request('estado')=='enviado') selected @endif>Enviado</option>
-                        <option value="cancelado" @if(request('estado')=='cancelado') selected @endif>Cancelado</option>
+                        @foreach($estadoOpciones as $key => $label)
+                            <option value="{{ $key }}" @selected(request('estado') === $key)>{{ $label }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md-4 col-lg-2">
                     <label class="form-label mb-1"><i class="bi bi-calendar me-1"></i>Fecha desde</label>
-                    <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="form-control">
+                    <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="form-control" max="{{ request('fecha_hasta') }}">
                 </div>
                 <div class="col-md-4 col-lg-2">
                     <label class="form-label mb-1"><i class="bi bi-calendar me-1"></i>Fecha hasta</label>
-                    <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="form-control">
+                    <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="form-control" min="{{ request('fecha_desde') }}">
                 </div>
                 <div class="col-md-4 col-lg-1">
                     <label class="form-label mb-1"><i class="bi bi-currency-dollar me-1"></i>Total min</label>
@@ -66,10 +82,13 @@
                 <div class="col-12 col-lg-1 d-grid">
                     <button type="submit" class="btn btn-primary"><i class="bi bi-funnel me-1"></i>Filtrar</button>
                 </div>
+                <div class="col-12 col-lg-2 d-grid">
+                    <a href="{{ route('admin.ventas.index') }}" class="btn btn-outline-secondary"><i class="bi bi-x-circle me-1"></i>Borrar filtros</a>
+                </div>
             </form>
         </div>
     </div>
-    </div>
+
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -94,13 +113,10 @@
                                 <td>
                                     <form action="{{ route('admin.ventas.cambiarEstado', $venta) }}" method="POST" class="d-inline align-middle estado-form">
                                         @csrf
+                                        @php($estadoClase = $estadoClases[$venta->estado] ?? 'secondary')
                                         <div class="position-relative d-inline-block">
-                                            <select name="estado" class="form-select form-select-sm estado-select fw-semibold text-capitalize bg-{{
-                                                $venta->estado === 'pagado' ? 'success' :
-                                                ($venta->estado === 'pendiente' ? 'warning' :
-                                                ($venta->estado === 'cancelado' ? 'danger' : 'secondary'))
-                                            }} text-white border-0 px-2 py-1 pe-4 shadow-sm" onchange="this.form.submit()" style="min-width: 110px; cursor:pointer; transition: background 0.2s;">
-                                                @foreach(['pendiente' => 'Pendiente', 'pagado' => 'Pagado', 'enviado' => 'Enviado', 'cancelado' => 'Cancelado'] as $key => $label)
+                                            <select name="estado" class="form-select form-select-sm estado-select fw-semibold text-capitalize bg-{{ $estadoClase }} text-white border-0 px-2 py-1 pe-4 shadow-sm" onchange="this.form.submit()" style="min-width: 125px; cursor:pointer; transition: background 0.2s;">
+                                                @foreach($estadoOpciones as $key => $label)
                                                     <option value="{{ $key }}" @if($venta->estado === $key) selected @endif>{{ $label }}</option>
                                                 @endforeach
                                             </select>
@@ -143,10 +159,46 @@
         }
         .estado-form .estado-select.bg-success { background: #198754 !important; }
         .estado-form .estado-select.bg-warning { background: #ffc107 !important; color: #212529 !important; }
+        .estado-form .estado-select.bg-primary { background: #0d6efd !important; }
+        .estado-form .estado-select.bg-info { background: #0dcaf0 !important; color: #0b2f3a !important; }
         .estado-form .estado-select.bg-danger { background: #dc3545 !important; }
         .estado-form .estado-select.bg-secondary { background: #6c757d !important; }
         .estado-form .estado-select:focus { outline: 2px solid #0d6efd; box-shadow: 0 0 0 0.15rem #0d6efd33; }
         .estado-form { margin-bottom: 0; }
     </style>
+@endpush
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const fechaDesde = document.querySelector('input[name="fecha_desde"]');
+            const fechaHasta = document.querySelector('input[name="fecha_hasta"]');
+
+            if (!fechaDesde || !fechaHasta) {
+                return;
+            }
+
+            fechaDesde.addEventListener('change', function () {
+                fechaHasta.min = fechaDesde.value || '';
+            });
+
+            fechaHasta.addEventListener('change', function () {
+                fechaDesde.max = fechaHasta.value || '';
+            });
+
+            const form = fechaDesde.closest('form');
+            if (!form) {
+                return;
+            }
+
+            form.addEventListener('submit', function (e) {
+                if (fechaDesde.value && fechaHasta.value && fechaHasta.value < fechaDesde.value) {
+                    e.preventDefault();
+                    alert('La fecha hasta no puede ser anterior a la fecha desde.');
+                    fechaHasta.focus();
+                }
+            });
+        });
+    </script>
 @endpush
 @endsection

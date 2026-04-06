@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('colores', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 50);
+            $table->string('nombre', 50)->notNullable();
             $table->string('codigo_hex', 7)->nullable();
             $table->boolean('activo')->default(true);
             $table->timestamp('created_at')->useCurrent();
