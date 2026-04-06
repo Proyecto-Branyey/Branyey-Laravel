@@ -112,6 +112,11 @@
                     @endforeach
                 </div>
 
+                <div id="pending-changes-alert" class="alert alert-warning border-0 shadow-sm mt-3 d-none" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Tienes cambios pendientes. Para guardarlos debes presionar <strong>ACTUALIZAR PRODUCTO</strong>.
+                </div>
+
                 <div class="mt-4">
                     <button type="submit" class="btn btn-dark btn-lg w-100 shadow-lg fw-bold">
                         <i class="bi bi-save2 me-2"></i> ACTUALIZAR PRODUCTO
@@ -124,6 +129,19 @@
 
 <script>
 let variantIndex = {{ count($producto->variantes) }};
+let hasPendingChanges = false;
+const form = document.querySelector('form[action="{{ route('admin.productos.update', $producto) }}"]');
+const pendingChangesAlert = document.getElementById('pending-changes-alert');
+
+function markPendingChanges() {
+    hasPendingChanges = true;
+    pendingChangesAlert.classList.remove('d-none');
+}
+
+function clearPendingChanges() {
+    hasPendingChanges = false;
+    pendingChangesAlert.classList.add('d-none');
+}
 
 // Datos de tallas por clasificación
 const tallasPorClasificacion = {
@@ -195,16 +213,37 @@ document.getElementById('add-variant').addEventListener('click', function() {
     updateTallaSelects(clasificacionId);
 
     variantIndex++;
+    markPendingChanges();
 });
 
 document.addEventListener('click', function(e) {
     if (e.target.closest('.remove-row')) {
         if (document.querySelectorAll('.variant-row').length > 1) {
             e.target.closest('.variant-row').remove();
+            markPendingChanges();
         } else {
             alert("Debe haber al menos una variante.");
         }
     }
+});
+
+document.addEventListener('input', function(e) {
+    if (e.target.closest('form[action="{{ route('admin.productos.update', $producto) }}"]')) {
+        markPendingChanges();
+    }
+});
+
+form.addEventListener('submit', function() {
+    clearPendingChanges();
+});
+
+window.addEventListener('beforeunload', function(e) {
+    if (!hasPendingChanges) {
+        return;
+    }
+
+    e.preventDefault();
+    e.returnValue = '';
 });
 
 // Inicializar tallas al cargar

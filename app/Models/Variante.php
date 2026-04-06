@@ -14,18 +14,17 @@ class Variante extends Model
     {
         return $query->where('activo', true);
     }
-    use SoftDeletes;
-
     protected $table = 'variantes';
     public $timestamps = true;
     protected $fillable = [
-        'producto_id', 'talla_id', 'sku', 'stock', 'precio_minorista', 'precio_mayorista'
+        'producto_id', 'talla_id', 'sku', 'stock', 'precio_minorista', 'precio_mayorista', 'activo'
     ];
 
     protected $casts = [
         'precio_minorista' => 'decimal:2',
         'precio_mayorista' => 'decimal:2',
         'stock' => 'integer',
+        'activo' => 'boolean',
     ];
 
     public function producto(): BelongsTo {

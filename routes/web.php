@@ -82,6 +82,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
         Route::put('/{id}/activar', [ProductoAdminController::class, 'activar'])->whereNumber('id')->name('activar');
     });
 
+    // GESTION DE VARIANTES
+    Route::prefix('variantes')->name('variantes.')->group(function () {
+        Route::get('/papelera', [\App\Http\Controllers\Admin\VarianteAdminController::class, 'papelera'])->name('papelera');
+        Route::delete('/{id}/eliminar', [\App\Http\Controllers\Admin\VarianteAdminController::class, 'destroy'])->whereNumber('id')->name('destroy');
+        Route::put('/{id}/activar', [\App\Http\Controllers\Admin\VarianteAdminController::class, 'activar'])->whereNumber('id')->name('activar');
+    });
+
     // CRUD DE ESTILOS
     Route::prefix('estilos')->name('estilos.')->group(function () {
         Route::get('/', [EstiloAdminController::class, 'index'])->name('index');

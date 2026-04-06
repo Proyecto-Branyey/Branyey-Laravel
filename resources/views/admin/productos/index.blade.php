@@ -4,12 +4,17 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold"><i class="bi bi-stack me-2"></i>Inventario de Branyey</h2>
-        <a href="{{ route('admin.productos.create') }}" class="btn btn-dark shadow-sm">
-            <i class="bi bi-plus-lg me-2"></i>Nueva Prenda
-        </a>
-        <a href="{{ route('admin.productos.papelera') }}" class="btn btn-outline-danger ms-2 shadow-sm">
-            <i class="bi bi-trash3"></i> Papelera
-        </a>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('admin.productos.create') }}" class="btn btn-dark shadow-sm">
+                <i class="bi bi-plus-lg me-2"></i>Nueva Prenda
+            </a>
+            <a href="{{ route('admin.productos.papelera') }}" class="btn btn-outline-danger shadow-sm">
+                <i class="bi bi-trash3 me-1"></i> Papelera Productos
+            </a>
+            <a href="{{ route('admin.variantes.papelera') }}" class="btn btn-outline-danger shadow-sm">
+                <i class="bi bi-trash3 me-1"></i> Papelera Variantes
+            </a>
+        </div>
     </div>
 
     @if(session('success'))
