@@ -23,7 +23,7 @@
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Nombre Completo</label>
                             <input type="text" class="form-control form-control-lg rounded-pill bg-light border-0" 
-                                   value="{{ $user->name }}" readonly>
+                                   value="{{ $user->nombre_completo }}" readonly>
                         </div>
 
                         <div class="col-md-6">
@@ -42,7 +42,7 @@
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Dirección de Residencia</label>
                             <input type="text" name="direccion" class="form-control form-control-lg rounded-pill @error('direccion') is-invalid @enderror" 
-                                   value="{{ old('direccion', $user->direccion) }}" placeholder="Calle, Carrera, Conjunto, Apto..." required>
+                                   value="{{ old('direccion', $user->direccion_defecto) }}" placeholder="Calle, Carrera, Conjunto, Apto..." required>
                             @error('direccion') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
