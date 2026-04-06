@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\ColombiaApiController;
 use App\Http\Controllers\Tienda\CartController;
 use App\Http\Controllers\Tienda\OrdenController;
 use App\Http\Controllers\Admin\AdminController;
@@ -13,6 +14,17 @@ use Illuminate\Support\Facades\Route;
 // Redirección inicial a la tienda
 Route::get('/', function () {
     return redirect()->route('tienda.inicio');
+});
+
+/**
+ * ==========================================
+ * API PÚBLICA — Datos de Colombia (Web Service)
+ * Fuente: https://api-colombia.com
+ * ==========================================
+ */
+Route::prefix('api')->name('api.')->group(function () {
+    Route::get('/departamentos', [ColombiaApiController::class, 'departamentos'])->name('departamentos');
+    Route::get('/departamentos/{id}/ciudades', [ColombiaApiController::class, 'ciudades'])->name('ciudades')->whereNumber('id');
 });
 
 /**

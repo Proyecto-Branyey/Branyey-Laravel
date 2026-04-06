@@ -8,8 +8,10 @@ use App\Models\DetalleVenta;
 use App\Models\DetallesOrden;
 use App\Models\Variante;
 use Illuminate\Http\Request;
+use App\Mail\ConfirmacionOrdenMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class OrdenController extends Controller
 {
@@ -99,7 +101,11 @@ class OrdenController extends Controller
             DB::commit();
             
             // Limpiamos la sesión del carrito al finalizar con éxito
-            session()->forget('cart'); 
+            session()->forget('cart');
+
+            // Enviar correo de confirmación al cliente
+            $venta->load(['usuario', 'detallesVenta.variante.producto', 'detallesOrden']);
+            Mail::to($emailCliente)->send(new ConfirmacionOrdenMail($venta));
 
             return redirect()->route('tienda.inicio')->with('success', '¡Orden #'.$venta->id.' generada con éxito! Pronto recibirás tus prendas Branyey.');
 
