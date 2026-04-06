@@ -18,6 +18,20 @@ class AdminController extends Controller
             'productos_count'=> Producto::count(),
         ];
 
-        return view('admin.dashboard', compact('stats'));
+        // Obtener variantes con stock bajo (5 o menos unidades)
+        $bajo_stock = \App\Models\Variante::with(['producto', 'talla'])
+            ->where('stock', '<=', 5)
+            ->where('activo', true)
+            ->orderBy('stock', 'asc')
+            ->limit(10)
+            ->get();
+
+        // Obtener ventas recientes (últimas 5)
+        $ventas_recientes = Venta::with('usuario')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'bajo_stock', 'ventas_recientes'));
     }
 }
