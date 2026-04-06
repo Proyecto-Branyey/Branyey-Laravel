@@ -17,6 +17,7 @@
                     <th>Total</th>
                     <th>Estado</th>
                     <th>Factura</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,11 +26,23 @@
                     <td>{{ $venta->id }}</td>
                     <td>{{ $venta->created_at->format('d/m/Y H:i') }}</td>
                     <td>${{ number_format($venta->total, 0, ',', '.') }}</td>
-                    <td>{{ ucfirst($venta->estado) }}</td>
+                    <td>{!! $venta->estado_badge !!}</td>
                     <td>
                         <a href="{{ route('tienda.pedidos.factura', $venta->id) }}" class="btn btn-sm btn-outline-primary" target="_blank">
                             <i class="bi bi-file-earmark-pdf"></i> Ver Factura
                         </a>
+                    </td>
+                    <td>
+                        @if($venta->estado === App\Models\Venta::ESTADO_ENVIADO)
+                        <form action="{{ route('tienda.pedidos.recibido', $venta->id) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-success btn-sm">Marcar como recibido</button>
+                        </form>
+                        @elseif($venta->estado === App\Models\Venta::ESTADO_ENTREGADO)
+                            <span class="text-success">Recibido</span>
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
                     </td>
                 </tr>
                 @endforeach

@@ -46,6 +46,8 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
         Route::get('/pedidos', [\App\Http\Controllers\Tienda\PedidoController::class, 'index'])->name('pedidos');
         // Factura de venta para el usuario autenticado
         Route::get('/pedidos/{venta}/factura', [\App\Http\Controllers\Tienda\PedidoController::class, 'factura'])->name('pedidos.factura');
+        // Marcar pedido como recibido
+        Route::post('/pedidos/{venta}/recibido', [\App\Http\Controllers\Tienda\PedidoController::class, 'recibido'])->name('pedidos.recibido');
     });
 });
 

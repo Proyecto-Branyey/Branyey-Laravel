@@ -33,4 +33,19 @@ class PedidoController extends Controller
             ->get();
         return view('tienda.pedidos', compact('ventas'));
     }
+    /**
+     * Marcar un pedido como recibido (cambiar estado a entregado)
+     */
+    public function recibido(Request $request, Venta $venta)
+    {
+        $user = Auth::user();
+        if ($venta->usuario_id !== $user->id) {
+            abort(403, 'No tienes permiso para modificar este pedido.');
+        }
+        if ($venta->estado === \App\Models\Venta::ESTADO_ENVIADO) {
+            $venta->estado = \App\Models\Venta::ESTADO_ENTREGADO;
+            $venta->save();
+        }
+        return redirect()->route('tienda.pedidos')->with('success', '¡Gracias por confirmar la recepción de tu pedido!');
+    }
 }
