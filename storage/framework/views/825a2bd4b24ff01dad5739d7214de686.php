@@ -102,46 +102,110 @@
 
             <div class="row g-4 mb-4">
                 <div class="col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-primary border-4">
-                        <small class="text-muted fw-bold">VENTAS REALES</small>
-                        <h3 class="fw-black"><?php echo e($stats['ventas_count']); ?></h3>
+                    <div class="card border-0 shadow-lg rounded-4 p-4 position-relative overflow-hidden dashboard-card-gradient-primary">
+                        <div class="dashboard-icon-bg"><i class="bi bi-bar-chart-line"></i></div>
+                        <small class="text-uppercase fw-bold text-primary">Ventas reales</small>
+                        <h2 class="fw-black mb-0"><?php echo e($stats['ventas_count']); ?></h2>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-success border-4">
-                        <small class="text-muted fw-bold">INGRESOS TOTALES</small>
-                        <h3 class="fw-black">$<?php echo e(number_format($stats['ingresos_total'], 0, ',', '.')); ?> COP</h3>
+                    <div class="card border-0 shadow-lg rounded-4 p-4 position-relative overflow-hidden dashboard-card-gradient-success">
+                        <div class="dashboard-icon-bg"><i class="bi bi-cash-coin"></i></div>
+                        <small class="text-uppercase fw-bold text-success">Ingresos totales</small>
+                        <h2 class="fw-black mb-0">$<?php echo e(number_format($stats['ingresos_total'], 0, ',', '.')); ?> <span class="fs-6">COP</span></h2>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-warning border-4">
-                        <small class="text-muted fw-bold">CATÁLOGO</small>
-                        <h3 class="fw-black"><?php echo e($stats['productos_count']); ?></h3>
+                    <div class="card border-0 shadow-lg rounded-4 p-4 position-relative overflow-hidden dashboard-card-gradient-warning">
+                        <div class="dashboard-icon-bg"><i class="bi bi-box-seam"></i></div>
+                        <small class="text-uppercase fw-bold text-warning">Catálogo</small>
+                        <h2 class="fw-black mb-0"><?php echo e($stats['productos_count']); ?></h2>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-info border-4">
-                        <small class="text-muted fw-bold">CLIENTES</small>
-                        <h3 class="fw-black"><?php echo e($stats['usuarios_count']); ?></h3>
+                    <div class="card border-0 shadow-lg rounded-4 p-4 position-relative overflow-hidden dashboard-card-gradient-info">
+                        <div class="dashboard-icon-bg"><i class="bi bi-people"></i></div>
+                        <small class="text-uppercase fw-bold text-info">Clientes</small>
+                        <h2 class="fw-black mb-0"><?php echo e($stats['usuarios_count']); ?></h2>
                     </div>
                 </div>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
-                <h5 class="fw-bold"><i class="bi bi-rocket-takeoff me-2"></i>¡Bienvenido al Panel de Branyey!</h5>
-                <p class="text-muted">Utiliza el menú de la izquierda para gestionar tus prendas, actualizar stock o generar los reportes PDF para tu entrega.</p>
-            </div>
-        </main>
-    </div>
-</div>
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <h6 class="fw-bold mb-3 text-warning"><i class="bi bi-exclamation-triangle me-2"></i>Variantes bajas en stock</h6>
+                        <ul class="list-group list-group-flush">
+                            <?php $__empty_1 = true; $__currentLoopData = $bajo_stock; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $variante): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <?php echo e($variante->producto->nombre_comercial ?? 'Producto eliminado'); ?>
 
-<style>
-    .fw-black { font-weight: 900; }
-    .italic { font-style: italic; }
-    .sidebar .nav-link { transition: 0.2s; padding: 12px 20px; border-radius: 10px; margin: 5px 12px; font-size: 0.95rem; }
-    .sidebar .nav-link:hover { background: rgba(255,255,255,0.08); color: #fff !important; }
-    .nav-link[aria-expanded="true"] { background: rgba(255,255,255,0.05); }
-    hr { opacity: 0.2; }
-</style>
+                                        <?php if($variante->talla): ?>
+                                            <span class="badge bg-secondary ms-2">Talla: <?php echo e($variante->talla->nombre ?? '-'); ?></span>
+                                        <?php endif; ?>
+                                    </span>
+                                    <span class="badge bg-warning text-dark"><?php echo e($variante->stock); ?></span>
+                                </li>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                <li class="list-group-item text-muted">No hay variantes bajas en stock.</li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-clock-history me-2"></i>Ventas recientes</h6>
+                        <ul class="list-group list-group-flush">
+                            <?php $__empty_1 = true; $__currentLoopData = $ventas_recientes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $venta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>
+                                        #<?php echo e($venta->id); ?> -
+                                        <?php echo e($venta->usuario->nombre_completo ?? 'Cliente eliminado'); ?>
+
+                                        <small class="text-muted">(<?php echo e($venta->created_at->format('d/m/Y H:i')); ?>)</small>
+                                    </span>
+                                    <span class="badge bg-primary">$<?php echo e(number_format($venta->total, 0, ',', '.')); ?></span>
+                                </li>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                <li class="list-group-item text-muted">No hay ventas recientes.</li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .dashboard-card-gradient-primary {
+                    background: linear-gradient(135deg, #e3f0ff 0%, #c9e4ff 100%);
+                }
+                .dashboard-card-gradient-success {
+                    background: linear-gradient(135deg, #e6ffed 0%, #c8ffe3 100%);
+                }
+                .dashboard-card-gradient-warning {
+                    background: linear-gradient(135deg, #fffbe6 0%, #fff3c8 100%);
+                }
+                .dashboard-card-gradient-info {
+                    background: linear-gradient(135deg, #e6f7ff 0%, #c8f4ff 100%);
+                }
+                .dashboard-icon-bg {
+                    position: absolute;
+                    top: 10px;
+                    right: 20px;
+                    font-size: 3.5rem;
+                    opacity: 0.13;
+                    z-index: 0;
+                }
+                .dashboard-card-gradient-primary .dashboard-icon-bg { color: #007bff; }
+                .dashboard-card-gradient-success .dashboard-icon-bg { color: #28a745; }
+                .dashboard-card-gradient-warning .dashboard-icon-bg { color: #ffc107; }
+                .dashboard-card-gradient-info .dashboard-icon-bg { color: #17a2b8; }
+                .fw-black { font-weight: 900; }
+                .italic { font-style: italic; }
+                .sidebar .nav-link { transition: 0.2s; padding: 12px 20px; border-radius: 10px; margin: 5px 12px; font-size: 0.95rem; }
+                .sidebar .nav-link:hover { background: rgba(255,255,255,0.08); color: #fff !important; }
+                .nav-link[aria-expanded="true"] { background: rgba(255,255,255,0.05); }
+                hr { opacity: 0.2; }
+            </style>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\resources\views/admin/dashboard.blade.php ENDPATH**/ ?>

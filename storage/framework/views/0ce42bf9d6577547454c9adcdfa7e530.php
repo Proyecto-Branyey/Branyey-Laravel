@@ -1,41 +1,39 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', $producto->nombre_comercial . ' - Branyey'); ?>
 
-@section('title', $producto->nombre_comercial . ' - Branyey')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="bg-white min-h-screen py-5">
     <div class="container">
         <nav aria-label="breadcrumb" class="mb-5">
             <ol class="breadcrumb small text-uppercase fw-black italic tracking-widest mb-0">
                 <li class="breadcrumb-item"><a href="/" class="text-muted text-decoration-none">Inicio</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('tienda.catalogo') }}" class="text-muted text-decoration-none">Catálogo</a></li>
-                <li class="breadcrumb-item active text-dark">{{ $producto->nombre_comercial }}</li>
+                <li class="breadcrumb-item"><a href="<?php echo e(route('tienda.catalogo')); ?>" class="text-muted text-decoration-none">Catálogo</a></li>
+                <li class="breadcrumb-item active text-dark"><?php echo e($producto->nombre_comercial); ?></li>
             </ol>
         </nav>
 
         <div class="row g-5">
             <div class="col-lg-7">
                 <div class="sticky-top" style="top: 100px;">
-                    @php $primeraImg = $producto->imagenes->first(); @endphp
+                    <?php $primeraImg = $producto->imagenes->first(); ?>
                     <div class="rounded-5 overflow-hidden shadow-sm bg-light mb-3">
                         <img id="main-product-image" 
-                             src="{{ $primeraImg ? Storage::url($primeraImg->url) : asset('img/placeholder.jpg') }}" 
+                             src="<?php echo e($primeraImg ? Storage::url($primeraImg->url) : asset('img/placeholder.jpg')); ?>" 
                              class="img-fluid w-100 object-cover" style="min-height: 550px; object-position: top;">
                     </div>
 
                     <div class="d-flex gap-2 overflow-auto pb-2" id="gallery-thumbs">
-                        @foreach($producto->variantes->flatMap->colores->unique('id') as $color)
-                            @php
+                        <?php $__currentLoopData = $producto->variantes->flatMap->colores->unique('id'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
                                 $imagenColor = $producto->imagenes->firstWhere('color_id', $color->id);
-                            @endphp
-                            @if($imagenColor)
-                                <img src="{{ Storage::url($imagenColor->url) }}" class="rounded-4 thumb-img border cursor-pointer"
+                            ?>
+                            <?php if($imagenColor): ?>
+                                <img src="<?php echo e(Storage::url($imagenColor->url)); ?>" class="rounded-4 thumb-img border cursor-pointer"
                                      style="width: 80px; height: 100px; object-fit: cover;"
-                                     data-full="{{ Storage::url($imagenColor->url) }}"
-                                     data-color-id="{{ $color->id }}"
+                                     data-full="<?php echo e(Storage::url($imagenColor->url)); ?>"
+                                     data-color-id="<?php echo e($color->id); ?>"
                                      onclick="document.getElementById('main-product-image').src = this.dataset.full">
-                            @endif
-                        @endforeach
+                            <?php endif; ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
             </div>
@@ -43,19 +41,19 @@
             <div class="col-lg-5">
                 <div class="ps-lg-4">
                     <span class="badge bg-dark rounded-pill px-3 py-2 mb-3 text-uppercase tracking-widest" style="font-size: 10px;">
-                        {{ $producto->estilo?->nombre ?? 'Colección' }} • Colección 2026
+                        <?php echo e($producto->estilo?->nombre ?? 'Colección'); ?> • Colección 2026
                     </span>
 
-                    <h1 class="display-4 fw-black text-uppercase italic tracking-tighter mb-2">{{ $producto->nombre_comercial }}</h1>
-                    <p class="text-muted fw-bold mb-4 small tracking-widest">REF: {{ $producto->estilo?->nombre ?? '' }}</p>
+                    <h1 class="display-4 fw-black text-uppercase italic tracking-tighter mb-2"><?php echo e($producto->nombre_comercial); ?></h1>
+                    <p class="text-muted fw-bold mb-4 small tracking-widest">REF: <?php echo e($producto->estilo?->nombre ?? ''); ?></p>
 
                     <h2 class="fw-bold mb-5 display-6 text-dark">
                         <span id="price-display">Selecciona color y talla</span>
                     </h2>
 
-                    <form action="{{ route('tienda.cart.add') }}" method="POST" id="form-compra">
-                        @csrf
-                        <input type="hidden" name="producto_id" value="{{ $producto->id }}">
+                    <form action="<?php echo e(route('tienda.cart.add')); ?>" method="POST" id="form-compra">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="producto_id" value="<?php echo e($producto->id); ?>">
 
                         <div class="mb-5">
                             <div class="mb-2">
@@ -63,33 +61,34 @@
                             </div>
                             <label class="form-label fw-black text-uppercase small tracking-widest mb-3">1. Elige Color</label>
                             <div class="d-flex flex-wrap gap-3">
-                                @foreach($producto->variantes->flatMap->colores->unique('id') as $color)
+                                <?php $__currentLoopData = $producto->variantes->flatMap->colores->unique('id'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="color-option">
-                                        <input type="radio" name="color_id" id="c-{{ $color->id }}" value="{{ $color->id }}" 
-                                               class="btn-check color-radio" data-color-id="{{ $color->id }}" required>
-                                        <label class="color-circle shadow-sm" for="c-{{ $color->id }}" 
-                                               style="background-color: {{ $color->codigo_hex }}; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid #fff; display: block;">
+                                        <input type="radio" name="color_id" id="c-<?php echo e($color->id); ?>" value="<?php echo e($color->id); ?>" 
+                                               class="btn-check color-radio" data-color-id="<?php echo e($color->id); ?>" required>
+                                        <label class="color-circle shadow-sm" for="c-<?php echo e($color->id); ?>" 
+                                               style="background-color: <?php echo e($color->codigo_hex); ?>; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid #fff; display: block;">
                                         </label>
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
 
                         <div class="mb-5">
                             <label class="form-label fw-black text-uppercase small tracking-widest mb-3">2. Elige Talla</label>
                             <div class="d-flex flex-wrap gap-2" id="tallas-container">
-                                @foreach($producto->variantes as $v)
-                                    @foreach($v->colores as $color)
-                                        <div class="talla-item d-none color-group-{{ $color->id }}">
-                                            <input type="radio" name="variante_id" id="v-{{ $v->id }}" value="{{ $v->id }}" 
-                                                   class="btn-check talla-radio" data-precio="{{ $v->precio_formateado }}" 
-                                                   data-stock="{{ $v->stock }}" required>
-                                            <label class="btn btn-outline-dark rounded-pill px-4 py-2 fw-bold" for="v-{{ $v->id }}">
-                                                {{ $v->talla?->nombre ?? 'Sin talla' }}
+                                <?php $__currentLoopData = $producto->variantes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $v): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php $__currentLoopData = $v->colores; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <div class="talla-item d-none color-group-<?php echo e($color->id); ?>">
+                                            <input type="radio" name="variante_id" id="v-<?php echo e($v->id); ?>" value="<?php echo e($v->id); ?>" 
+                                                   class="btn-check talla-radio" data-precio="<?php echo e($v->precio_formateado); ?>" 
+                                                   data-stock="<?php echo e($v->stock); ?>" required>
+                                            <label class="btn btn-outline-dark rounded-pill px-4 py-2 fw-bold" for="v-<?php echo e($v->id); ?>">
+                                                <?php echo e($v->talla?->nombre ?? 'Sin talla'); ?>
+
                                             </label>
                                         </div>
-                                    @endforeach
-                                @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
 
@@ -120,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const inputQuantity = document.getElementById('input-quantity');
     const stockActual = document.getElementById('stock-actual');
     // Obtener cantidades del carrito desde backend (si existe)
-    const cantidadesCarrito = @json(session('cart', []));
+    const cantidadesCarrito = <?php echo json_encode(session('cart', []), 512) ?>;
 
     colorRadios.forEach(radio => {
         radio.addEventListener('click', function() {
@@ -175,4 +174,5 @@ document.addEventListener('DOMContentLoaded', function() {
     .color-radio:checked + .color-circle { border-color: #000 !important; transform: scale(1.1); }
     .btn-check:checked + .btn-outline-dark { background-color: #000 !important; color: #fff !important; }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\resources\views/tienda/producto_detalle.blade.php ENDPATH**/ ?>

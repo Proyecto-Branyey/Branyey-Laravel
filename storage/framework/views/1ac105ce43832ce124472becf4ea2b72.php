@@ -28,10 +28,12 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars, $__key, $__value); ?>
 
+
+
 <?php if($messages): ?>
     <ul <?php echo e($attributes->merge(['class' => 'text-sm text-red-600 dark:text-red-400 space-y-1'])); ?>>
         <?php $__currentLoopData = (array) $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <li><?php echo e($message); ?></li>
+            <li><?php echo $message; ?></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </ul>
 <?php endif; ?>
