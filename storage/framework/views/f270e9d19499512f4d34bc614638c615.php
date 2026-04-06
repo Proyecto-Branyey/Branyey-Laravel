@@ -17,6 +17,7 @@
             <tr>
                 <th>ID</th>
                 <th>Cliente</th>
+                <th>Tipo de cliente</th>
                 <th>Fecha</th>
                 <th>Total</th>
                 <th>Estado</th>
@@ -27,6 +28,7 @@
                 <tr>
                     <td><?php echo e($venta->id); ?></td>
                     <td><?php echo e($venta->usuario->nombre_completo ?? $venta->usuario->name ?? '-'); ?></td>
+                    <td><?php echo e($venta->usuario->rol->nombre ?? '-'); ?></td>
                     <td><?php echo e($venta->created_at->format('Y-m-d H:i')); ?></td>
                     <td>$<?php echo e(number_format($venta->total, 0, ',', '.')); ?></td>
                     <td><?php echo e(ucfirst($venta->estado)); ?></td>

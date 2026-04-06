@@ -56,8 +56,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
     Route::get('ventas/{venta}/factura', [\App\Http\Controllers\Admin\VentaAdminController::class, 'factura'])
         ->name('ventas.factura');
 
-        // Reportes de ventas PDF/Excel
+        // Reportes de ventas PDF/CSV
         Route::get('ventas/reporte/{formato?}', [\App\Http\Controllers\Admin\ReporteVentasController::class, 'descargar'])
+            ->where('formato', 'pdf|csv')
             ->name('ventas.reporte');
     
     // Panel Principal (Estadísticas)

@@ -13,11 +13,12 @@
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 <button type="submit" class="btn btn-outline-danger btn-sm me-2"><i class="bi bi-file-earmark-pdf"></i> PDF</button>
             </form>
-            <form method="GET" action="<?php echo e(route('admin.ventas.reporte', ['formato' => 'excel'])); ?>" class="d-inline">
+            <form method="GET" action="<?php echo e(route('admin.ventas.reporte', ['formato' => 'csv'])); ?>" class="d-inline">
                 <?php $__currentLoopData = request()->except('page'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <input type="hidden" name="<?php echo e($key); ?>" value="<?php echo e($value); ?>">
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                <button type="submit" class="btn btn-outline-success btn-sm"><i class="bi bi-file-earmark-excel"></i> Excel</button>
+                <button type="submit" class="btn btn-outline-success btn-sm"><i class="bi bi-file-earmark-spreadsheet"></i> CSV</button>
+            </form>
             </form>
         </div>
     </div>

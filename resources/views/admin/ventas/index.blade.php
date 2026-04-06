@@ -13,11 +13,12 @@
                 @endforeach
                 <button type="submit" class="btn btn-outline-danger btn-sm me-2"><i class="bi bi-file-earmark-pdf"></i> PDF</button>
             </form>
-            <form method="GET" action="{{ route('admin.ventas.reporte', ['formato' => 'excel']) }}" class="d-inline">
+            <form method="GET" action="{{ route('admin.ventas.reporte', ['formato' => 'csv']) }}" class="d-inline">
                 @foreach(request()->except('page') as $key => $value)
                     <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                 @endforeach
-                <button type="submit" class="btn btn-outline-success btn-sm"><i class="bi bi-file-earmark-excel"></i> Excel</button>
+                <button type="submit" class="btn btn-outline-success btn-sm"><i class="bi bi-file-earmark-spreadsheet"></i> CSV</button>
+            </form>
             </form>
         </div>
     </div>
