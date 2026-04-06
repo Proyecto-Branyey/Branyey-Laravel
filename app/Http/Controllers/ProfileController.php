@@ -12,6 +12,16 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
+     * Descargar los datos del usuario en PDF.
+     */
+    public function descargarDatosPdf(Request $request)
+    {
+        $user = $request->user();
+        $pdf = app('dompdf.wrapper');
+        $pdf->loadView('profile.datos_pdf', compact('user'));
+        return $pdf->download('mis_datos.pdf');
+    }
+    /**
      * Display the user's profile form.
      */
     public function edit(Request $request): View
@@ -47,14 +57,13 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+        $user->activo = false;
+        $user->save();
 
         Auth::logout();
-
-        $user->delete();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+        return Redirect::to('/')->with('status', 'Cuenta desactivada. Si deseas reactivarla, comunícate con soporte.');
     }
 }

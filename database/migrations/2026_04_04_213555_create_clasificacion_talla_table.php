@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('clasificacion_talla', function (Blueprint $table) {
             $table->id();
-            $table->enum('nombre', ['Niño', 'Dama', 'Adulto'])->unique();
+            $table->enum('nombre', ['Niño', 'Dama', 'Adulto'])->unique()->notNullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
         });

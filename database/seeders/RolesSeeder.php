@@ -13,10 +13,10 @@ class RolesSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('roles')->upsert([
-            ['nombre' => 'administrador'],
-            ['nombre' => 'mayorista'],
-            ['nombre' => 'minorista'],
-        ], ['nombre']);
+        DB::table('roles')->insertOrIgnore([
+            ['id' => 1, 'nombre' => 'administrador', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 2, 'nombre' => 'mayorista', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 3, 'nombre' => 'minorista', 'created_at' => now(), 'updated_at' => now()],
+        ]);
     }
 }

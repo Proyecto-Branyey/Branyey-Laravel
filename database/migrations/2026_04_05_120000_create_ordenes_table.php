@@ -13,9 +13,9 @@ return new class extends Migration
             $table->unsignedBigInteger('cliente_id');
             $table->date('fecha')->nullable();
             $table->string('estado')->default('pendiente');
-            $table->timestamps();
-
-            $table->foreign('cliente_id')->references('id')->on('usuarios')->onDelete('cascade');
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->foreign('cliente_id')->references('id')->on('usuarios')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

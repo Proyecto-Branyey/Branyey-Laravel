@@ -43,8 +43,20 @@ class LoginRequest extends FormRequest
         $login = $this->input('login', $this->input('email'));
         $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        // Intentamos el login usando el campo detectado dinámicamente
-        if (! Auth::attempt([$fieldType => $login, 'password' => $this->input('password')], $this->boolean('remember'))) {
+        // Buscar usuario por username/email
+        $userModel = Auth::getProvider()->retrieveByCredentials([$fieldType => $login]);
+        if ($userModel && !$userModel->activo) {
+            $mensaje = "Su cuenta está inhabilitada, <a href='https://wa.me/573213229744' target='_blank' style='color:#0d6efd;font-weight:600'>comuníquese aquí</a> para reactivarla.";
+            throw ValidationException::withMessages([
+                'login' => $mensaje,
+                'email' => $mensaje,
+            ]);
+        }
+
+        // Solo permite usuarios activos
+        $credentials = [$fieldType => $login, 'password' => $this->input('password'), 'activo' => true];
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

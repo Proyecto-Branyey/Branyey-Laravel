@@ -13,14 +13,15 @@ return new class extends Migration
     {
         Schema::create('detalles_orden', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('venta_id')->constrained('ventas')->onDelete('cascade');
-            $table->string('nombre_cliente', 255);
-            $table->string('email_cliente', 255);
-            $table->string('telefono_cliente', 50);
-            $table->text('direccion_envio');
-            $table->string('ciudad', 100);
-            $table->string('departamento', 100);
-            $table->timestamps();
+            $table->foreignId('venta_id')->constrained('ventas')->onUpdate('cascade')->onDelete('cascade');
+            $table->string('nombre_cliente', 255)->notNullable();
+            $table->string('email_cliente', 255)->notNullable();
+            $table->string('telefono_cliente', 50)->notNullable();
+            $table->text('direccion_envio')->notNullable();
+            $table->string('ciudad', 100)->notNullable();
+            $table->string('departamento', 100)->notNullable();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
         });
     }
 

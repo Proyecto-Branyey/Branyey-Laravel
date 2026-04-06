@@ -24,7 +24,7 @@
                             <input id="login" type="text" class="form-control @error('login') is-invalid @enderror" 
                                    name="login" value="{{ old('login') }}" required autofocus autocomplete="username">
                             @error('login')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{!! $message !!}</div>
                             @enderror
                         </div>
 

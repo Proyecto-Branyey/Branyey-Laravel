@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('ventas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('usuario_id')->nullable()->constrained('usuarios')->onDelete('set null');
-            $table->decimal('total', 12, 2);
+            $table->foreignId('usuario_id')->nullable()->constrained('usuarios')->onUpdate('cascade')->onDelete('set null');
+            $table->decimal('total', 12, 2)->notNullable();
             $table->enum('estado', ['pendiente', 'pagado', 'enviado', 'cancelado'])->default('pendiente');
-            $table->softDeletes();
-            $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->index('estado', 'idx_ventas_estado');
         });
     }
 

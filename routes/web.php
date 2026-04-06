@@ -42,6 +42,10 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
         // Checkout y Generación de Orden (Transaccional)
         Route::get('/checkout', [OrdenController::class, 'checkout'])->name('checkout');
         Route::post('/confirmar-compra', [OrdenController::class, 'store'])->name('orden.store');
+        // Historial de pedidos del usuario (Mis Pedidos)
+        Route::get('/pedidos', [\App\Http\Controllers\Tienda\PedidoController::class, 'index'])->name('pedidos');
+        // Factura de venta para el usuario autenticado
+        Route::get('/pedidos/{venta}/factura', [\App\Http\Controllers\Tienda\PedidoController::class, 'factura'])->name('pedidos.factura');
     });
 });
 
@@ -134,6 +138,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
  * ==========================================
  */
 Route::middleware('auth')->group(function () {
+        Route::get('/profile/datos/pdf', [ProfileController::class, 'descargarDatosPdf'])->name('profile.datos.pdf');
     Route::get('/dashboard', function () {
         return redirect()->route('tienda.catalogo');
     })->name('dashboard');

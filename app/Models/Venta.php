@@ -16,10 +16,10 @@ class Venta extends Model {
      */
     public function scopeFiltros($query, $filtros)
     {
-        // Filtrar por cliente (nombre, email, teléfono)
+        // Filtrar por cliente (nombre_completo, email, teléfono)
         if (!empty($filtros['cliente'])) {
             $query->whereHas('usuario', function ($q) use ($filtros) {
-                $q->where('name', 'like', '%'.$filtros['cliente'].'%')
+                $q->where('nombre_completo', 'like', '%'.$filtros['cliente'].'%')
                   ->orWhere('email', 'like', '%'.$filtros['cliente'].'%')
                   ->orWhere('telefono', 'like', '%'.$filtros['cliente'].'%');
             });

@@ -28,12 +28,11 @@ class VentaAdminController extends Controller
     {
         $query = Venta::with('usuario');
 
-        // Filtro por nombre o email de cliente
+        // Filtro por nombre_completo o email de cliente
         if ($request->filled('cliente')) {
             $cliente = $request->cliente;
             $query->whereHas('usuario', function($q) use ($cliente) {
                 $q->where('nombre_completo', 'like', "%$cliente%")
-                  ->orWhere('name', 'like', "%$cliente%")
                   ->orWhere('email', 'like', "%$cliente%")
                   ->orWhere('telefono', 'like', "%$cliente%")
                   ;
