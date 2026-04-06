@@ -22,18 +22,8 @@ class ProductoAdminController extends Controller
      */
     public function papelera()
     {
-        $productos = Producto::withTrashed()
-            ->with([
-                'estilo',
-                'imagenes',
-                'variantes' => function ($query) {
-                    $query->withTrashed();
-                },
-            ])
-            ->where(function ($query) {
-                $query->where('activo', false)
-                    ->orWhereNotNull('deleted_at');
-            })
+        $productos = Producto::with(['estilo', 'imagenes', 'variantes'])
+            ->where('activo', false)
             ->orderBy('id', 'desc')
             ->get();
         return view('admin.productos.papelera', compact('productos'));
@@ -43,24 +33,13 @@ class ProductoAdminController extends Controller
      */
     public function activar($id)
     {
-        $producto = Producto::withTrashed()->findOrFail($id);
-
-        if ($producto->trashed()) {
-            $producto->restore();
-        }
-
+        $producto = Producto::with('variantes')->findOrFail($id);
         $producto->activo = true;
         $producto->save();
-
-        $variantes = Variante::withTrashed()->where('producto_id', $producto->id)->get();
-        foreach ($variantes as $variante) {
-            if ($variante->trashed()) {
-                $variante->restore();
-            }
+        foreach ($producto->variantes as $variante) {
             $variante->activo = true;
             $variante->save();
         }
-
         return redirect()->route('admin.productos.index')
             ->with('success', 'Producto y variantes activados correctamente.');
     }
@@ -237,7 +216,7 @@ class ProductoAdminController extends Controller
                 'clasificacion_id' => $request->clasificacion_id,
             ]);
 
-            $existingVariantIds = $producto->variantes()->pluck('id')->toArray();
+            $existingVariantIds = $producto->variantes->pluck('id')->toArray();
             $updatedVariantIds = [];
 
             foreach ($request->variantes as $index => $v) {
@@ -306,15 +285,21 @@ class ProductoAdminController extends Controller
                 }
             }
 
-            // Enviar a papelera variantes removidas desde el formulario de edición
+            // Eliminar variantes que ya no existen
             $variantsToDelete = array_diff($existingVariantIds, $updatedVariantIds);
-            $removedVariantsCount = count($variantsToDelete);
             foreach ($variantsToDelete as $variantId) {
-                $variante = Variante::where('producto_id', $producto->id)->find($variantId);
+                $variante = Variante::find($variantId);
                 if ($variante) {
-                    // En papelera lógica de variantes no se elimina la imagen para poder recuperarla intacta.
-                    Variante::where('id', $variantId)->update(['activo' => false]);
-                    Variante::where('id', $variantId)->delete();
+                    foreach ($variante->colores as $color) {
+                        $imagen = ImagenProducto::where('producto_id', $producto->id)
+                            ->where('color_id', $color->id)
+                            ->first();
+                        if ($imagen) {
+                            Storage::disk('public')->delete($imagen->url);
+                            $imagen->delete();
+                        }
+                    }
+                    $variante->delete();
                 }
             }
 
@@ -325,7 +310,7 @@ class ProductoAdminController extends Controller
 
             return redirect()
                 ->route('admin.productos.index')
-                ->with('success', 'Producto actualizado correctamente.' . ($removedVariantsCount > 0 ? ' Se enviaron ' . $removedVariantsCount . ' variante(s) a la papelera.' : ''));
+                ->with('success', 'Producto actualizado correctamente.');
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -341,23 +326,35 @@ class ProductoAdminController extends Controller
     }
 
     /**
-     * Envía un producto a papelera junto con sus variantes.
+     * Elimina un producto si no tiene ventas registradas.
      */
     public function destroy($id)
     {
         $producto = Producto::with('variantes')->findOrFail($id);
-
+        $tieneVentas = false;
         foreach ($producto->variantes as $variante) {
-            $variante->activo = false;
-            $variante->save();
+            if (\App\Models\DetalleVenta::where('variante_id', $variante->id)->exists()) {
+                $tieneVentas = true;
+                break;
+            }
+        }
+        if ($tieneVentas) {
+            // Desactivar producto y variantes
+            $producto->activo = false;
+            $producto->save();
+            foreach ($producto->variantes as $variante) {
+                $variante->activo = false;
+                $variante->save();
+            }
+            return redirect()->route('admin.productos.index')
+                ->with('success', 'Producto desactivado correctamente porque tiene ventas registradas.');
+        }
+        // Eliminar producto y variantes si no tiene ventas
+        foreach ($producto->variantes as $variante) {
             $variante->delete();
         }
-
-        $producto->activo = false;
-        $producto->save();
         $producto->delete();
-
         return redirect()->route('admin.productos.index')
-            ->with('success', 'Producto enviado a la papelera junto con sus variantes.');
+            ->with('success', 'Producto eliminado correctamente.');
     }
 }

@@ -26,21 +26,14 @@ class VentaAdminController extends Controller
 
     public function index(Request $request)
     {
-        $request->validate([
-            'estado' => 'nullable|in:pagado,en_proceso,enviado,entregado,cancelado',
-            'fecha_desde' => 'nullable|date',
-            'fecha_hasta' => 'nullable|date|after_or_equal:fecha_desde',
-            'total_min' => 'nullable|numeric|min:0',
-            'total_max' => 'nullable|numeric|min:0',
-        ]);
-
         $query = Venta::with('usuario');
 
-        // Filtro por nombre_completo o email de cliente
+        // Filtro por nombre o email de cliente
         if ($request->filled('cliente')) {
             $cliente = $request->cliente;
             $query->whereHas('usuario', function($q) use ($cliente) {
                 $q->where('nombre_completo', 'like', "%$cliente%")
+                  ->orWhere('name', 'like', "%$cliente%")
                   ->orWhere('email', 'like', "%$cliente%")
                   ->orWhere('telefono', 'like', "%$cliente%")
                   ;
@@ -131,7 +124,7 @@ class VentaAdminController extends Controller
     public function cambiarEstado(Request $request, Venta $venta)
     {
         $request->validate([
-            'estado' => 'required|in:pagado,en_proceso,enviado,entregado,cancelado',
+            'estado' => 'required|in:pendiente,pagado,enviado,cancelado',
         ]);
         $venta->estado = $request->estado;
         $venta->save();
