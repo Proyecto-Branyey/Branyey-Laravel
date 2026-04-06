@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\Tienda\CartController;
+use App\Http\Controllers\Tienda\OrdenController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\ProductoAdminController;
@@ -38,6 +39,9 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
             Route::delete('/remove/{id}', [CartController::class, 'remove'])->name('remove');
         });
 
+        // Checkout y Generación de Orden (Transaccional)
+        Route::get('/checkout', [OrdenController::class, 'checkout'])->name('checkout');
+        Route::post('/confirmar-compra', [OrdenController::class, 'store'])->name('orden.store');
         // Historial de pedidos del usuario (Mis Pedidos)
         Route::get('/pedidos', [\App\Http\Controllers\Tienda\PedidoController::class, 'index'])->name('pedidos');
         // Factura de venta para el usuario autenticado
@@ -132,6 +136,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
     Route::post('ventas/{venta}/estado', [App\Http\Controllers\Admin\VentaAdminController::class, 'cambiarEstado'])->name('ventas.cambiarEstado');
 
     // CRUD DE ÓRDENES
+    Route::resource('ordenes', App\Http\Controllers\Admin\OrdenAdminController::class);
 
     // Notificaciones eliminadas
 });

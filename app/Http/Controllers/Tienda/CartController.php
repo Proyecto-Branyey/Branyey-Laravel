@@ -38,24 +38,20 @@ class CartController extends Controller
         // --- FIN VALIDACIÓN ---
 
         $cart = session()->get('cart', []);
-        $request->validate([
-            'variante_id' => 'required|exists:variantes,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
-
-        $cantidad = (int) $request->input('quantity', 1);
+        
+        // El precio viene directamente de la variante (ya considera rol del usuario)
         $precioFinal = $variante->getPrecioActual();
 
-        $cantidadEnCarrito = isset($cart[$variante->id]) ? $cart[$variante->id]['quantity'] : 0;
-        if ($cantidad + $cantidadEnCarrito > $variante->stock) {
-            return redirect()->back()->with('error', 'Solo hay ' . $variante->stock . ' unidades disponibles para esta combinación.');
-        }
+        // Si ya está en el carrito, verificamos que la nueva cantidad no supere el stock
         if(isset($cart[$variante->id])) {
-            $cart[$variante->id]['quantity'] += $cantidad;
+            if ($cart[$variante->id]['quantity'] + 1 > $variante->stock) {
+                return redirect()->back()->with('error', 'No puedes agregar más unidades, has alcanzado el límite de stock disponible.');
+            }
+            $cart[$variante->id]['quantity']++;
         } else {
             $cart[$variante->id] = [
                 "name"     => $variante->producto?->nombre_comercial ?? 'Producto',
-                "quantity" => $cantidad,
+                "quantity" => 1,
                 "price"    => $precioFinal,
                 "talla"    => $variante->talla?->nombre ?? 'Sin talla',
                 "image"    => $variante->producto?->imagenes->first()?->url ?? 'default.jpg'
