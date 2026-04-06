@@ -34,11 +34,9 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Departamento</label>
-                            <select name="departamento" id="select-departamento"
-                                    class="form-select form-select-lg rounded-pill" required>
-                                <option value="">Cargando departamentos…</option>
-                            </select>
+                            <label class="form-label small fw-bold text-muted text-uppercase">Ciudad</label>
+                            <input type="text" name="ciudad" class="form-control form-control-lg rounded-pill" 
+                                   value="Bogotá" required>
                         </div>
 
                         <div class="col-12">
@@ -48,12 +46,10 @@
                             @error('direccion') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Ciudad</label>
-                            <select name="ciudad" id="select-ciudad"
-                                    class="form-select form-select-lg rounded-pill" required disabled>
-                                <option value="">Selecciona un departamento primero</option>
-                            </select>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Departamento / Notas</label>
+                            <input type="text" name="departamento" class="form-control form-control-lg rounded-pill" 
+                                   value="Cundinamarca" placeholder="Indicaciones adicionales...">
                         </div>
                     </div>
                 </div>
@@ -112,66 +108,4 @@
     .btn-warning { color: #000; }
     .btn-warning:hover { background-color: #ffca2c; transform: translateY(-2px); transition: 0.3s; }
 </style>
-
-@push('scripts')
-<script>
-/**
- * Carga dinámica de departamentos y ciudades de Colombia
- * Fuente de datos: https://api-colombia.com (API pública gratuita)
- * El backend actúa como proxy en /api/departamentos y /api/departamentos/{id}/ciudades
- */
-document.addEventListener('DOMContentLoaded', function () {
-    const selectDepto = document.getElementById('select-departamento');
-    const selectCiudad = document.getElementById('select-ciudad');
-
-    // 1. Cargar departamentos al cargar la página
-    fetch('{{ route("api.departamentos") }}')
-        .then(res => res.json())
-        .then(data => {
-            selectDepto.innerHTML = '<option value="">— Selecciona tu departamento —</option>';
-            data.forEach(d => {
-                const opt = document.createElement('option');
-                opt.value = d.nombre;
-                opt.dataset.id = d.id;
-                opt.textContent = d.nombre;
-                selectDepto.appendChild(opt);
-            });
-        })
-        .catch(() => {
-            selectDepto.innerHTML = '<option value="">Error al cargar. Intenta de nuevo.</option>';
-        });
-
-    // 2. Cuando el usuario elige un departamento, cargar sus ciudades
-    selectDepto.addEventListener('change', function () {
-        const selected = this.options[this.selectedIndex];
-        const deptoId = selected.dataset.id;
-
-        selectCiudad.innerHTML = '<option value="">Cargando ciudades…</option>';
-        selectCiudad.disabled = true;
-
-        if (!deptoId) {
-            selectCiudad.innerHTML = '<option value="">Selecciona un departamento primero</option>';
-            return;
-        }
-
-        fetch(`{{ url("api/departamentos") }}/${deptoId}/ciudades`)
-            .then(res => res.json())
-            .then(data => {
-                selectCiudad.innerHTML = '<option value="">— Selecciona tu ciudad —</option>';
-                data.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.nombre;
-                    opt.textContent = c.nombre;
-                    selectCiudad.appendChild(opt);
-                });
-                selectCiudad.disabled = false;
-            })
-            .catch(() => {
-                selectCiudad.innerHTML = '<option value="">Error al cargar ciudades.</option>';
-                selectCiudad.disabled = false;
-            });
-    });
-});
-</script>
-@endpush
 @endsection

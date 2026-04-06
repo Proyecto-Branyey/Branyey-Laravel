@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductoController;
-use App\Http\Controllers\ColombiaApiController;
 use App\Http\Controllers\Tienda\CartController;
 use App\Http\Controllers\Tienda\OrdenController;
 use App\Http\Controllers\Admin\AdminController;
@@ -14,17 +13,6 @@ use Illuminate\Support\Facades\Route;
 // Redirección inicial a la tienda
 Route::get('/', function () {
     return redirect()->route('tienda.inicio');
-});
-
-/**
- * ==========================================
- * API PÚBLICA — Datos de Colombia (Web Service)
- * Fuente: https://api-colombia.com
- * ==========================================
- */
-Route::prefix('api')->name('api.')->group(function () {
-    Route::get('/departamentos', [ColombiaApiController::class, 'departamentos'])->name('departamentos');
-    Route::get('/departamentos/{id}/ciudades', [ColombiaApiController::class, 'ciudades'])->name('ciudades')->whereNumber('id');
 });
 
 /**
@@ -168,31 +156,5 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-/**
- * ==========================================
- * RUTA DE PRUEBA DE CORREO
- * Visita: /test-correo?to=tu@correo.com
- * Verifica que MAIL_MAILER, MAIL_HOST, MAIL_USERNAME y MAIL_PASSWORD
- * estén configurados en el .env antes de usar esta ruta.
- * ==========================================
- */
-Route::get('/test-correo', function (\Illuminate\Http\Request $request) {
-    $to = $request->query('to');
-
-    if (! $to || ! filter_var($to, FILTER_VALIDATE_EMAIL)) {
-        return response('Indica un correo válido: /test-correo?to=tu@correo.com', 400);
-    }
-
-    \Illuminate\Support\Facades\Mail::raw(
-        "✅ ¡Funciona! Este es un correo de prueba enviado desde Branyey.\n\n" .
-        "Si ves este mensaje en tu bandeja, el sistema de correo está correctamente configurado.",
-        function ($message) use ($to) {
-            $message->to($to)->subject('✅ Correo de prueba — Branyey');
-        }
-    );
-
-    return response("Correo de prueba enviado a: {$to} — revisa tu bandeja (o Mailtrap).", 200);
-})->name('test.correo');
 
 require __DIR__.'/auth.php';

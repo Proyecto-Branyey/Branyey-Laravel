@@ -5,9 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Venta;
+
 use App\Models\User;
-use App\Mail\EstadoOrdenMail;
-use Illuminate\Support\Facades\Mail;
 
 class VentaAdminController extends Controller
 {
@@ -134,20 +133,8 @@ class VentaAdminController extends Controller
         $request->validate([
             'estado' => 'required|in:pagado,en_proceso,enviado,entregado,cancelado',
         ]);
-
-        $estadoAnterior = $venta->estado;
         $venta->estado = $request->estado;
         $venta->save();
-
-        // Notificar al cliente por correo cuando el estado cambia (excepto si se queda en pagado)
-        if ($estadoAnterior !== $venta->estado && $venta->estado !== 'pagado') {
-            $venta->load(['usuario', 'detallesOrden']);
-            $emailDestino = $venta->detallesOrden->email_cliente ?? optional($venta->usuario)->email;
-            if ($emailDestino) {
-                Mail::to($emailDestino)->send(new EstadoOrdenMail($venta, $estadoAnterior));
-            }
-        }
-
         return redirect()->back()->with('success', 'Estado de la venta actualizado.');
     }
 }

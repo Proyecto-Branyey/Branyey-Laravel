@@ -203,7 +203,5 @@
 
     {{-- Notificaciones eliminadas --}}
 
-    @stack('scripts')
-
 </body>
 </html>
