@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Finalizar Compra | Branyey'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -23,7 +21,7 @@
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Nombre Completo</label>
                             <input type="text" class="form-control form-control-lg rounded-pill bg-light border-0" 
-                                   value="<?php echo e($user->name); ?>" readonly>
+                                   value="<?php echo e($user->nombre_completo); ?>" readonly>
                         </div>
 
                         <div class="col-md-6">
@@ -63,7 +61,7 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>" 
-                                   value="<?php echo e(old('direccion', $user->direccion)); ?>" placeholder="Calle, Carrera, Conjunto, Apto..." required>
+                                   value="<?php echo e(old('direccion', $user->direccion_defecto)); ?>" placeholder="Calle, Carrera, Conjunto, Apto..." required>
                             <?php $__errorArgs = ['direccion'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
