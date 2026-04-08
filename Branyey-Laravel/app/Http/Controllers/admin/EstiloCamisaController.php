@@ -13,7 +13,7 @@ class EstiloCamisaController extends Controller
      */
     public function index()
     {
-        $estilos = EstiloCamisa::all();
+        $estilos = EstiloCamisa::activos()->get();
         return view('admin.estilos-camisa.index', compact('estilos'));
     }
 
