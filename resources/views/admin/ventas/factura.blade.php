@@ -23,7 +23,7 @@
             <strong>Fecha:</strong> {{ $venta->created_at->format('Y-m-d H:i') }}<br>
             <strong>Estado:</strong> {{ $venta->estado_label }}<br>
             @if($venta->detallesOrden)
-                <strong>Dirección de envío:</strong> {{ $venta->detallesOrden->direccion ?? '-' }}<br>
+                <strong>Dirección de envío:</strong> {{ $venta->detallesOrden->direccion_envio ?? '-' }}<br>
                 <strong>Ciudad:</strong> {{ $venta->detallesOrden->ciudad ?? '-' }}<br>
             @endif
         </div>

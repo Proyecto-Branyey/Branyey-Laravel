@@ -4,44 +4,65 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Venta;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use PDF;
 
-class ReporteVentasController extends Controller
+class VentaAdminController extends Controller
 {
-    public function descargar(Request $request, $formato = 'pdf')
+    public function index(Request $request)
     {
-        $ventas = Venta::with('usuario')
+        $ventas = Venta::with(['usuario.rol'])
             ->filtros($request->all())
-            ->get();
+            ->orderByDesc('created_at')
+            ->paginate(15)
+            ->withQueryString();
 
-        if ($formato === 'csv') {
-            $filename = 'reporte_ventas.csv';
-            $headers = [
-                'Content-Type' => 'text/csv',
-                'Content-Disposition' => "attachment; filename=\"$filename\"",
-            ];
-            $callback = function() use ($ventas) {
-                $handle = fopen('php://output', 'w');
-                // Encabezados
-                fputcsv($handle, ['ID', 'Cliente', 'Tipo de cliente', 'Fecha', 'Total', 'Estado'], ';');
-                foreach ($ventas as $venta) {
-                    fputcsv($handle, [
-                        $venta->id,
-                        $venta->usuario->nombre_completo ?? $venta->usuario->name ?? '-',
-                        $venta->usuario->rol->nombre ?? '-',
-                        ' ' . $venta->created_at->format('Y-m-d H:i:s'),
-                        $venta->total,
-                        $venta->estado_label,
-                    ], ';');
-                }
-                fclose($handle);
-            };
-            return response()->stream($callback, 200, $headers);
+        return view('admin.ventas.index', compact('ventas'));
+    }
+
+    public function show(Venta $venta)
+    {
+        $venta->load([
+            'usuario.rol',
+            'detallesOrden',
+            'detallesVenta.variante.producto',
+            'detallesVenta.variante.talla',
+            'detallesVenta.variante.colores',
+        ]);
+
+        return view('admin.ventas.show', compact('venta'));
+    }
+
+    public function factura(Venta $venta)
+    {
+        $venta->load([
+            'usuario.rol',
+            'detallesOrden',
+            'detallesVenta.variante.producto',
+            'detallesVenta.variante.talla',
+            'detallesVenta.variante.colores',
+        ]);
+
+        $pdf = \PDF::loadView('admin.ventas.factura', compact('venta'));
+
+        if (request()->boolean('pdf')) {
+            return $pdf->download('factura_venta_' . $venta->id . '.pdf');
         }
 
-        // PDF sigue igual
-        $pdf = \PDF::loadView('admin.ventas.reporte_pdf', compact('ventas'));
-        return $pdf->download('reporte_ventas.pdf');
+        return $pdf->stream('factura_venta_' . $venta->id . '.pdf');
+    }
+
+    public function cambiarEstado(Request $request, Venta $venta): RedirectResponse
+    {
+        $estado = $request->input('estado');
+
+        if (!array_key_exists($estado, Venta::estadosDisponibles())) {
+            return back()->with('error', 'Estado de venta no valido.');
+        }
+
+        $venta->estado = $estado;
+        $venta->save();
+
+        return back()->with('success', 'Estado de la venta actualizado correctamente.');
     }
 }

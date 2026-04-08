@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tienda;
 
 use App\Http\Controllers\Controller;
 use App\Models\DetalleVenta;
+use App\Models\DetallesOrden;
 use App\Models\Venta;
 use App\Models\Variante;
 use Illuminate\Http\Request;
@@ -158,6 +159,18 @@ class CartController extends Controller
                 'usuario_id' => Auth::id(),
                 'total' => $total,
                 'estado' => Venta::ESTADO_PAGADO,
+            ]);
+
+            $usuario = Auth::user();
+
+            DetallesOrden::create([
+                'venta_id' => $venta->id,
+                'nombre_cliente' => $usuario->nombre_completo ?: $usuario->username,
+                'email_cliente' => $usuario->email,
+                'telefono_cliente' => $usuario->telefono ?: 'No registrado',
+                'direccion_envio' => $usuario->direccion_defecto ?: 'No registrada',
+                'ciudad' => $usuario->ciudad_defecto ?: 'No registrada',
+                'departamento' => $usuario->departamento_defecto ?: 'No registrado',
             ]);
 
             foreach ($detalles as $detalle) {
