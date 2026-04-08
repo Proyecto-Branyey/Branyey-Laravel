@@ -28,7 +28,7 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
     Route::get('/buscar', [ProductoController::class, 'buscar'])->name('buscar');
 
     // Rutas Protegidas (Requieren Login)
-    Route::middleware(['auth'])->group(function () {
+    Route::middleware(['auth', 'not_admin'])->group(function () {
         
         // Gestión del Carrito (HU-014)
         Route::prefix('carrito')->name('cart.')->group(function () {
@@ -37,6 +37,8 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
             Route::post('/update/{id}', [CartController::class, 'update'])->name('update');
             Route::delete('/remove/{id}', [CartController::class, 'remove'])->name('remove');
         });
+
+        Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
 
         // Historial de pedidos del usuario (Mis Pedidos)
         Route::get('/pedidos', [\App\Http\Controllers\Tienda\PedidoController::class, 'index'])->name('pedidos');
@@ -141,15 +143,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
  * PERFIL DE USUARIO Y AUTENTICACIÓN
  * ==========================================
  */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'not_admin'])->group(function () {
         Route::get('/profile/datos/pdf', [ProfileController::class, 'descargarDatosPdf'])->name('profile.datos.pdf');
-    Route::get('/dashboard', function () {
-        return redirect()->route('tienda.catalogo');
-    })->name('dashboard');
-
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        if (auth()->user()?->rol?->nombre === 'administrador') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('tienda.catalogo');
+    })->name('dashboard');
 });
 
 require __DIR__.'/auth.php';

@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', $producto->nombre_comercial . ' - Admin'); ?>
 
 <?php $__env->startSection('admin-content'); ?>
@@ -38,28 +36,44 @@
                     <?php endif; ?>
 
                     <!-- Imágenes -->
-                    <?php if($producto->imagenes->count() > 0): ?>
-                        <div class="mb-4">
-                            <h6 class="text-muted fw-bold small text-uppercase mb-3">Imágenes</h6>
+                    <div class="mb-4">
+                        <h6 class="text-muted fw-bold small text-uppercase mb-3">Imágenes por Color</h6>
+                        <?php if($producto->imagenes->count() > 0): ?>
                             <div class="row g-3">
                                 <?php $__currentLoopData = $producto->imagenes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $imagen): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="col-md-4">
-                                        <img src="<?php echo e(Storage::url($imagen->url)); ?>" class="img-fluid rounded-3 shadow-sm" alt="<?php echo e($producto->nombre_comercial); ?>">
+                                        <div class="border rounded-3 p-2 bg-white h-100 shadow-sm">
+                                            <img src="<?php echo e(Storage::url($imagen->url)); ?>" class="img-fluid rounded-3" alt="<?php echo e($producto->nombre_comercial); ?>">
+                                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                                <small class="fw-bold text-uppercase text-secondary">
+                                                    Color: <?php echo e($imagen->color?->nombre ?? 'Sin color'); ?>
+
+                                                </small>
+                                                <?php if($imagen->es_principal): ?>
+                                                    <span class="badge bg-dark">Principal</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
                                     </div>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
-                        </div>
-                    <?php endif; ?>
+                        <?php else: ?>
+                            <div class="alert alert-warning mb-0">
+                                Este producto no tiene imágenes registradas.
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
                     <!-- Variantes (Tallas + Colores) -->
                     <div class="mb-4">
-                        <h6 class="text-muted fw-bold small text-uppercase mb-3">Variantes (Talla + Color + Precio + Stock)</h6>
+                        <h6 class="text-muted fw-bold small text-uppercase mb-3">Variantes (Talla + Color + Imagen + Precio + Stock)</h6>
                         <div class="table-responsive">
                             <table class="table table-sm table-hover">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Talla</th>
                                         <th>Color</th>
+                                        <th>Imagen</th>
                                         <th>Precio Minorista</th>
                                         <th>Precio Mayorista</th>
                                         <th>Stock</th>
@@ -70,12 +84,39 @@
                                         <tr>
                                             <td class="fw-bold"><?php echo e($variante->talla?->nombre ?? 'Sin talla'); ?></td>
                                             <td>
-                                                <?php $__currentLoopData = $variante->colores; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <span class="badge" style="background-color: <?php echo e($color->codigo_hex); ?>; color: <?php echo e($color->codigo_hex == '#ffffff' || $color->codigo_hex == '#fff' ? '#000' : '#fff'); ?>">
-                                                        <?php echo e($color->nombre); ?>
+                                                <?php if($variante->colores->count() > 0): ?>
+                                                    <?php $__currentLoopData = $variante->colores; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                        <span class="badge" style="background-color: <?php echo e($color->codigo_hex); ?>; color: <?php echo e($color->codigo_hex == '#ffffff' || $color->codigo_hex == '#fff' ? '#000' : '#fff'); ?>">
+                                                            <?php echo e($color->nombre); ?>
 
-                                                    </span>
-                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                        </span>
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                <?php else: ?>
+                                                    <span class="badge bg-secondary">Sin color</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <?php if($variante->colores->count() > 0): ?>
+                                                    <?php
+                                                        $imagenesColor = $variante->colores->map(function($color) use ($producto) {
+                                                            return $producto->imagenes->firstWhere('color_id', $color->id);
+                                                        })->filter();
+                                                    ?>
+
+                                                    <?php if($imagenesColor->count() > 0): ?>
+                                                        <span class="badge bg-success">Con imagen</span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-danger">Sin imagen</span>
+                                                        <a href="<?php echo e(route('admin.productos.edit', $producto->id)); ?>" class="btn btn-sm btn-outline-primary ms-2">
+                                                            Subir imagen
+                                                        </a>
+                                                    <?php endif; ?>
+                                                <?php else: ?>
+                                                    <span class="badge bg-danger">Sin imagen</span>
+                                                    <a href="<?php echo e(route('admin.productos.edit', $producto->id)); ?>" class="btn btn-sm btn-outline-primary ms-2">
+                                                        Subir imagen
+                                                    </a>
+                                                <?php endif; ?>
                                             </td>
                                             <td>$<?php echo e(number_format($variante->precio_minorista, 0, ',', '.')); ?> COP</td>
                                             <td>$<?php echo e(number_format($variante->precio_mayorista, 0, ',', '.')); ?> COP</td>

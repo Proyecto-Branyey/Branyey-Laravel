@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Tienda;
 
 use App\Http\Controllers\Controller;
+use App\Models\DetalleVenta;
+use App\Models\Venta;
 use App\Models\Variante;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -102,5 +106,83 @@ class CartController extends Controller
             return redirect()->back()->with('success', 'Carrito actualizado.');
         }
         return redirect()->back()->with('error', 'Cantidad no válida.');
+    }
+
+    /**
+     * Finaliza la compra y genera la venta con sus detalles.
+     */
+    public function checkout()
+    {
+        $cart = session()->get('cart', []);
+
+        if (empty($cart)) {
+            return redirect()->route('tienda.cart.index')->with('error', 'Tu carrito está vacío.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $total = 0;
+            $detalles = [];
+
+            foreach ($cart as $varianteId => $item) {
+                $variante = Variante::lockForUpdate()->find($varianteId);
+
+                if (!$variante || !$variante->activo) {
+                    throw new \RuntimeException('Una de las variantes del carrito ya no está disponible.');
+                }
+
+                $cantidad = (int) ($item['quantity'] ?? 0);
+                if ($cantidad <= 0) {
+                    throw new \RuntimeException('Cantidad inválida en el carrito.');
+                }
+
+                if ($cantidad > $variante->stock) {
+                    throw new \RuntimeException('Stock insuficiente para la variante ' . $variante->sku . '.');
+                }
+
+                $precio = (float) ($item['price'] ?? $variante->getPrecioActual());
+                $subtotal = $precio * $cantidad;
+                $total += $subtotal;
+
+                $detalles[] = [
+                    'variante_id' => $variante->id,
+                    'cantidad' => $cantidad,
+                    'precio_cobrado' => $precio,
+                ];
+
+                $variante->decrement('stock', $cantidad);
+            }
+
+            $venta = Venta::create([
+                'usuario_id' => Auth::id(),
+                'total' => $total,
+                'estado' => Venta::ESTADO_PAGADO,
+            ]);
+
+            foreach ($detalles as $detalle) {
+                DetalleVenta::create([
+                    'venta_id' => $venta->id,
+                    'variante_id' => $detalle['variante_id'],
+                    'cantidad' => $detalle['cantidad'],
+                    'precio_cobrado' => $detalle['precio_cobrado'],
+                ]);
+            }
+
+            DB::commit();
+
+            session()->forget('cart');
+
+            return redirect()
+                ->route('tienda.pedidos')
+                ->with('success', 'Compra finalizada correctamente. Pedido #' . $venta->id . ' creado.');
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return redirect()
+                ->route('tienda.cart.index')
+                ->with('error', $e->getMessage());
+        }
     }
 }

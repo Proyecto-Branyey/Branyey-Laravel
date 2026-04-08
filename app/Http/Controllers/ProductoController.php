@@ -25,6 +25,9 @@ class ProductoController extends Controller
     public function index(Request $request)
     {
         $query = Producto::activos()
+            ->whereHas('variantesActivas', function ($q) {
+                $q->where('stock', '>', 0);
+            })
             ->with(['imagenes', 'estilo', 'variantesActivas.tallaActiva', 'variantesActivas.coloresActivos']);
 
         if ($request->filled('estilo_id')) {
@@ -45,11 +48,14 @@ class ProductoController extends Controller
     public function show($id)
     {
         $producto = Producto::activos()
+            ->whereHas('variantesActivas', function ($q) {
+                $q->where('stock', '>', 0);
+            })
             ->with([
                 'imagenes', 
                 'estilo', 
                 'variantes' => function($q) {
-                    $q->activos()->with(['talla', 'colores']);
+                    $q->activos()->where('stock', '>', 0)->with(['talla', 'colores']);
                 }
             ])->findOrFail($id);
 

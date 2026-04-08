@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('title', 'Ventas'); ?>
 <?php $__env->startSection('admin-content'); ?>
 <?php

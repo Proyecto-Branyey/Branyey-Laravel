@@ -77,7 +77,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('tienda.inicio') }}">BRANYEY</a>
+            <a class="navbar-brand" href="{{ auth()->check() && auth()->user()?->rol?->nombre === 'administrador' ? route('admin.dashboard') : route('tienda.inicio') }}">BRANYEY</a>
             
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -118,10 +118,11 @@
                                     @if(Auth::user()?->rol?->nombre === 'administrador')
                                         <li><a class="dropdown-item fw-bold text-primary" href="{{ route('admin.dashboard') }}">Panel Admin</a></li>
                                         <li><hr class="dropdown-divider"></li>
+                                    @else
+                                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Mi Perfil</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('tienda.pedidos') }}">Mis Pedidos</a></li>
+                                        <li><hr class="dropdown-divider"></li>
                                     @endif
-                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Mi Perfil</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('tienda.pedidos') }}">Mis Pedidos</a></li>
-                                    <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf
@@ -139,16 +140,18 @@
                             </li>
                         @endauth
 
-                        <li class="nav-item ms-lg-4">
-                            <a class="btn btn-light position-relative rounded-pill px-3 d-flex align-items-center" href="{{ route('tienda.cart.index') }}">
-                                <i class="bi bi-bag-fill me-2"></i>
-                                <span class="d-none d-lg-inline small fw-bold">CARRITO</span>
-                                @php $count = session('cart') ? count(session('cart')) : 0; @endphp
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white" style="font-size: 0.7rem;">
-                                    {{ $count }}
-                                </span>
-                            </a>
-                        </li>
+                        @if(!auth()->check() || auth()->user()?->rol?->nombre !== 'administrador')
+                            <li class="nav-item ms-lg-4">
+                                <a class="btn btn-light position-relative rounded-pill px-3 d-flex align-items-center" href="{{ route('tienda.cart.index') }}">
+                                    <i class="bi bi-bag-fill me-2"></i>
+                                    <span class="d-none d-lg-inline small fw-bold">CARRITO</span>
+                                    @php $count = session('cart') ? count(session('cart')) : 0; @endphp
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white" style="font-size: 0.7rem;">
+                                        {{ $count }}
+                                    </span>
+                                </a>
+                            </li>
+                        @endif
                     @endif
                 </ul>
             </div>
