@@ -158,27 +158,29 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
-        @if(session('success'))
-            <div class="alert alert-dark alert-dismissible fade show border-0 shadow-sm rounded-4 px-4 py-3" role="alert">
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
-                    <div><strong>¡Éxito!</strong> {{ session('success') }}</div>
+    @if(session('success') || session('error'))
+        <div class="container mt-4">
+            @if(session('success'))
+                <div class="alert alert-dark alert-dismissible fade show border-0 shadow-sm rounded-4 px-4 py-3" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+                        <div><strong>¡Éxito!</strong> {{ session('success') }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+            @endif
 
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-4 px-4 py-3" role="alert">
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
-                    <div><strong>Atención:</strong> {{ session('error') }}</div>
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-4 px-4 py-3" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                        <div><strong>Atención:</strong> {{ session('error') }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-    </div>
+            @endif
+        </div>
+    @endif
 
     <main>
         @yield('content')
