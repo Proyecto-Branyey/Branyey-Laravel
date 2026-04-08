@@ -110,6 +110,27 @@ class CartController extends Controller
     }
 
     /**
+     * Muestra la vista de checkout antes de confirmar la compra.
+     */
+    public function showCheckout()
+    {
+        $cart = session()->get('cart', []);
+
+        if (empty($cart)) {
+            return redirect()->route('tienda.cart.index')->with('error', 'Tu carrito está vacío.');
+        }
+
+        $total = 0;
+        foreach ($cart as $item) {
+            $total += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
+        }
+
+        $user = Auth::user();
+
+        return view('tienda.checkout', compact('cart', 'total', 'user'));
+    }
+
+    /**
      * Finaliza la compra y genera la venta con sus detalles.
      */
     public function checkout()
