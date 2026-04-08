@@ -302,7 +302,7 @@
                 <div class="flex-grow-1" style="height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);"></div>
                 
                 <div class="d-flex gap-3">
-                    <a href="https://instagram.com/tu_usuario" target="_blank" rel="noopener noreferrer"
+                    <a href="https://www.instagram.com/branyey/" target="_blank" rel="noopener noreferrer"
                        class="text-white-50 text-decoration-none"
                        style="transition: all 0.3s ease;">
                         <i class="bi bi-instagram fs-5"></i>
