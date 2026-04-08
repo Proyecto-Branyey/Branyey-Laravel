@@ -3,84 +3,115 @@
 @section('title', 'Catálogo Completo - Branyey')
 
 @section('content')
-<div class="container py-5">
-    <div class="row">
-        {{-- Filtros --}}
-        <div class="col-md-3 mb-4">
-            <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 100px; border-radius: 15px;">
-                <h5 class="fw-bold mb-4 italic">FILTRAR</h5>
-                <form action="{{ route('tienda.catalogo') }}" method="GET">
-                    {{-- Estilo --}}
-                    <div class="mb-4">
-                        <label class="form-label small fw-bold text-uppercase text-muted">Estilo de Prenda</label>
-                        <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-sm">
-                            <label class="list-group-item list-group-item-action border-0 {{ !request('estilo_id') ? 'active bg-dark text-white' : '' }} cursor-pointer">
-                                <input type="radio" name="estilo_id" value="" class="d-none" onchange="this.form.submit()" {{ !request('estilo_id') ? 'checked' : '' }}>
-                                Todos los estilos
-                            </label>
-                            @foreach($estilos as $estilo)
-                                <label class="list-group-item list-group-item-action border-0 {{ request('estilo_id') == $estilo->id ? 'active bg-dark text-white' : '' }} cursor-pointer">
-                                    <input type="radio" name="estilo_id" value="{{ $estilo->id }}" class="d-none" onchange="this.form.submit()" {{ request('estilo_id') == $estilo->id ? 'checked' : '' }}>
-                                    {{ $estilo->nombre }}
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    {{-- Clasificación de Talla (Género) --}}
-                    <div class="mb-4">
-                        <label class="form-label small fw-bold text-uppercase text-muted">Categoría</label>
-                        <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-sm">
-                            <label class="list-group-item list-group-item-action border-0 {{ !request('clasificacion_id') ? 'active bg-dark text-white' : '' }} cursor-pointer">
-                                <input type="radio" name="clasificacion_id" value="" class="d-none" onchange="this.form.submit()" {{ !request('clasificacion_id') ? 'checked' : '' }}>
-                                Todas las categorías
-                            </label>
-                            @foreach($clasificaciones as $clasif)
-                                <label class="list-group-item list-group-item-action border-0 {{ request('clasificacion_id') == $clasif->id ? 'active bg-dark text-white' : '' }} cursor-pointer">
-                                    <input type="radio" name="clasificacion_id" value="{{ $clasif->id }}" class="d-none" onchange="this.form.submit()" {{ request('clasificacion_id') == $clasif->id ? 'checked' : '' }}>
-                                    {{ $clasif->nombre }}
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
-
+<div class="container py-4">
+    <div class="row g-4">
+        {{-- Filtros Mejorados --}}
+        <div class="col-lg-3">
+            <div class="filters-card">
+                <div class="filters-header">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-funnel-fill me-2"></i>FILTRAR
+                    </h5>
                     @if(request()->anyFilled(['estilo_id', 'clasificacion_id']))
-                        <a href="{{ route('tienda.catalogo') }}" class="btn btn-link btn-sm text-decoration-none text-danger p-0 fw-bold mt-2">
-                            × LIMPIAR FILTROS
+                        <a href="{{ route('tienda.catalogo') }}" class="btn-clear-filters">
+                            <i class="bi bi-x-circle me-1"></i>Limpiar
                         </a>
                     @endif
+                </div>
+                
+                <form action="{{ route('tienda.catalogo') }}" method="GET" id="filterForm">
+                    {{-- Estilo de Prenda --}}
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <i class="bi bi-tag me-2"></i>Estilo de Prenda
+                        </label>
+                        <div class="filter-options">
+                            <button type="button" 
+                                    class="filter-option {{ !request('estilo_id') ? 'active' : '' }}"
+                                    onclick="submitFilter('estilo_id', '')">
+                                Todos
+                            </button>
+                            @foreach($estilos as $estilo)
+                                <button type="button" 
+                                        class="filter-option {{ request('estilo_id') == $estilo->id ? 'active' : '' }}"
+                                        onclick="submitFilter('estilo_id', '{{ $estilo->id }}')">
+                                    {{ $estilo->nombre }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Categoría --}}
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <i class="bi bi-person-standing me-2"></i>Categoría
+                        </label>
+                        <div class="filter-options">
+                            <button type="button" 
+                                    class="filter-option {{ !request('clasificacion_id') ? 'active' : '' }}"
+                                    onclick="submitFilter('clasificacion_id', '')">
+                                Todas
+                            </button>
+                            @foreach($clasificaciones as $clasif)
+                                <button type="button" 
+                                        class="filter-option {{ request('clasificacion_id') == $clasif->id ? 'active' : '' }}"
+                                        onclick="submitFilter('clasificacion_id', '{{ $clasif->id }}')">
+                                    {{ $clasif->nombre }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Inputs ocultos para mantener los filtros --}}
+                    <input type="hidden" name="estilo_id" id="estilo_id" value="{{ request('estilo_id') }}">
+                    <input type="hidden" name="clasificacion_id" id="clasificacion_id" value="{{ request('clasificacion_id') }}">
                 </form>
             </div>
         </div>
 
         {{-- Productos --}}
-        <div class="col-md-9">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="fw-bold mb-0 italic text-uppercase">Colección <span class="text-muted">/ Branyey</span></h2>
-                <p class="text-muted mb-0 small fw-bold uppercase">Items: {{ $productos->total() }}</p>
+        <div class="col-lg-9">
+            <div class="catalog-header">
+                <div>
+                    <h2 class="fw-bold mb-1">
+                        Colección <span class="text-gradient">/ Branyey</span>
+                    </h2>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-grid-3x3-gap-fill me-1"></i>{{ $productos->total() }} productos encontrados
+                    </p>
+                </div>
             </div>
 
-            <div class="row g-4">
+            <div class="row g-4 mt-1">
                 @forelse($productos as $producto)
-                    <div class="col-sm-6 col-lg-4">
-                        <div class="card h-100 border-0 shadow-sm product-hover" style="border-radius: 20px; overflow: hidden;">
-                            <div class="position-relative overflow-hidden" style="height: 380px; background-color: #f8f9fa;">
+                    <div class="col-sm-6 col-xl-4">
+                        <div class="product-card-catalog">
+                            <div class="product-image-catalog">
                                 <a href="{{ route('tienda.producto.detalle', $producto->id) }}">
                                     @php $img = $producto->imagenes->first(); @endphp
                                     @if($img)
-                                        <img src="{{ Storage::url($img->url) }}" class="w-100 h-100 img-zoom" style="object-fit: cover; object-position: top;" alt="{{ $producto->nombre_comercial }}">
+                                        <img src="{{ Storage::url($img->url) }}" alt="{{ $producto->nombre_comercial }}">
                                     @else
-                                        <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted small fw-bold italic" style="background: #eee;">NO IMAGE</div>
+                                        <div class="no-image-placeholder">
+                                            <i class="bi bi-image fs-1"></i>
+                                            <span>Sin imagen</span>
+                                        </div>
                                     @endif
                                 </a>
+                                @if($producto->variantes->sum('stock') > 0)
+                                    <span class="stock-badge-catalog">Disponible</span>
+                                @else
+                                    <span class="stock-badge-catalog out">Agotado</span>
+                                @endif
                             </div>
-
-                            <div class="card-body text-center">
-                                <span class="text-uppercase text-muted fw-bold mb-1 d-block small" style="letter-spacing: 2px;">
-                                    {{ $producto->estilo?->nombre ?? 'Colección' }}
+                            <div class="product-info-catalog">
+                                <span class="product-category-catalog">
+                                    {{ $producto->estilo?->nombre ?? 'Premium' }}
                                 </span>
-                                <h6 class="card-title fw-bold text-dark text-uppercase mb-3">{{ $producto->nombre_comercial }}</h6>
-                                <h5 class="fw-bold text-dark mb-3">
+                                <h6 class="product-title-catalog">
+                                    {{ Str::limit($producto->nombre_comercial, 40) }}
+                                </h6>
+                                <div class="product-price-catalog">
                                     @php
                                         $precios = $producto->variantes->map(function($v) {
                                             return $v->getPrecioActual();
@@ -88,22 +119,28 @@
                                         $minPrecio = $precios->min();
                                         $maxPrecio = $precios->max();
                                     @endphp
-                                    ${{ number_format($minPrecio, 0, ',', '.') }} COP
+                                    <span class="current-price-catalog">
+                                        ${{ number_format($minPrecio, 0, ',', '.') }}
+                                    </span>
                                     @if($minPrecio != $maxPrecio)
-                                        - ${{ number_format($maxPrecio, 0, ',', '.') }} COP
+                                        <span class="price-range">- ${{ number_format($maxPrecio, 0, ',', '.') }}</span>
                                     @endif
-                                </h5>
-                                <a href="{{ route('tienda.producto.detalle', $producto->id) }}" class="btn btn-dark w-100 rounded-pill py-2 fw-bold text-uppercase small">
-                                    Ver Pieza
+                                </div>
+                                <a href="{{ route('tienda.producto.detalle', $producto->id) }}" class="btn-catalog-detail">
+                                    Ver detalles <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
                 @empty
-                    <div class="col-12 text-center py-5">
-                        <div class="py-5 border border-2 border-dashed rounded-5">
-                            <h4 class="text-muted fw-bold italic mb-0">Sin resultados</h4>
-                            <p class="text-muted small uppercase mt-2">Aún no existe este producto.</p>
+                    <div class="col-12">
+                        <div class="empty-state">
+                            <i class="bi bi-emoji-frown fs-1 mb-3 d-block"></i>
+                            <h4 class="fw-bold mb-2">No encontramos productos</h4>
+                            <p class="text-muted mb-4">Intenta con otros filtros o revisa luego nuestra colección</p>
+                            <a href="{{ route('tienda.catalogo') }}" class="btn btn-dark rounded-pill px-4">
+                                Ver todos los productos
+                            </a>
                         </div>
                     </div>
                 @endforelse
@@ -117,11 +154,286 @@
 </div>
 
 <style>
-.cursor-pointer { cursor: pointer; }
-.product-hover { transition: transform 0.3s ease; }
-.product-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
-.img-zoom { transition: transform 0.5s ease; }
-.product-hover:hover .img-zoom { transform: scale(1.05); }
-.italic { font-style: italic; }
+/* ===== FILTROS MEJORADOS ===== */
+.filters-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 90px;
+    transition: all 0.3s ease;
+}
+
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.filters-header h5 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.btn-clear-filters {
+    font-size: 0.75rem;
+    color: #dc3545;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-clear-filters:hover {
+    color: #bb2d3b;
+    transform: translateX(-2px);
+}
+
+.filter-group {
+    margin-bottom: 1.5rem;
+}
+
+.filter-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: #6c757d;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.filter-option {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    color: #495057;
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.filter-option:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+}
+
+.filter-option.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* ===== CATALOG HEADER ===== */
+.catalog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ===== PRODUCT CARDS CATALOG ===== */
+.product-card-catalog {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card-catalog:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(102, 126, 234, 0.12);
+    border-color: rgba(102, 126, 234, 0.2);
+}
+
+.product-image-catalog {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
+}
+
+.product-image-catalog img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card-catalog:hover .product-image-catalog img {
+    transform: scale(1.05);
+}
+
+.no-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    background: #f8f9fa;
+}
+
+.stock-badge-catalog {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: #10b981;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    z-index: 2;
+}
+
+.stock-badge-catalog.out {
+    background: #6c757d;
+}
+
+.product-info-catalog {
+    padding: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-category-catalog {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+}
+
+.product-title-catalog {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.product-price-catalog {
+    margin-bottom: 0.75rem;
+}
+
+.current-price-catalog {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1a1a2e;
+    letter-spacing: -0.5px;
+}
+
+.price-range {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.btn-catalog-detail {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #f8f9fa;
+    color: #1a1a2e;
+    text-decoration: none;
+    padding: 0.5rem;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+    border: 1px solid #e9ecef;
+}
+
+.btn-catalog-detail:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    gap: 0.75rem;
+    border-color: transparent;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 20px;
+    border: 2px dashed #e9ecef;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .filters-card {
+        position: relative;
+        top: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-options {
+        gap: 0.4rem;
+    }
+    
+    .filter-option {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.7rem;
+    }
+    
+    .catalog-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
 </style>
+
+<script>
+function submitFilter(field, value) {
+    document.getElementById(field).value = value;
+    document.getElementById('filterForm').submit();
+}
+</script>
 @endsection
