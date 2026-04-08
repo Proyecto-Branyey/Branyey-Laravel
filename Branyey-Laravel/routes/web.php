@@ -9,10 +9,15 @@ use App\Http\Controllers\Admin\ProductoAdminController;
 use App\Http\Controllers\Admin\EstiloAdminController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\MailProxyController;
+
 // Redirección inicial a la tienda
 Route::get('/', function () {
     return redirect()->route('tienda.inicio');
 });
+
+// Ruta para enviar correo vía microservicio Java
+Route::post('/enviar-correo', [MailProxyController::class, 'enviarCorreo'])->name('enviar.correo');
 
 /**
  * ==========================================

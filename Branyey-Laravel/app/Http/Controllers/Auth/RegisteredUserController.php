@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -74,6 +75,20 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+            // Enviar correo de bienvenida usando el microservicio Java
+            try {
+                $correo = $user->email;
+                $nombre = $user->name;
+                $response = Http::post('http://localhost:8080/api/mail/send', [
+                    'to' => $correo,
+                    'subject' => '¡Bienvenido a Branyey!',
+                    'body' => "Hola $nombre, gracias por registrarte en Branyey. ¡Ya puedes disfrutar de la tienda!"
+                ]);
+                // Opcional: puedes loguear el resultado o manejar errores
+            } catch (\Exception $e) {
+                // Log::error('Error enviando correo de bienvenida: ' . $e->getMessage());
+            }
 
         return redirect()->route('dashboard');
     }
