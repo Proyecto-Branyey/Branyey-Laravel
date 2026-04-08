@@ -10,6 +10,20 @@ use App\Models\Venta;
 class PedidoController extends Controller
 {
     /**
+     * Display a listing of the authenticated user's orders.
+     */
+    public function index()
+    {
+        $user = Auth::user();
+        $ventas = Venta::with(['detallesVenta.variante.producto.imagenes', 'detallesVenta.variante.talla', 'detallesOrden'])
+            ->where('usuario_id', $user->id)
+            ->orderByDesc('created_at')
+            ->paginate(10);
+        
+        return view('tienda.pedidos', compact('ventas'));
+    }
+
+    /**
      * Mostrar la factura de una venta del usuario autenticado.
      */
     public function factura(Venta $venta)
@@ -22,17 +36,7 @@ class PedidoController extends Controller
         $pdf = \PDF::loadView('admin.ventas.factura', compact('venta'));
         return $pdf->download('factura_venta_'.$venta->id.'.pdf');
     }
-    /**
-     * Display a listing of the authenticated user's orders.
-     */
-    public function index()
-    {
-        $user = Auth::user();
-        $ventas = Venta::where('usuario_id', $user->id)
-            ->orderByDesc('created_at')
-            ->get();
-        return view('tienda.pedidos', compact('ventas'));
-    }
+
     /**
      * Marcar un pedido como recibido (cambiar estado a entregado)
      */
