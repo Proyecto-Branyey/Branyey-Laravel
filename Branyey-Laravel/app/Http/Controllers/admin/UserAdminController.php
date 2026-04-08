@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Rol;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserAdminController extends Controller
 {
@@ -157,5 +158,41 @@ class UserAdminController extends Controller
         $usuario->activo = false;
         $usuario->save();
         return redirect()->route('admin.usuarios.index')->with('success', 'Usuario desactivado correctamente.');
+    }
+
+    public function exportarPdf(Request $request)
+    {
+        $query = User::with('rol');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nombre_completo', 'LIKE', "%{$search}%")
+                ->orWhere('username', 'LIKE', "%{$search}%")
+                ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('rol')) {
+            $rolNombre = $request->rol;
+            $query->whereHas('rol', function($q) use ($rolNombre) {
+                $q->where('nombre', $rolNombre);
+            });
+        }
+
+        if ($request->filled('estado')) {
+            if ($request->estado == 'activo') {
+                $query->where('activo', true);
+            } elseif ($request->estado == 'inactivo') {
+                $query->where('activo', false);
+            }
+        } else {
+            $query->where('activo', true);
+        }
+
+        $usuarios = $query->orderBy('id', 'desc')->get();
+
+        $pdf = Pdf::loadView('admin.usuarios.pdf', compact('usuarios'));
+        return $pdf->download('usuarios_branyey_' . now()->format('Y-m-d_His') . '.pdf');
     }
 }

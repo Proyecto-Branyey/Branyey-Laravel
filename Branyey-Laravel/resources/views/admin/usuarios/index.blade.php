@@ -54,15 +54,20 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn-filter-apply">
+                    <div class="d-flex flex-column gap-2">
+                        <button type="submit" class="btn-filter-apply w-100">
                             <i class="bi bi-funnel me-1"></i> Filtrar
                         </button>
-                        @if(request()->anyFilled(['search', 'rol', 'estado']))
-                            <a href="{{ route('admin.usuarios.index') }}" class="btn-filter-clear">
-                                <i class="bi bi-x-circle me-1"></i> Limpiar
+                        <div class="d-flex gap-2">
+                            @if(request()->anyFilled(['search', 'rol', 'estado']))
+                                <a href="{{ route('admin.usuarios.index') }}" class="btn-filter-clear flex-grow-1 text-center">
+                                    <i class="bi bi-x-circle me-1"></i> Limpiar
+                                </a>
+                            @endif
+                            <a href="{{ route('admin.usuarios.exportar.pdf', request()->query()) }}" class="btn-export-pdf flex-grow-1 text-center" target="_blank">
+                                <i class="bi bi-file-pdf me-1"></i> PDF
                             </a>
-                        @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -248,6 +253,25 @@
     border-color: #dc3545;
 }
 
+.btn-export-pdf {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.25rem;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-export-pdf:hover {
+    background: #bb2d3b;
+    transform: translateY(-1px);
+    color: white;
+}
 /* ===== BOTONES PRINCIPALES ===== */
 .btn-action-primary {
     display: inline-flex;
