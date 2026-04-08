@@ -11,10 +11,32 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
+        $adminsCount = User::where('activo', true)->whereHas('rol', function ($q) {
+            $q->where('nombre', 'administrador');
+        })->count();
+
+        $clientesCount = User::where('activo', true)->whereHas('rol', function ($q) {
+            $q->whereIn('nombre', ['mayorista', 'minorista']);
+        })->count();
+
+        $mayoristasCount = User::where('activo', true)->whereHas('rol', function ($q) {
+            $q->where('nombre', 'mayorista');
+        })->count();
+
+        $minoristasCount = User::where('activo', true)->whereHas('rol', function ($q) {
+            $q->where('nombre', 'minorista');
+        })->count();
+
+        $usuariosPapeleraCount = User::where('activo', false)->count();
+
         $stats = [
             'ventas_count'   => Venta::count(),
             'ingresos_total' => Venta::sum('total'),
-            'usuarios_count' => User::count(),
+            'clientes_count' => $clientesCount,
+            'admins_count'   => $adminsCount,
+            'mayoristas_count' => $mayoristasCount,
+            'minoristas_count' => $minoristasCount,
+            'usuarios_papelera_count' => $usuariosPapeleraCount,
             'productos_count'=> Producto::count(),
         ];
 

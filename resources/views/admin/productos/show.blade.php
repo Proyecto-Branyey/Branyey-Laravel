@@ -38,28 +38,43 @@
                     @endif
 
                     <!-- Imágenes -->
-                    @if($producto->imagenes->count() > 0)
-                        <div class="mb-4">
-                            <h6 class="text-muted fw-bold small text-uppercase mb-3">Imágenes</h6>
+                    <div class="mb-4">
+                        <h6 class="text-muted fw-bold small text-uppercase mb-3">Imágenes por Color</h6>
+                        @if($producto->imagenes->count() > 0)
                             <div class="row g-3">
                                 @foreach($producto->imagenes as $imagen)
                                     <div class="col-md-4">
-                                        <img src="{{ Storage::url($imagen->url) }}" class="img-fluid rounded-3 shadow-sm" alt="{{ $producto->nombre_comercial }}">
+                                        <div class="border rounded-3 p-2 bg-white h-100 shadow-sm">
+                                            <img src="{{ Storage::url($imagen->url) }}" class="img-fluid rounded-3" alt="{{ $producto->nombre_comercial }}">
+                                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                                <small class="fw-bold text-uppercase text-secondary">
+                                                    Color: {{ $imagen->color?->nombre ?? 'Sin color' }}
+                                                </small>
+                                                @if($imagen->es_principal)
+                                                    <span class="badge bg-dark">Principal</span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
-                        </div>
-                    @endif
+                        @else
+                            <div class="alert alert-warning mb-0">
+                                Este producto no tiene imágenes registradas.
+                            </div>
+                        @endif
+                    </div>
 
                     <!-- Variantes (Tallas + Colores) -->
                     <div class="mb-4">
-                        <h6 class="text-muted fw-bold small text-uppercase mb-3">Variantes (Talla + Color + Precio + Stock)</h6>
+                        <h6 class="text-muted fw-bold small text-uppercase mb-3">Variantes (Talla + Color + Imagen + Precio + Stock)</h6>
                         <div class="table-responsive">
                             <table class="table table-sm table-hover">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Talla</th>
                                         <th>Color</th>
+                                        <th>Imagen</th>
                                         <th>Precio Minorista</th>
                                         <th>Precio Mayorista</th>
                                         <th>Stock</th>
@@ -70,11 +85,38 @@
                                         <tr>
                                             <td class="fw-bold">{{ $variante->talla?->nombre ?? 'Sin talla' }}</td>
                                             <td>
-                                                @foreach($variante->colores as $color)
-                                                    <span class="badge" style="background-color: {{ $color->codigo_hex }}; color: {{ $color->codigo_hex == '#ffffff' || $color->codigo_hex == '#fff' ? '#000' : '#fff' }}">
-                                                        {{ $color->nombre }}
-                                                    </span>
-                                                @endforeach
+                                                @if($variante->colores->count() > 0)
+                                                    @foreach($variante->colores as $color)
+                                                        <span class="badge" style="background-color: {{ $color->codigo_hex }}; color: {{ $color->codigo_hex == '#ffffff' || $color->codigo_hex == '#fff' ? '#000' : '#fff' }}">
+                                                            {{ $color->nombre }}
+                                                        </span>
+                                                    @endforeach
+                                                @else
+                                                    <span class="badge bg-secondary">Sin color</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($variante->colores->count() > 0)
+                                                    @php
+                                                        $imagenesColor = $variante->colores->map(function($color) use ($producto) {
+                                                            return $producto->imagenes->firstWhere('color_id', $color->id);
+                                                        })->filter();
+                                                    @endphp
+
+                                                    @if($imagenesColor->count() > 0)
+                                                        <span class="badge bg-success">Con imagen</span>
+                                                    @else
+                                                        <span class="badge bg-danger">Sin imagen</span>
+                                                        <a href="{{ route('admin.productos.edit', $producto->id) }}" class="btn btn-sm btn-outline-primary ms-2">
+                                                            Subir imagen
+                                                        </a>
+                                                    @endif
+                                                @else
+                                                    <span class="badge bg-danger">Sin imagen</span>
+                                                    <a href="{{ route('admin.productos.edit', $producto->id) }}" class="btn btn-sm btn-outline-primary ms-2">
+                                                        Subir imagen
+                                                    </a>
+                                                @endif
                                             </td>
                                             <td>${{ number_format($variante->precio_minorista, 0, ',', '.') }} COP</td>
                                             <td>${{ number_format($variante->precio_mayorista, 0, ',', '.') }} COP</td>

@@ -1,19 +1,17 @@
-@extends('layouts.admin')
+<?php $__env->startSection('title', 'Nuevo Producto - Branyey'); ?>
 
-@section('title', 'Nuevo Producto - Branyey')
-
-@section('admin-content')
+<?php $__env->startSection('admin-content'); ?>
 <div class="container py-4">
-    @if($errors->any())
+    <?php if($errors->any()): ?>
         <div class="alert alert-danger shadow-sm border-0 mb-4">
             <ul class="mb-0 small">
-                @foreach($errors->all() as $err) <li>{{ $err }}</li> @endforeach
+                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $err): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?> <li><?php echo e($err); ?></li> <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </ul>
         </div>
-    @endif
+    <?php endif; ?>
 
-    <form action="{{ route('admin.productos.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
+    <form action="<?php echo e(route('admin.productos.store')); ?>" method="POST" enctype="multipart/form-data">
+        <?php echo csrf_field(); ?>
         <div class="card border-0 shadow-lg rounded-4">
             <div class="card-header bg-dark text-white p-3 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i> Nuevo Producto Branyey</h5>
@@ -35,18 +33,18 @@
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Estilo</label>
                         <select name="estilo_id" class="form-select" required>
-                            @foreach($estilos as $estilo)
-                                <option value="{{ $estilo->id }}">{{ $estilo->nombre }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $estilos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $estilo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($estilo->id); ?>"><?php echo e($estilo->nombre); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Clasificación de Talla</label>
                         <select name="clasificacion_id" id="clasificacion_id" class="form-select" required>
                             <option value="">Seleccione clasificación</option>
-                            @foreach($clasificaciones as $clasif)
-                                <option value="{{ $clasif->id }}">{{ $clasif->nombre }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $clasificaciones; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $clasif): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($clasif->id); ?>"><?php echo e($clasif->nombre); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                 </div>
@@ -68,9 +66,9 @@
                                 <label class="small fw-bold">2. Color</label>
                                 <select name="variantes[0][color_id]" class="form-select color-select" required>
                                     <option value="">-- Color --</option>
-                                    @foreach($colores as $color)
-                                        <option value="{{ $color->id }}">{{ strtoupper($color->nombre) }}</option>
-                                    @endforeach
+                                    <?php $__currentLoopData = $colores; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($color->id); ?>"><?php echo e(strtoupper($color->nombre)); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </div>
 
@@ -117,13 +115,13 @@ let variantIndex = 1;
 
 // Datos de tallas por clasificación
 const tallasPorClasificacion = {
-    @foreach($clasificaciones as $clasif)
-        {{ $clasif->id }}: [
-            @foreach($tallas->where('clasificacion_id', $clasif->id) as $talla)
-                {id: {{ $talla->id }}, nombre: '{{ $talla->nombre }}'},
-            @endforeach
+    <?php $__currentLoopData = $clasificaciones; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $clasif): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php echo e($clasif->id); ?>: [
+            <?php $__currentLoopData = $tallas->where('clasificacion_id', $clasif->id); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $talla): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                {id: <?php echo e($talla->id); ?>, nombre: '<?php echo e($talla->nombre); ?>'},
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         ],
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 };
 
 // Función para actualizar todos los selects de tallas
@@ -229,4 +227,5 @@ document.addEventListener('click', function(e) {
 
 syncFotoInputsByColor();
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\resources\views/admin/productos/create.blade.php ENDPATH**/ ?>

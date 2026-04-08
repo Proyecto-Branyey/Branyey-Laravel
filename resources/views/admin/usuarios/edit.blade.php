@@ -3,6 +3,17 @@
 @section('admin-content')
 <div class="container py-4">
     <h1>Editar Usuario</h1>
+
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form action="{{ route('admin.usuarios.update', $usuario->id) }}" method="POST">
         @csrf
         @method('PUT')
@@ -22,6 +33,10 @@
             <div class="col-md-6 mb-3">
                 <label for="ciudad_defecto" class="form-label">Ciudad</label>
                 <input type="text" name="ciudad_defecto" id="ciudad_defecto" class="form-control" value="{{ old('ciudad_defecto', $usuario->ciudad_defecto) }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="departamento_defecto" class="form-label">Departamento</label>
+                <input type="text" name="departamento_defecto" id="departamento_defecto" class="form-control" value="{{ old('departamento_defecto', $usuario->departamento_defecto) }}">
             </div>
         </div>
         <div class="mb-3">

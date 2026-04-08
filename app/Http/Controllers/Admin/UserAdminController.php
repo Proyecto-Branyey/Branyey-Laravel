@@ -45,7 +45,11 @@ class UserAdminController extends Controller
     {
 
         $request->validate([
-            'nombre_completo' => 'required|string|max:255',
+            'nombre_completo' => 'nullable|string|max:255',
+            'telefono' => 'nullable|string|max:50',
+            'direccion_defecto' => 'nullable|string|max:1000',
+            'ciudad_defecto' => 'nullable|string|max:100',
+            'departamento_defecto' => 'nullable|string|max:100',
             'username' => 'required|string|max:255|unique:usuarios',
             'email' => 'required|email|max:255|unique:usuarios',
             'password' => 'required|string|min:6|confirmed',
@@ -54,10 +58,15 @@ class UserAdminController extends Controller
 
         $usuario = User::create([
             'nombre_completo' => $request->nombre_completo,
+            'telefono' => $request->telefono,
+            'direccion_defecto' => $request->direccion_defecto,
+            'ciudad_defecto' => $request->ciudad_defecto,
+            'departamento_defecto' => $request->departamento_defecto,
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'rol_id' => $request->rol_id,
+            'activo' => true,
         ]);
 
         return redirect()->route('admin.usuarios.index')->with('success', 'Usuario creado correctamente.');
@@ -74,14 +83,22 @@ class UserAdminController extends Controller
     {
         $usuario = User::findOrFail($id);
         $request->validate([
-            'name' => 'required|string|max:255',
+            'nombre_completo' => 'nullable|string|max:255',
+            'telefono' => 'nullable|string|max:50',
+            'direccion_defecto' => 'nullable|string|max:1000',
+            'ciudad_defecto' => 'nullable|string|max:100',
+            'departamento_defecto' => 'nullable|string|max:100',
             'username' => 'required|string|max:255|unique:usuarios,username,' . $usuario->id,
             'email' => 'required|email|max:255|unique:usuarios,email,' . $usuario->id,
             'rol_id' => 'required|exists:roles,id',
             'password' => 'nullable|string|min:6|confirmed',
         ]);
 
-        $usuario->name = $request->name;
+        $usuario->nombre_completo = $request->nombre_completo;
+        $usuario->telefono = $request->telefono;
+        $usuario->direccion_defecto = $request->direccion_defecto;
+        $usuario->ciudad_defecto = $request->ciudad_defecto;
+        $usuario->departamento_defecto = $request->departamento_defecto;
         $usuario->username = $request->username;
         $usuario->email = $request->email;
         $usuario->rol_id = $request->rol_id;
