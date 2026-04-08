@@ -38,10 +38,6 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
             Route::delete('/remove/{id}', [CartController::class, 'remove'])->name('remove');
         });
 
-        // Checkout y Generación de Orden (Transaccional)
-        Route::get('/checkout', [\App\Http\Controllers\Tienda\OrdenController::class, 'checkout'])->name('checkout');
-        Route::post('/confirmar-compra', [\App\Http\Controllers\Tienda\OrdenController::class, 'store'])->name('orden.store');
-
         // Historial de pedidos del usuario (Mis Pedidos)
         Route::get('/pedidos', [\App\Http\Controllers\Tienda\PedidoController::class, 'index'])->name('pedidos');
         // Factura de venta para el usuario autenticado
