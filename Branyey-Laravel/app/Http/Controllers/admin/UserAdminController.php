@@ -29,9 +29,49 @@ class UserAdminController extends Controller
         $usuario->save();
         return redirect()->route('admin.usuarios.index')->with('success', 'Usuario reactivado correctamente.');
     }
-    public function index()
+
+    /**
+     * Display a listing of the users with filters.
+     */
+    public function index(Request $request)
     {
-        $usuarios = User::with('rol')->where('activo', true)->orderBy('id', 'desc')->paginate(15);
+        $query = User::with('rol');
+
+        // 1. FILTRO POR BÚSQUEDA (nombre, usuario, email)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nombre_completo', 'LIKE', "%{$search}%")
+                  ->orWhere('username', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // 2. FILTRO POR ROL (usando el nombre del rol)
+        if ($request->filled('rol')) {
+            $rolNombre = $request->rol;
+            $query->whereHas('rol', function($q) use ($rolNombre) {
+                $q->where('nombre', $rolNombre);
+            });
+        }
+
+        // 3. FILTRO POR ESTADO
+        if ($request->filled('estado')) {
+            if ($request->estado == 'activo') {
+                $query->where('activo', true);
+            } elseif ($request->estado == 'inactivo') {
+                $query->where('activo', false);
+            }
+        } else {
+            // Por defecto, mostrar SOLO activos (a menos que se filtre por inactivos)
+            if (!$request->filled('estado')) {
+                $query->where('activo', true);
+            }
+        }
+
+        // 4. ORDENAR y PAGINAR
+        $usuarios = $query->orderBy('id', 'desc')->paginate(15);
+
         return view('admin.usuarios.index', compact('usuarios'));
     }
 
@@ -43,7 +83,6 @@ class UserAdminController extends Controller
 
     public function store(Request $request)
     {
-
         $request->validate([
             'nombre_completo' => 'nullable|string|max:255',
             'telefono' => 'nullable|string|max:50',
@@ -102,9 +141,11 @@ class UserAdminController extends Controller
         $usuario->username = $request->username;
         $usuario->email = $request->email;
         $usuario->rol_id = $request->rol_id;
+        
         if ($request->filled('password')) {
             $usuario->password = Hash::make($request->password);
         }
+        
         $usuario->save();
 
         return redirect()->route('admin.usuarios.index')->with('success', 'Usuario actualizado correctamente.');
