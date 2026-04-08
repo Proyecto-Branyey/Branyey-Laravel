@@ -70,126 +70,63 @@
     </div>
 </section>
 
-<!-- ===== CATEGORÍAS DESTACADAS ===== -->
-<section class="py-5 bg-white">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold display-5 mb-3">Explora Nuestras Colecciones</h2>
-            <p class="text-muted fs-5">Encuentra el estilo perfecto para tu personalidad</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="category-card position-relative overflow-hidden rounded-xl shadow-sm hover-zoom">
-                    <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop" 
-                         alt="Casual" class="w-100" style="height: 300px; object-fit: cover;">
-                    <div class="category-overlay d-flex align-items-end">
-                        <div class="w-100 p-4 text-white">
-                            <h4 class="fw-bold mb-2">COLECCIÓN CASUAL</h4>
-                            <small class="d-block mb-3">Confort para el día a día</small>
-                            <a href="{{ route('tienda.catalogo') }}" class="btn btn-sm btn-light rounded-pill">Ver Más →</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="category-card position-relative overflow-hidden rounded-xl shadow-sm hover-zoom">
-                    <img src="https://images.unsplash.com/photo-1489749798305-4fea3ba63d60?w=500&h=500&fit=crop" 
-                         alt="Premium" class="w-100" style="height: 300px; object-fit: cover;">
-                    <div class="category-overlay d-flex align-items-end">
-                        <div class="w-100 p-4 text-white">
-                            <h4 class="fw-bold mb-2">LÍNEA PREMIUM</h4>
-                            <small class="d-block mb-3">Lujo y distinción</small>
-                            <a href="{{ route('tienda.catalogo') }}" class="btn btn-sm btn-light rounded-pill">Ver Más →</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="category-card position-relative overflow-hidden rounded-xl shadow-sm hover-zoom">
-                    <img src="https://images.unsplash.com/photo-1618932260643-30b39caf8fa2?w=500&h=500&fit=crop" 
-                         alt="Urban" class="w-100" style="height: 300px; object-fit: cover;">
-                    <div class="category-overlay d-flex align-items-end">
-                        <div class="w-100 p-4 text-white">
-                            <h4 class="fw-bold mb-2">URBAN STYLE</h4>
-                            <small class="d-block mb-3">Para los atrevidos</small>
-                            <a href="{{ route('tienda.catalogo') }}" class="btn btn-sm btn-light rounded-pill">Ver Más →</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== DESTACADOS MEJORADO ===== -->
+<!-- ===== DESTACADOS MAS COMPACTO ===== -->
 @if($destacados->isNotEmpty())
     <section class="py-5 bg-light">
         <div class="container">
             <div class="text-center mb-5">
-                <span class="badge bg-danger mb-2">🔥 LO MÁS VENDIDO</span>
-                <h2 class="fw-bold display-5 mb-2">Favoritos de Nuestros Clientes</h2>
-                <p class="text-muted">Estos son los productos que cautivaron a miles</p>
+                <span class="badge bg-danger mb-2 px-3 py-2" style="background: linear-gradient(135deg, #dc3545, #ff6b6b) !important;">
+                    🔥 LO MÁS VENDIDO
+                </span>
+                <h2 class="fw-bold display-6 mb-3">Favoritos de Nuestros Clientes</h2>
+                <p class="text-muted">Los productos que están marcando tendencia</p>
             </div>
 
             <div class="row g-4">
                 @foreach($destacados->take(6) as $producto)
                     <div class="col-md-6 col-lg-4">
-                        <div class="product-card-enhanced h-100">
-                            <div class="product-image-wrapper position-relative overflow-hidden rounded-xl">
+                        <div class="product-card-compact">
+                            <div class="product-image-compact">
                                 @php
                                     $imagenUrl = $producto->imagenes->first() 
                                         ? Storage::url($producto->imagenes->first()->url)
                                         : 'https://via.placeholder.com/400x500'
                                 @endphp
-                                <img src="{{ $imagenUrl }}" 
-                                     alt="{{ $producto->nombre_comercial }}" class="w-100" style="height: 350px; object-fit: cover;">
-                                <div class="product-badge">⭐ BESTSELLER</div>
-                                <div class="product-overlay">
-                                    <a href="{{ route('tienda.producto.detalle', $producto->id) }}" class="btn btn-light btn-lg rounded-circle shadow-lg">
+                                <img src="{{ $imagenUrl }}" alt="{{ $producto->nombre_comercial }}">
+                                <div class="product-actions">
+                                    <a href="{{ route('tienda.producto.detalle', $producto->id) }}" class="action-btn">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </div>
+                                @if($producto->variantes->sum('stock') > 0)
+                                    <span class="stock-badge">En stock</span>
+                                @else
+                                    <span class="stock-badge out">Agotado</span>
+                                @endif
                             </div>
-                            <div class="p-4">
-                                <div class="mb-2">
-                                    <small class="text-muted">{{ $producto->estilo?->nombre ?? 'Estilo' }}</small>
-                                </div>
-                                <h5 class="fw-bold mb-3">{{ $producto->nombre_comercial }}</h5>
-                                
-                                <div class="d-flex align-items-center mb-3">
-                                    <div class="text-warning">
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-half"></i>
-                                    </div>
-                                    <small class="text-muted ms-2">(128 reseñas)</small>
-                                </div>
-
-                                <div class="mb-3 pb-3 border-bottom">
-                                    <p class="text-muted small mb-0">{{ Str::limit($producto->descripcion, 60) }}</p>
-                                </div>
-
-                                <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="product-info-compact">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
                                     <div>
-                                        <p class="text-primary fw-bold fs-5 mb-1">
-                                            ${{ number_format($producto->variantes->first()?->precio_minorista ?? 0, 0, ',', '.') }} COP
-                                        </p>
+                                        <span class="product-category">{{ $producto->estilo?->nombre ?? 'Premium' }}</span>
+                                        <h6 class="product-title mb-0">{{ Str::limit($producto->nombre_comercial, 35) }}</h6>
+                                    </div>
+                                    <div class="product-rating">
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <span class="rating-number">4.8</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="product-price">
+                                        <span class="current-price">${{ number_format($producto->variantes->first()?->precio_minorista ?? 0, 0, ',', '.') }}</span>
                                         @if(auth()->check() && auth()->user()?->rol?->nombre === 'mayorista')
-                                            <small class="text-success">Mayorista: ${{ number_format($producto->variantes->first()?->precio_mayorista ?? 0, 0, ',', '.') }}</small>
+                                            <small class="wholesale-price">Mayorista: ${{ number_format($producto->variantes->first()?->precio_mayorista ?? 0, 0, ',', '.') }}</small>
                                         @endif
                                     </div>
-                                    @if($producto->variantes->sum('stock') > 0)
-                                        <span class="badge bg-success">En Stock</span>
-                                    @else
-                                        <span class="badge bg-secondary">Agotado</span>
-                                    @endif
+                                    <a href="{{ route('tienda.producto.detalle', $producto->id) }}" class="btn-detail">
+                                        Ver <i class="bi bi-arrow-right-short"></i>
+                                    </a>
                                 </div>
-
-                                <a href="{{ route('tienda.producto.detalle', $producto->id) }}" class="btn btn-dark w-100 rounded-pill fw-bold py-2 hover-lift">
-                                    + Ver Detalles
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -197,7 +134,7 @@
             </div>
 
             <div class="text-center mt-5">
-                <a href="{{ route('tienda.catalogo') }}" class="btn btn-primary btn-lg px-5 rounded-pill fw-bold">
+                <a href="{{ route('tienda.catalogo') }}" class="btn btn-outline-primary btn-lg px-5 rounded-pill fw-bold hover-lift">
                     Ver Todo el Catálogo <i class="bi bi-arrow-right ms-2"></i>
                 </a>
             </div>
@@ -524,6 +461,194 @@
 
     .z-2 {
         z-index: 2;
+    }
+
+    /* ===== PRODUCT CARD COMPACT ===== */
+    .product-card-compact {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .product-card-compact:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(102, 126, 234, 0.15);
+        border-color: rgba(102, 126, 234, 0.2);
+    }
+
+    .product-image-compact {
+        position: relative;
+        aspect-ratio: 1/1;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
+    }
+
+    .product-image-compact img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .product-card-compact:hover .product-image-compact img {
+        transform: scale(1.05);
+    }
+
+    .product-actions {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        opacity: 0;
+        transform: translateX(10px);
+        transition: all 0.3s ease;
+    }
+
+    .product-card-compact:hover .product-actions {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #667eea;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-btn:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .stock-badge {
+        position: absolute;
+        bottom: 12px;
+        left: 12px;
+        background: #10b981;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .stock-badge.out {
+        background: #6c757d;
+    }
+
+    .product-info-compact {
+        padding: 16px;
+    }
+
+    .product-category {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #667eea;
+        font-weight: 600;
+        background: rgba(102, 126, 234, 0.1);
+        padding: 2px 8px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    .product-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin: 8px 0 0 0;
+        line-height: 1.4;
+    }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(255, 193, 7, 0.1);
+        padding: 2px 8px;
+        border-radius: 20px;
+    }
+
+    .product-rating i {
+        font-size: 0.7rem;
+    }
+
+    .rating-number {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #ffc107;
+    }
+
+    .product-price {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .current-price {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #1a1a2e;
+        letter-spacing: -0.5px;
+    }
+
+    .wholesale-price {
+        font-size: 0.65rem;
+        color: #10b981;
+        font-weight: 500;
+    }
+
+    .btn-detail {
+        background: transparent;
+        border: none;
+        color: #667eea;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.3s ease;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+
+    .btn-detail:hover {
+        background: rgba(102, 126, 234, 0.1);
+        gap: 8px;
+        color: #764ba2;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .product-info-compact {
+            padding: 12px;
+        }
+        
+        .product-title {
+            font-size: 0.85rem;
+        }
+        
+        .current-price {
+            font-size: 0.95rem;
+        }
+        
+        .btn-detail {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+        }
     }
 </style>
 
