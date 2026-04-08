@@ -69,7 +69,151 @@
             font-weight: 700;
             margin-left: 5px;
         }
+        /* ===== CARRITO FLOTANTE ===== */
+        .cart-float {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 60px;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
 
+        .cart-float:hover {
+            transform: translateX(-5px) translateY(-2px);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+        }
+
+        .cart-float-icon {
+            position: relative;
+        }
+
+        .cart-float-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .cart-float-badge {
+            position: absolute;
+            top: -8px;
+            right: -12px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 50px;
+            min-width: 20px;
+            text-align: center;
+            animation: pulse 1.5s infinite;
+        }
+
+        .cart-float-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .cart-float-text small {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .cart-float-text strong {
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        /* ===== CARRITO NAVBAR SIMPLIFICADO ===== */
+        .cart-nav-simple {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cart-nav-simple i {
+            font-size: 1.1rem;
+            color: white;
+        }
+
+        .cart-nav-simple:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateY(-2px);
+        }
+
+        .cart-nav-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 50px;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Ocultar carrito flotante en móviles pequeños */
+        @media (max-width: 768px) {
+            .cart-float {
+                bottom: 80px;
+                right: 20px;
+                padding: 0.5rem 1rem;
+            }
+            
+            .cart-float-text {
+                display: none;
+            }
+            
+            .cart-float {
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                justify-content: center;
+            }
+            
+            .cart-float-icon i {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Mostrar/ocultar según scroll */
+        .cart-float {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cart-float.show {
+            opacity: 1;
+            visibility: visible;
+        }
         /* Botones en navbar */
         .navbar .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
@@ -175,14 +319,13 @@
                         @endauth
 
                         @if(!auth()->check() || auth()->user()?->rol?->nombre !== 'administrador')
-                            <li class="nav-item ms-lg-4">
-                                <a class="btn btn-light position-relative rounded-pill px-3 d-flex align-items-center" href="{{ route('tienda.cart.index') }}">
-                                    <i class="bi bi-bag-fill me-2"></i>
-                                    <span class="d-none d-lg-inline small fw-bold">CARRITO</span>
+                            <li class="nav-item ms-lg-3">
+                                <a class="cart-nav-simple" href="{{ route('tienda.cart.index') }}" title="Carrito">
+                                    <i class="bi bi-bag-fill"></i>
                                     @php $count = session('cart') ? count(session('cart')) : 0; @endphp
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white" style="font-size: 0.7rem;">
-                                        {{ $count }}
-                                    </span>
+                                    @if($count > 0)
+                                        <span class="cart-nav-badge">{{ $count }}</span>
+                                    @endif
                                 </a>
                             </li>
                         @endif
@@ -276,9 +419,22 @@
 
     <!-- Componente de WhatsApp (solo se mostrará en las rutas configuradas) -->
     <x-whatsapp-button />
-
+    @if(!auth()->check() || auth()->user()?->rol?->nombre !== 'administrador')
+        @php $cartCount = session('cart') ? count(session('cart')) : 0; @endphp
+        @if($cartCount > 0)
+            <a href="{{ route('tienda.cart.index') }}" class="cart-float show" id="cartFloat">
+                <div class="cart-float-icon">
+                    <i class="bi bi-bag-fill"></i>
+                    <span class="cart-float-badge">{{ $cartCount }}</span>
+                </div>
+                <div class="cart-float-text">
+                    <small>Ver carrito</small>
+                    <strong>${{ number_format(session('cart_total', 0), 0, ',', '.') }}</strong>
+                </div>
+            </a>
+        @endif
+    @endif
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-
 </body>
 </html>
