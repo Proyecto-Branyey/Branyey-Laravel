@@ -40,6 +40,8 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
 
         Route::get('/checkout', [CartController::class, 'showCheckout'])->name('checkout');
         Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout.confirm');
+        // Cotización de envío AJAX
+        Route::post('/checkout/shipping-quote', [CartController::class, 'shippingQuote']);
 
         // Historial de pedidos del usuario (Mis Pedidos)
         Route::get('/pedidos', [\App\Http\Controllers\Tienda\PedidoController::class, 'index'])->name('pedidos');

@@ -20,6 +20,10 @@
                     </h4>
 
                     <div class="row g-3">
+                                                <div class="d-flex justify-content-end mb-3 gap-2">
+                                                    <button type="button" id="btn-editar-datos" class="btn btn-outline-primary btn-sm">Editar datos</button>
+                                                    <button type="button" id="btn-confirmar-datos" class="btn btn-success btn-sm" disabled>Confirmar datos</button>
+                                                </div>
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Nombre Completo</label>
                             <input type="text" class="form-control form-control-lg rounded-pill bg-light border-0" 
@@ -29,27 +33,31 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Teléfono de Contacto</label>
                             <input type="text" name="telefono" class="form-control form-control-lg rounded-pill @error('telefono') is-invalid @enderror" 
-                                   value="{{ old('telefono', $user->telefono) }}" placeholder="Ej: 300 123 4567" required>
+                                value="{{ old('telefono', $user->telefono ?? '') }}" placeholder="Ej: 300 123 4567" required disabled>
                             @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Departamento</label>
+                            <input type="text" name="departamento" class="form-control form-control-lg rounded-pill" 
+                                value="{{ old('departamento', $user->departamento_defecto ?? 'Cundinamarca') }}" required disabled>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Ciudad</label>
                             <input type="text" name="ciudad" class="form-control form-control-lg rounded-pill" 
-                                   value="Bogotá" required>
+                                value="{{ old('ciudad', $user->ciudad_defecto ?? 'Bogotá') }}" required disabled>
                         </div>
 
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Dirección de Residencia</label>
                             <input type="text" name="direccion" class="form-control form-control-lg rounded-pill @error('direccion') is-invalid @enderror" 
-                                   value="{{ old('direccion', $user->direccion) }}" placeholder="Calle, Carrera, Conjunto, Apto..." required>
+                                value="{{ old('direccion', $user->direccion_defecto ?? '') }}" placeholder="Calle, Carrera, Conjunto, Apto..." required disabled>
                             @error('direccion') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Departamento / Notas</label>
-                            <input type="text" name="departamento" class="form-control form-control-lg rounded-pill" 
-                                   value="Cundinamarca" placeholder="Indicaciones adicionales...">
+
                         </div>
                     </div>
                 </div>
@@ -80,9 +88,9 @@
                         <span class="text-secondary">Subtotal</span>
                         <span>${{ number_format($total, 0, ',', '.') }} COP</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-4">
-                        <span class="text-secondary">Envío (Bogotá)</span>
-                        <span class="text-success fw-bold">GRATIS</span>
+                    <div class="d-flex justify-content-between mb-4" id="shipping-row">
+                        <span class="text-secondary" id="shipping-label">Envío</span>
+                        <span class="text-success fw-bold" id="shipping-value">Calculando...</span>
                     </div>
 
                     <hr class="border-secondary">
@@ -92,8 +100,82 @@
                         <span class="h3 mb-0 fw-black italic text-warning">${{ number_format($total, 0, ',', '.') }} COP</span>
                     </div>
 
-                    <button type="submit" class="btn btn-warning btn-lg w-100 rounded-pill fw-black text-uppercase py-3 shadow">
+                    <div id="mensaje-confirma-datos" class="small text-warning mb-2">
+                        <i class="bi bi-exclamation-triangle me-1"></i>Debes confirmar tus datos antes de finalizar el pedido.
+                    </div>
+                    <button type="submit" id="btn-confirmar-pedido" class="btn btn-warning btn-lg w-100 rounded-pill fw-black text-uppercase py-3 shadow" disabled>
                         Confirmar Pedido <i class="bi bi-chevron-right ms-2"></i>
+                    </button>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const btnEditar = document.getElementById('btn-editar-datos');
+                            const btnConfirmar = document.getElementById('btn-confirmar-datos');
+                            const btnPedido = document.getElementById('btn-confirmar-pedido');
+                            const mensaje = document.getElementById('mensaje-confirma-datos');
+                            const campos = [
+                                document.querySelector('input[name="telefono"]'),
+                                document.querySelector('input[name="departamento"]'),
+                                document.querySelector('input[name="ciudad"]'),
+                                document.querySelector('input[name="direccion"]'),
+                            ];
+                            // Estado inicial: se puede confirmar datos o editar, pero no pedir
+                            btnPedido.disabled = true;
+                            btnConfirmar.disabled = false;
+                            btnEditar.disabled = false;
+                            // El mensaje es visible por defecto
+
+                            btnEditar.addEventListener('click', function () {
+                                campos.forEach(c => c.disabled = false);
+                                btnConfirmar.disabled = false;
+                                btnEditar.disabled = true;
+                                btnPedido.disabled = true;
+                                mensaje.classList.remove('d-none');
+                            });
+                            btnConfirmar.addEventListener('click', function () {
+                                campos.forEach(c => c.disabled = true);
+                                btnConfirmar.disabled = true;
+                                btnEditar.disabled = false;
+                                btnPedido.disabled = false;
+                                mensaje.classList.add('d-none');
+
+                                // Cotizar envío
+                                const departamento = document.querySelector('input[name="departamento"]').value;
+                                const ciudad = document.querySelector('input[name="ciudad"]').value;
+                                const shippingValue = document.getElementById('shipping-value');
+                                const shippingLabel = document.getElementById('shipping-label');
+                                shippingValue.textContent = 'Calculando...';
+                                fetch('/tienda/checkout/shipping-quote', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                                    },
+                                    body: JSON.stringify({ departamento, ciudad })
+                                })
+                                .then(r => r.json())
+                                .then(data => {
+                                    if(data.success && data.valor_envio !== undefined) {
+                                        shippingValue.textContent = data.valor_envio === 0 ? 'GRATIS' : `$${data.valor_envio.toLocaleString('es-CO')} COP`;
+                                        shippingLabel.textContent = `Envío (${ciudad})`;
+                                    } else {
+                                        shippingValue.textContent = 'No disponible';
+                                        shippingLabel.textContent = 'Envío';
+                                    }
+                                })
+                                .catch(() => {
+                                    shippingValue.textContent = 'Error';
+                                    shippingLabel.textContent = 'Envío';
+                                });
+                            });
+                            // Si el usuario intenta enviar sin confirmar datos
+                            btnPedido.form.addEventListener('submit', function(e) {
+                                if(btnPedido.disabled) {
+                                    e.preventDefault();
+                                    mensaje.classList.remove('d-none');
+                                }
+                            });
+                        });
+                    </script>
                     </button>
 
                     <a href="{{ route('tienda.cart.index') }}" class="btn btn-outline-light w-100 rounded-pill fw-bold text-uppercase mt-3 py-2">

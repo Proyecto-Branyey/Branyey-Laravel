@@ -219,4 +219,29 @@ class CartController extends Controller
                 ->with('error', $e->getMessage());
         }
     }
+
+    /**
+     * Cotización de envío AJAX
+     */
+    public function shippingQuote(Request $request)
+    {
+        $departamento = $request->input('departamento');
+        $ciudad = $request->input('ciudad');
+        // Lógica de cotización según distancia
+        $valor_envio = 0;
+        $ciudad_limpia = strtolower(trim($ciudad));
+        if ($ciudad_limpia === 'bogotá') {
+            $valor_envio = 0;
+        } elseif (in_array($ciudad_limpia, ['soacha', 'chia', 'cota', 'funza', 'mosquera', 'facatativá', 'zipaquirá'])) {
+            $valor_envio = 7000;
+        } elseif ($departamento && strtolower($departamento) === 'cundinamarca') {
+            $valor_envio = 12000;
+        } else {
+            $valor_envio = 18000;
+        }
+        return response()->json([
+            'success' => true,
+            'valor_envio' => $valor_envio
+        ]);
+    }
 }
