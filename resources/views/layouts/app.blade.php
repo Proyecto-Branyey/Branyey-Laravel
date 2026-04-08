@@ -10,8 +10,24 @@
     
     <style>
         :root { --primary-black: #111111; }
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
+
         .fw-black { font-weight: 900; }
         .italic { font-style: italic; }
         
@@ -70,7 +86,13 @@
             font-weight: 600 !important;
         }
 
-        footer { background: var(--primary-black); color: rgba(255,255,255,0.6); padding: 40px 0; margin-top: 60px; }
+        footer {
+            background: var(--primary-black);
+            color: rgba(255,255,255,0.6);
+            padding: 40px 0;
+            flex-shrink: 0;
+            margin-top: auto; /* Esto empuja el footer hacia abajo */
+        }
     </style>
 </head>
 <body>
