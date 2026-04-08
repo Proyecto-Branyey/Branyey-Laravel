@@ -38,7 +38,8 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
             Route::delete('/remove/{id}', [CartController::class, 'remove'])->name('remove');
         });
 
-        Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+        Route::get('/checkout', [CartController::class, 'showCheckout'])->name('checkout');
+        Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout.confirm');
 
         // Historial de pedidos del usuario (Mis Pedidos)
         Route::get('/pedidos', [\App\Http\Controllers\Tienda\PedidoController::class, 'index'])->name('pedidos');

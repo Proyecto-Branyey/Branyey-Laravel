@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Finalizar Compra | Branyey'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -9,7 +7,7 @@
         <p class="text-muted">Estás a un paso de recibir tus prendas. Completa los datos de entrega.</p>
     </div>
 
-    <form action="<?php echo e(route('tienda.orden.store')); ?>" method="POST">
+    <form action="<?php echo e(route('tienda.checkout.confirm')); ?>" method="POST">
         <?php echo csrf_field(); ?>
         <div class="row g-5">
             
@@ -23,7 +21,7 @@
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Nombre Completo</label>
                             <input type="text" class="form-control form-control-lg rounded-pill bg-light border-0" 
-                                   value="<?php echo e($user->name); ?>" readonly>
+                                value="<?php echo e($user->nombre_completo ?: $user->username); ?>" readonly>
                         </div>
 
                         <div class="col-md-6">
@@ -89,8 +87,12 @@ unset($__errorArgs, $__bag); ?>
                     
                     <div class="cart-items-preview mb-4" style="max-height: 300px; overflow-y: auto;">
                         <?php $__currentLoopData = $cart; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $id => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php
+                            $img = $item['image'] ?? 'default.jpg';
+                            $imgUrl = Str::startsWith($img, ['http', 'storage/', '/storage/']) ? asset($img) : Storage::url($img);
+                        ?>
                         <div class="d-flex align-items-center mb-3 border-bottom border-secondary pb-3">
-                            <img src="<?php echo e(asset($item['image'])); ?>" class="rounded-3 me-3" width="50" height="50" style="object-fit: cover;">
+                            <img src="<?php echo e($imgUrl); ?>" class="rounded-3 me-3" width="50" height="50" style="object-fit: cover;">
                             <div class="flex-grow-1">
                                 <h6 class="mb-0 small fw-bold text-uppercase"><?php echo e($item['name']); ?></h6>
                                 <small class="text-secondary">Talla: <?php echo e($item['talla']); ?> | Cant: <?php echo e($item['quantity']); ?></small>
@@ -119,6 +121,10 @@ unset($__errorArgs, $__bag); ?>
                     <button type="submit" class="btn btn-warning btn-lg w-100 rounded-pill fw-black text-uppercase py-3 shadow">
                         Confirmar Pedido <i class="bi bi-chevron-right ms-2"></i>
                     </button>
+
+                    <a href="<?php echo e(route('tienda.cart.index')); ?>" class="btn btn-outline-light w-100 rounded-pill fw-bold text-uppercase mt-3 py-2">
+                        Volver al carrito
+                    </a>
                     
                     <p class="text-center mt-3 mb-0 small text-secondary italic">
                         <i class="bi bi-shield-check me-1"></i> Compra segura protegida por Branyey

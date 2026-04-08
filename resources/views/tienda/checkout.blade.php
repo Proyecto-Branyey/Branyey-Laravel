@@ -9,7 +9,7 @@
         <p class="text-muted">Estás a un paso de recibir tus prendas. Completa los datos de entrega.</p>
     </div>
 
-    <form action="{{ route('tienda.orden.store') }}" method="POST">
+    <form action="{{ route('tienda.checkout.confirm') }}" method="POST">
         @csrf
         <div class="row g-5">
             
@@ -23,7 +23,7 @@
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Nombre Completo</label>
                             <input type="text" class="form-control form-control-lg rounded-pill bg-light border-0" 
-                                   value="{{ $user->name }}" readonly>
+                                value="{{ $user->nombre_completo ?: $user->username }}" readonly>
                         </div>
 
                         <div class="col-md-6">
@@ -61,8 +61,12 @@
                     
                     <div class="cart-items-preview mb-4" style="max-height: 300px; overflow-y: auto;">
                         @foreach($cart as $id => $item)
+                        @php
+                            $img = $item['image'] ?? 'default.jpg';
+                            $imgUrl = Str::startsWith($img, ['http', 'storage/', '/storage/']) ? asset($img) : Storage::url($img);
+                        @endphp
                         <div class="d-flex align-items-center mb-3 border-bottom border-secondary pb-3">
-                            <img src="{{ asset($item['image']) }}" class="rounded-3 me-3" width="50" height="50" style="object-fit: cover;">
+                            <img src="{{ $imgUrl }}" class="rounded-3 me-3" width="50" height="50" style="object-fit: cover;">
                             <div class="flex-grow-1">
                                 <h6 class="mb-0 small fw-bold text-uppercase">{{ $item['name'] }}</h6>
                                 <small class="text-secondary">Talla: {{ $item['talla'] }} | Cant: {{ $item['quantity'] }}</small>
@@ -91,6 +95,10 @@
                     <button type="submit" class="btn btn-warning btn-lg w-100 rounded-pill fw-black text-uppercase py-3 shadow">
                         Confirmar Pedido <i class="bi bi-chevron-right ms-2"></i>
                     </button>
+
+                    <a href="{{ route('tienda.cart.index') }}" class="btn btn-outline-light w-100 rounded-pill fw-bold text-uppercase mt-3 py-2">
+                        Volver al carrito
+                    </a>
                     
                     <p class="text-center mt-3 mb-0 small text-secondary italic">
                         <i class="bi bi-shield-check me-1"></i> Compra segura protegida por Branyey
