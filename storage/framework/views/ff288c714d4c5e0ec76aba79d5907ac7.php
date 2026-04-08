@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('title', 'Detalle de Venta'); ?>
 <?php $__env->startSection('admin-content'); ?>
 <?php
@@ -84,27 +83,7 @@
         <?php endif; ?>
     </div>
 
-    <?php if($venta->detallesOrden): ?>
-    <div class="card mb-3">
-        <div class="card-header bg-primary text-white">Datos de Envío</div>
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-3">Nombre</dt>
-                <dd class="col-sm-9"><?php echo e($venta->detallesOrden->nombre_cliente); ?></dd>
-                <dt class="col-sm-3">Email</dt>
-                <dd class="col-sm-9"><?php echo e($venta->detallesOrden->email_cliente); ?></dd>
-                <dt class="col-sm-3">Teléfono</dt>
-                <dd class="col-sm-9"><?php echo e($venta->detallesOrden->telefono_cliente); ?></dd>
-                <dt class="col-sm-3">Dirección</dt>
-                <dd class="col-sm-9"><?php echo e($venta->detallesOrden->direccion_envio); ?></dd>
-                <dt class="col-sm-3">Ciudad</dt>
-                <dd class="col-sm-9"><?php echo e($venta->detallesOrden->ciudad); ?></dd>
-                <dt class="col-sm-3">Departamento</dt>
-                <dd class="col-sm-9"><?php echo e($venta->detallesOrden->departamento); ?></dd>
-            </dl>
-        </div>
-    </div>
-    <?php endif; ?>
+    
 
     <div class="card mb-4">
         <div class="card-header bg-secondary text-white fw-semibold"><i class="bi bi-box-seam me-2"></i>Productos Vendidos</div>

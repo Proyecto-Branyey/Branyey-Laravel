@@ -48,9 +48,27 @@
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </tbody>
         <tfoot>
+            <?php
+                $envio = 0;
+                $ciudad = strtolower($venta->detallesOrden->ciudad ?? '');
+                $departamento = strtolower($venta->detallesOrden->departamento ?? '');
+                if ($ciudad === 'bogotá') {
+                    $envio = 0;
+                } elseif (in_array($ciudad, ['soacha', 'chia', 'cota', 'funza', 'mosquera', 'facatativá', 'zipaquirá'])) {
+                    $envio = 7000;
+                } elseif ($departamento === 'cundinamarca') {
+                    $envio = 12000;
+                } else {
+                    $envio = 18000;
+                }
+            ?>
+            <tr>
+                <td colspan="3" class="total">Envío</td>
+                <td class="total"><?php if($envio === 0): ?> GRATIS <?php else: ?> $<?php echo e(number_format($envio, 0, ',', '.')); ?> <?php endif; ?></td>
+            </tr>
             <tr>
                 <td colspan="3" class="total">TOTAL</td>
-                <td class="total">$<?php echo e(number_format($venta->total, 0, ',', '.')); ?></td>
+                <td class="total">$<?php echo e(number_format($venta->total + $envio, 0, ',', '.')); ?></td>
             </tr>
         </tfoot>
     </table>

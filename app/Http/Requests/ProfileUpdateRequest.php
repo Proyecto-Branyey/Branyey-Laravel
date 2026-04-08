@@ -33,8 +33,8 @@ class ProfileUpdateRequest extends FormRequest
             'telefono' => ['nullable', 'string', 'max:30'],
             'nombre_completo' => ['nullable', 'string', 'max:255'],
             'direccion_defecto' => ['nullable', 'string', 'max:255'],
-            'ciudad_defecto' => ['nullable', 'string', 'max:100'],
-            'departamento_defecto' => ['nullable', 'string', 'max:100'],
+            'ciudad_defecto' => ['required', 'string', 'max:100'],
+            'departamento_defecto' => ['required', 'string', 'max:100'],
         ];
     }
 }
