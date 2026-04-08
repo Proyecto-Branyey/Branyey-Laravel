@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('username', 255)->unique()->notNullable();
             $table->string('password', 255)->notNullable();
+                $table->rememberToken()->nullable();
             $table->foreignId('rol_id')->constrained('roles')->onUpdate('cascade')->onDelete('restrict');
             $table->string('email', 255)->unique()->notNullable();
             $table->string('telefono', 50)->nullable();

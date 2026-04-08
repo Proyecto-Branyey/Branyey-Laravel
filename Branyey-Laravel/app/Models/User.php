@@ -12,6 +12,23 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Sobrescribe el envío de notificación de restablecimiento de contraseña para usar el microservicio Java.
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $url = url(route('password.reset', ['token' => $token, 'email' => $this->email], false));
+        try {
+            \Illuminate\Support\Facades\Http::post('http://localhost:8080/api/mail/send', [
+                'to' => $this->email,
+                'subject' => 'Restablece tu contraseña',
+                'body' => "Hola {$this->name}, para restablecer tu contraseña haz clic en el siguiente enlace: $url"
+            ]);
+        } catch (\Exception $e) {
+            // Log::error('Error enviando correo de restablecimiento: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Relación: historial de ventas del usuario
      */
     public function ventas()
