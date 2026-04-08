@@ -14,16 +14,30 @@ use Illuminate\Support\Facades\DB;
 class CartController extends Controller
 {
     /**
+     * Recalcula y guarda el total del carrito en sesión
+     */
+    private function recalculateCartTotal()
+    {
+        $cart = session()->get('cart', []);
+        $total = 0;
+        
+        foreach($cart as $item) {
+            $total += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
+        }
+        
+        session()->put('cart_total', $total);
+        return $total;
+    }
+
+    /**
      * Muestra la vista del carrito con el total calculado.
      */
     public function index()
     {
         $cart = session()->get('cart', []);
         
-        $total = 0;
-        foreach($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
-        }
+        // Recalcular total para asegurar consistencia
+        $total = $this->recalculateCartTotal();
 
         return view('tienda.carrito.index', compact('cart', 'total'));
     }
@@ -55,6 +69,7 @@ class CartController extends Controller
         if ($cantidad + $cantidadEnCarrito > $variante->stock) {
             return redirect()->back()->with('error', 'Solo hay ' . $variante->stock . ' unidades disponibles para esta combinación.');
         }
+        
         if(isset($cart[$variante->id])) {
             $cart[$variante->id]['quantity'] += $cantidad;
         } else {
@@ -68,6 +83,10 @@ class CartController extends Controller
         }
 
         session()->put('cart', $cart);
+        
+        // Recalcular y guardar el total en sesión
+        $this->recalculateCartTotal();
+        
         return redirect()->route('tienda.cart.index')->with('success', 'Producto añadido al carrito.');
     }
 
@@ -80,6 +99,9 @@ class CartController extends Controller
         if(isset($cart[$id])) {
             unset($cart[$id]);
             session()->put('cart', $cart);
+            
+            // Recalcular y guardar el total en sesión
+            $this->recalculateCartTotal();
         }
         return redirect()->back()->with('success', 'Producto eliminado.');
     }
@@ -104,6 +126,10 @@ class CartController extends Controller
 
             $cart[$id]['quantity'] = $request->quantity;
             session()->put('cart', $cart);
+            
+            // Recalcular y guardar el total en sesión
+            $this->recalculateCartTotal();
+            
             return redirect()->back()->with('success', 'Carrito actualizado.');
         }
         return redirect()->back()->with('error', 'Cantidad no válida.');
@@ -120,10 +146,7 @@ class CartController extends Controller
             return redirect()->route('tienda.cart.index')->with('error', 'Tu carrito está vacío.');
         }
 
-        $total = 0;
-        foreach ($cart as $item) {
-            $total += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
-        }
+        $total = $this->recalculateCartTotal();
 
         $user = Auth::user();
 
@@ -205,7 +228,9 @@ class CartController extends Controller
 
             DB::commit();
 
+            // Limpiar carrito y total de sesión
             session()->forget('cart');
+            session()->forget('cart_total');
 
             return redirect()
                 ->route('tienda.pedidos')
