@@ -125,7 +125,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
         Route::get('/{id}/editar', [\App\Http\Controllers\Admin\UserAdminController::class, 'edit'])->name('edit');
         Route::put('/{id}/actualizar', [\App\Http\Controllers\Admin\UserAdminController::class, 'update'])->name('update');
         Route::delete('/{id}/eliminar', [\App\Http\Controllers\Admin\UserAdminController::class, 'destroy'])->name('destroy');
+        Route::get('/exportar-pdf', [\App\Http\Controllers\Admin\UserAdminController::class, 'exportarPdf'])->name('exportar.pdf');
     });
+
     Route::get('usuarios/papelera', [App\Http\Controllers\Admin\UserAdminController::class, 'papelera'])->name('usuarios.papelera');
     Route::put('usuarios/{id}/activar', [App\Http\Controllers\Admin\UserAdminController::class, 'activar'])->name('usuarios.activar');
 
