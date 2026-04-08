@@ -107,6 +107,13 @@ class ProductoAdminController extends Controller
             'variantes.*.foto' => 'nullable|image|max:10240',
         ]);
 
+        $duplicateError = $this->findDuplicateVariantCombinationInRequest($request->variantes ?? []);
+        if ($duplicateError !== null) {
+            return back()
+                ->withInput()
+                ->withErrors(['variantes' => $duplicateError]);
+        }
+
         $coloresConImagen = [];
         foreach ($request->variantes as $index => $v) {
             $colorId = $v['color_id'] ?? null;
@@ -249,6 +256,39 @@ class ProductoAdminController extends Controller
             'variantes.*.stock' => 'required|integer|min:0',
             'variantes.*.foto' => 'nullable|image|max:10240',
         ]);
+
+        $duplicateError = $this->findDuplicateVariantCombinationInRequest($request->variantes ?? []);
+        if ($duplicateError !== null) {
+            return back()
+                ->withInput()
+                ->withErrors(['variantes' => $duplicateError]);
+        }
+
+        foreach (($request->variantes ?? []) as $v) {
+            $tallaId = $v['talla_id'] ?? null;
+            $colorId = $v['color_id'] ?? null;
+            $currentVariantId = $v['id'] ?? null;
+
+            if (!$tallaId || !$colorId) {
+                continue;
+            }
+
+            $exists = Variante::where('producto_id', $producto->id)
+                ->where('talla_id', $tallaId)
+                ->when($currentVariantId, function ($q) use ($currentVariantId) {
+                    $q->where('id', '!=', $currentVariantId);
+                })
+                ->whereHas('colores', function ($q) use ($colorId) {
+                    $q->where('colores.id', $colorId);
+                })
+                ->exists();
+
+            if ($exists) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['variantes' => 'No se puede repetir la misma combinación de talla y color para un producto.']);
+            }
+        }
 
         $uploadedPaths = [];
 
@@ -395,5 +435,28 @@ class ProductoAdminController extends Controller
 
         return redirect()->route('admin.productos.index')
             ->with('success', 'Producto enviado a la papelera junto con sus variantes.');
+    }
+
+    private function findDuplicateVariantCombinationInRequest(array $variantes): ?string
+    {
+        $combinations = [];
+
+        foreach ($variantes as $variant) {
+            $tallaId = $variant['talla_id'] ?? null;
+            $colorId = $variant['color_id'] ?? null;
+
+            if (!$tallaId || !$colorId) {
+                continue;
+            }
+
+            $key = $tallaId . '-' . $colorId;
+            if (isset($combinations[$key])) {
+                return 'No se puede repetir la misma combinación de talla y color para un producto.';
+            }
+
+            $combinations[$key] = true;
+        }
+
+        return null;
     }
 }
