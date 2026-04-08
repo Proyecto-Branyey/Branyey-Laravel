@@ -48,14 +48,17 @@
                                 @error('direccion_defecto') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label small fw-bold">CIUDAD</label>
-                                <input type="text" name="ciudad_defecto" class="form-control @error('ciudad_defecto') is-invalid @enderror" value="{{ old('ciudad_defecto') }}" required>
-                                @error('ciudad_defecto') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <label class="form-label small fw-bold">DEPARTAMENTO</label>
+                                <input type="text" name="departamento_defecto" id="departamento_defecto" list="departamentos_list" class="form-control @error('departamento_defecto') is-invalid @enderror" value="{{ old('departamento_defecto') }}" required>
+                                <datalist id="departamentos_list"></datalist>
+                                @error('departamento_defecto') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label small fw-bold">DEPARTAMENTO</label>
-                                <input type="text" name="departamento_defecto" class="form-control @error('departamento_defecto') is-invalid @enderror" value="{{ old('departamento_defecto') }}" required>
-                                @error('departamento_defecto') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <label class="form-label small fw-bold">CIUDAD</label>
+                                <input type="text" name="ciudad_defecto" id="ciudad_defecto" list="ciudades_list" class="form-control @error('ciudad_defecto') is-invalid @enderror" value="{{ old('ciudad_defecto') }}" required>
+                                <datalist id="ciudades_list"></datalist>
+                                <small class="text-muted">Selecciona primero un departamento para sugerir municipios.</small>
+                                @error('ciudad_defecto') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                         </div>
 
@@ -81,4 +84,89 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const deptInput = document.getElementById('departamento_defecto');
+    const cityInput = document.getElementById('ciudad_defecto');
+    const deptList = document.getElementById('departamentos_list');
+    const cityList = document.getElementById('ciudades_list');
+
+    if (!deptInput || !cityInput || !deptList || !cityList) {
+        return;
+    }
+
+    const API_BASE = 'https://api-colombia.com/api/v1';
+    let departments = [];
+
+    const normalize = (value) => (value || '').toString().trim().toLowerCase();
+
+    const renderCityOptions = (cities) => {
+        cityList.innerHTML = '';
+        cities.forEach((city) => {
+            const option = document.createElement('option');
+            option.value = city.name;
+            cityList.appendChild(option);
+        });
+    };
+
+    const loadCitiesByDepartmentName = async () => {
+        const deptName = normalize(deptInput.value);
+        const selectedDepartment = departments.find((dept) => normalize(dept.name) === deptName);
+
+        cityList.innerHTML = '';
+
+        if (!selectedDepartment) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/Department/${selectedDepartment.id}/cities`);
+            if (!response.ok) {
+                return;
+            }
+            const cities = await response.json();
+            renderCityOptions(Array.isArray(cities) ? cities : []);
+        } catch (error) {
+            // Si la API falla, el usuario puede escribir ciudad manualmente.
+        }
+    };
+
+    const loadDepartments = async () => {
+        try {
+            const response = await fetch(`${API_BASE}/Department`);
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+            departments = Array.isArray(data)
+                ? data.slice().sort((a, b) => a.name.localeCompare(b.name, 'es'))
+                : [];
+
+            deptList.innerHTML = '';
+            departments.forEach((dept) => {
+                const option = document.createElement('option');
+                option.value = dept.name;
+                deptList.appendChild(option);
+            });
+
+            if (deptInput.value) {
+                loadCitiesByDepartmentName();
+            }
+        } catch (error) {
+            // Si la API falla, el usuario puede escribir departamento manualmente.
+        }
+    };
+
+    deptInput.addEventListener('change', () => {
+        cityInput.value = '';
+        loadCitiesByDepartmentName();
+    });
+
+    deptInput.addEventListener('blur', loadCitiesByDepartmentName);
+
+    loadDepartments();
+});
+</script>
 @endsection
