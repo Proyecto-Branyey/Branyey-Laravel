@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\{
@@ -14,6 +14,7 @@ use App\Models\{
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{DB, Storage};
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ProductoAdminController extends Controller
 {
@@ -64,13 +65,38 @@ class ProductoAdminController extends Controller
         return redirect()->route('admin.productos.index')
             ->with('success', 'Producto y variantes activados correctamente.');
     }
-    public function index() {
-        $productos = Producto::with(['estilo', 'imagenes', 'variantes'])
-            ->where('activo', true)
-            ->orderBy('id', 'desc')
-            ->get();
 
-        return view('admin.productos.index', compact('productos'));
+    public function index(Request $request)
+    {
+        $query = Producto::with(['estilo', 'imagenes']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nombre_comercial', 'LIKE', "%{$search}%")
+                ->orWhere('id', $search);
+            });
+        }
+
+        if ($request->filled('estilo_id')) {
+            $query->where('estilo_id', $request->estilo_id);
+        }
+
+        if ($request->filled('estado')) {
+            if ($request->estado == 'activo') {
+                $query->where('activo', true);
+            } elseif ($request->estado == 'inactivo') {
+                $query->where('activo', false);
+            }
+        } else {
+            $query->where('activo', true);
+        }
+
+        $productos = $query->orderBy('id', 'desc')->paginate(15);
+
+        $estilos = EstiloCamisa::where('activo', true)->get();
+
+        return view('admin.productos.index', compact('productos', 'estilos'));
     }
 
     public function create() {
@@ -458,5 +484,43 @@ class ProductoAdminController extends Controller
         }
 
         return null;
+    }
+
+    public function exportarPdf(Request $request)
+    {
+        $query = Producto::with([
+            'estilo',
+            'imagenes',
+            'variantes' => function ($query) {
+                $query->with(['talla', 'colores']);
+            }
+        ]);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nombre_comercial', 'LIKE', "%{$search}%")
+                ->orWhere('id', $search);
+            });
+        }
+
+        if ($request->filled('estilo_id')) {
+            $query->where('estilo_id', $request->estilo_id);
+        }
+
+        if ($request->filled('estado')) {
+            if ($request->estado == 'activo') {
+                $query->where('activo', true);
+            } elseif ($request->estado == 'inactivo') {
+                $query->where('activo', false);
+            }
+        }
+
+        $productos = $query->orderBy('id', 'desc')->get();
+
+        $estilos = EstiloCamisa::all();
+
+        $pdf = Pdf::loadView('admin.productos.pdf', compact('productos', 'estilos'));
+        return $pdf->download('productos_branyey_' . now()->format('Y-m-d_His') . '.pdf');
     }
 }

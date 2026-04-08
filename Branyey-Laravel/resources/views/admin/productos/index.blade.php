@@ -1,101 +1,579 @@
 @extends('layouts.admin')
 
 @section('admin-content')
-<div class="container py-4">
+<div class="container-fluid px-0">
+    {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold"><i class="bi bi-stack me-2"></i>Inventario de Branyey</h2>
-        <div class="d-flex align-items-center gap-2">
-            <a href="{{ route('admin.productos.create') }}" class="btn btn-dark shadow-sm">
-                <i class="bi bi-plus-lg me-2"></i>Nueva Prenda
+        <div>
+            <h1 class="fw-bold mb-1" style="background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <i class="bi bi-box-seam-fill me-2"></i>Inventario
+            </h1>
+            <p class="text-muted small mb-0">Gestiona los productos y variantes de Branyey</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.productos.exportar.pdf', request()->query()) }}" class="btn-export-pdf" target="_blank">
+                <i class="bi bi-file-pdf me-1"></i> Exportar PDF
             </a>
-            <a href="{{ route('admin.productos.papelera') }}" class="btn btn-outline-danger shadow-sm">
-                <i class="bi bi-trash3 me-1"></i> Papelera Productos
+            <a href="{{ route('admin.productos.papelera') }}" class="btn-action-outline">
+                <i class="bi bi-trash3 me-1"></i> Papelera
             </a>
-            <a href="{{ route('admin.variantes.papelera') }}" class="btn btn-outline-danger shadow-sm">
-                <i class="bi bi-trash3 me-1"></i> Papelera Variantes
+            <a href="{{ route('admin.variantes.papelera') }}" class="btn-action-outline">
+                <i class="bi bi-layers me-1"></i> Variantes
+            </a>
+            <a href="{{ route('admin.productos.create') }}" class="btn-action-primary">
+                <i class="bi bi-plus-lg me-1"></i> Nueva Prenda
             </a>
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4 p-3 mb-4" role="alert">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-check-circle-fill fs-4 me-3"></i>
-                <div>
-                    <strong>¡Hecho!</strong> {{ session('success') }}
+    {{-- Filtros --}}
+    <div class="filters-card mb-4">
+        <form method="GET" action="{{ route('admin.productos.index') }}" id="filterForm">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="filter-label">
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </label>
+                    <input type="text" name="search" class="filter-input" 
+                           placeholder="Nombre comercial o ID..." 
+                           value="{{ request('search') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="filter-label">
+                        <i class="bi bi-tag me-1"></i> Estilo
+                    </label>
+                    <select name="estilo_id" class="filter-select">
+                        <option value="">Todos los estilos</option>
+                        @foreach($estilos ?? [] as $estilo)
+                            <option value="{{ $estilo->id }}" {{ request('estilo_id') == $estilo->id ? 'selected' : '' }}>
+                                {{ $estilo->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="filter-label">
+                        <i class="bi bi-toggle-on me-1"></i> Estado
+                    </label>
+                    <select name="estado" class="filter-select">
+                        <option value="">Todos</option>
+                        <option value="activo" {{ request('estado') == 'activo' ? 'selected' : '' }}>Activos</option>
+                        <option value="inactivo" {{ request('estado') == 'inactivo' ? 'selected' : '' }}>Inactivos</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <div class="d-flex flex-column gap-2">
+                        <button type="submit" class="btn-filter-apply w-100">
+                            <i class="bi bi-funnel me-1"></i> Filtrar
+                        </button>
+                        <div class="d-flex gap-2">
+                            @if(request()->anyFilled(['search', 'estilo_id', 'estado']))
+                                <a href="{{ route('admin.productos.index') }}" class="btn-filter-clear flex-grow-1 text-center">
+                                    <i class="bi bi-x-circle me-1"></i> Limpiar
+                                </a>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </form>
+    </div>
+
+    {{-- Alertas --}}
+    @if(session('success'))
+        <div class="alert-success-card mb-4">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
         </div>
     @endif
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+    @if(session('error'))
+        <div class="alert-error-card mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ session('error') }}
+        </div>
+    @endif
+
+    {{-- Tabla de productos --}}
+    <div class="table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th class="col-image">Imagen</th>
+                    <th class="col-product">Producto</th>
+                    <th class="col-style">Estilo</th>
+                    <th class="col-status">Estado</th>
+                    <th class="col-actions">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($productos as $producto)
                     <tr>
-                        <th class="ps-4">Imagen Principal</th>
-                        <th>Producto</th>
-                        <th>Estilo</th>
-                        <th>Estado</th>
-                        <th class="text-end pe-4">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($productos as $producto)
-                    <tr>
-                        <td class="ps-4">
-                            @php $img = $producto->imagenes->where('es_principal', true)->first(); @endphp
+                        <td class="col-image">
+                            @php 
+                                $img = $producto->imagenes->where('es_principal', true)->first() ?? $producto->imagenes->first();
+                            @endphp
                             @if($img)
-                                <img src="{{ asset('storage/' . $img->url) }}" class="rounded-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+                                <img src="{{ Storage::url($img->url) }}" class="product-image" alt="{{ $producto->nombre_comercial }}">
                             @else
-                                <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                                    <i class="bi bi-image text-muted"></i>
+                                <div class="product-image-placeholder">
+                                    <i class="bi bi-image"></i>
                                 </div>
                             @endif
                         </td>
-                        <td>
-                            <a href="{{ route('admin.productos.show', $producto->id) }}" class="d-block p-2 rounded-2 fw-bold text-dark text-decoration-none hover-bg-light position-relative" style="transition:background 0.2s;">
-                                {{ $producto->nombre_comercial }}
-                                <small class="text-muted d-block fw-normal" style="font-size: 0.85em;">ID: #{{ $producto->id }}</small>
-                                <span class="stretched-link"></span>
-                            </a>
+                        <td class="col-product">
+                            <div class="product-cell">
+                                <div>
+                                    <a href="{{ route('admin.productos.show', $producto->id) }}" class="product-title">
+                                        {{ $producto->nombre_comercial }}
+                                    </a>
+                                    <div class="product-id">ID: #{{ $producto->id }}</div>
+                                </div>
+                            </div>
                         </td>
-                        <td><span class="badge bg-secondary-subtle text-secondary border">{{ $producto->estilo?->nombre ?? 'Sin estilo' }}</span></td>
-                        <td>
+                        <td class="col-style">
+                            <span class="style-badge">{{ $producto->estilo?->nombre ?? 'Sin estilo' }}</span>
+                        </td>
+                        <td class="col-status">
                             @if($producto->activo)
-                                <span class="badge bg-success-subtle text-success">Activo</span>
+                                <span class="status-badge active">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Activo
+                                </span>
                             @else
-                                <span class="badge bg-danger-subtle text-danger">Inactivo</span>
+                                <span class="status-badge inactive">
+                                    <i class="bi bi-x-circle-fill me-1"></i> Inactivo
+                                </span>
                             @endif
                         </td>
-                        <td class="text-end pe-4">
-                            <div class="btn-group shadow-sm">
-                                <a href="{{ route('admin.productos.edit', $producto->id) }}" class="btn btn-sm btn-white border" title="Editar producto"><i class="bi bi-pencil"></i></a>
+                        <td class="col-actions">
+                            <div class="action-buttons">
+                                <a href="{{ route('admin.productos.edit', $producto->id) }}" class="action-btn edit" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
                                 @if(!$producto->activo)
-                                    <form action="{{ route('admin.productos.activar', $producto->id) }}" method="POST" style="display:inline-block;">
+                                    <form action="{{ route('admin.productos.activar', $producto->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('PUT')
-                                        <button class="btn btn-sm btn-success border" title="Reactivar producto">
-                                            <i class="bi bi-arrow-repeat"></i> Reactivar
+                                        <button type="submit" class="action-btn restore" title="Reactivar">
+                                            <i class="bi bi-arrow-repeat"></i>
                                         </button>
                                     </form>
                                 @endif
-                                <form action="{{ route('admin.productos.destroy', $producto->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este producto?')">
-                                    @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-white border text-danger" title="Eliminar producto"><i class="bi bi-trash"></i></button>
+                                <form action="{{ route('admin.productos.destroy', $producto->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que deseas eliminar este producto?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="action-btn delete" title="Eliminar">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
                                 </form>
                             </div>
                         </td>
                     </tr>
-                    @empty
+                @empty
                     <tr>
-                        <td colspan="5" class="text-center py-5 text-muted">No hay productos registrados aún.</td>
+                        <td colspan="5" class="empty-state-cell">
+                            <div class="empty-state">
+                                <i class="bi bi-box-seam fs-1 text-muted"></i>
+                                <p class="mt-3 mb-0">No se encontraron productos</p>
+                                <small class="text-muted">Prueba con otros filtros o crea un nuevo producto</small>
+                            </div>
+                        </td>
                     </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    {{-- Paginación --}}
+    <div class="pagination-wrapper mt-4">
+        {{ $productos->appends(request()->query())->links() }}
     </div>
 </div>
+
+<style>
+/* ===== FILTROS ===== */
+.filters-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.filter-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.filter-input, .filter-select {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    border: 1.5px solid #e9ecef;
+    border-radius: 12px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.filter-input:focus, .filter-select:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-filter-apply {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1.25rem;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-filter-apply:hover {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    transform: translateY(-1px);
+}
+
+.btn-filter-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1.25rem;
+    background: transparent;
+    color: #6c757d;
+    border: 1.5px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-filter-clear:hover {
+    background: #f8f9fa;
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+/* ===== BOTONES PRINCIPALES ===== */
+.btn-action-primary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.25rem;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-action-primary:hover {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    transform: translateY(-1px);
+    color: white;
+}
+
+.btn-action-outline {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.25rem;
+    background: transparent;
+    color: #6c757d;
+    border: 1.5px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-action-outline:hover {
+    background: #f8f9fa;
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-export-pdf {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.25rem;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-export-pdf:hover {
+    background: #bb2d3b;
+    transform: translateY(-1px);
+    color: white;
+}
+
+/* ===== ALERTAS ===== */
+.alert-success-card, .alert-error-card {
+    padding: 0.85rem 1rem;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.alert-success-card {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-left: 3px solid #10b981;
+}
+
+.alert-error-card {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border-left: 3px solid #dc3545;
+}
+
+/* ===== TABLA ===== */
+.table-container {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    padding: 1rem 1rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6c757d;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.admin-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.85rem;
+}
+
+.admin-table tr:hover {
+    background: #fafbfc;
+}
+
+/* Columnas específicas */
+.col-image { width: 80px; }
+.col-product { width: auto; }
+.col-style { width: 120px; }
+.col-status { width: 100px; }
+.col-actions { width: 120px; }
+
+/* Imagen producto */
+.product-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-image-placeholder {
+    width: 60px;
+    height: 60px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    border: 1px solid #e9ecef;
+}
+
+.product-image-placeholder i {
+    font-size: 1.5rem;
+}
+
+/* Product cell */
+.product-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-title {
+    font-weight: 700;
+    color: #1a1a2e;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.product-title:hover {
+    color: #667eea;
+}
+
+.product-id {
+    font-size: 0.7rem;
+    color: #6c757d;
+    margin-top: 4px;
+}
+
+/* Style badge */
+.style-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.status-badge.active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-badge.inactive {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.action-btn.edit {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.action-btn.edit:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.action-btn.delete {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.action-btn.delete:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.action-btn.restore {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.action-btn.restore:hover {
+    background: #10b981;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Empty state */
+.empty-state-cell {
+    text-align: center !important;
+    padding: 3rem !important;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    opacity: 0.5;
+}
+
+/* Paginación */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-wrapper .pagination {
+    margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .admin-table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .col-image, .col-product, .col-style, .col-status, .col-actions {
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 768px) {
+    .filters-card .row > div {
+        margin-bottom: 0.75rem;
+    }
+    
+    .btn-filter-apply, .btn-filter-clear {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
 @endsection

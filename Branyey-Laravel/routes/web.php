@@ -83,6 +83,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
         Route::put('/{id}/actualizar', [ProductoAdminController::class, 'update'])->whereNumber('id')->name('update');
         Route::delete('/{id}/eliminar', [ProductoAdminController::class, 'destroy'])->whereNumber('id')->name('destroy');
         Route::put('/{id}/activar', [ProductoAdminController::class, 'activar'])->whereNumber('id')->name('activar');
+        Route::get('/exportar-pdf', [ProductoAdminController::class, 'exportarPdf'])->name('exportar.pdf');
     });
 
     // GESTION DE VARIANTES
