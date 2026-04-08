@@ -59,26 +59,112 @@
                 <x-input-error class="mt-2" :messages="$errors->get('direccion_defecto')" />
             </div>
             <div class="col-md-3">
-                <x-input-label for="ciudad_defecto" :value="__('Ciudad')" />
-                <x-text-input id="ciudad_defecto" name="ciudad_defecto" type="text" class="form-control profile-editable" :value="old('ciudad_defecto', $user->ciudad_defecto)" autocomplete="off" disabled />
-                <x-input-error class="mt-2" :messages="$errors->get('ciudad_defecto')" />
-            </div>
-            <div class="col-md-3">
                 <x-input-label for="departamento_defecto" :value="__('Departamento')" />
-                <x-text-input id="departamento_defecto" name="departamento_defecto" type="text" class="form-control profile-editable" :value="old('departamento_defecto', $user->departamento_defecto)" autocomplete="off" disabled />
+                <input type="text" name="departamento_defecto" id="departamento_defecto" list="departamentos_list" class="form-control profile-editable" value="{{ old('departamento_defecto', $user->departamento_defecto) }}" required disabled>
+                <datalist id="departamentos_list"></datalist>
                 <x-input-error class="mt-2" :messages="$errors->get('departamento_defecto')" />
             </div>
-        </div>
-        <div class="mt-4 d-flex justify-content-end align-items-center gap-3" id="profile-save-row" style="display:none;">
-            <x-primary-button class="btn btn-primary px-4">Guardar cambios</x-primary-button>
-            @if (session('status') === 'profile-updated')
-                <span class="text-success small">Guardado.</span>
-            @endif
-        </div>
+            <div class="col-md-3">
+                <x-input-label for="ciudad_defecto" :value="__('Ciudad')" />
+                <input type="text" name="ciudad_defecto" id="ciudad_defecto" list="ciudades_list" class="form-control profile-editable" value="{{ old('ciudad_defecto', $user->ciudad_defecto) }}" required disabled>
+                <datalist id="ciudades_list"></datalist>
+                <small class="text-muted">Selecciona primero un departamento para sugerir municipios.</small>
+                <x-input-error class="mt-2" :messages="$errors->get('ciudad_defecto')" />
+            </div>
+            <div class="mt-4 d-flex justify-content-end align-items-center gap-3" id="profile-save-row" style="display:none;">
+                <x-primary-button class="btn btn-primary px-4">Guardar cambios</x-primary-button>
+                @if (session('status') === 'profile-updated')
+                    <span class="text-success small">Guardado.</span>
+                @endif
+            </div>
+        </form>
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deptInput = document.getElementById('departamento_defecto');
+            const cityInput = document.getElementById('ciudad_defecto');
+            const deptList = document.getElementById('departamentos_list');
+            const cityList = document.getElementById('ciudades_list');
+
+            if (!deptInput || !cityInput || !deptList || !cityList) {
+                return;
+            }
+
+            const API_BASE = 'https://api-colombia.com/api/v1';
+            let departments = [];
+
+            const normalize = (value) => (value || '').toString().trim().toLowerCase();
+
+            const renderCityOptions = (cities) => {
+                cityList.innerHTML = '';
+                cities.forEach((city) => {
+                    const option = document.createElement('option');
+                    option.value = city.name;
+                    cityList.appendChild(option);
+                });
+            };
+
+            const loadCitiesByDepartmentName = async () => {
+                const deptName = normalize(deptInput.value);
+                const selectedDepartment = departments.find((dept) => normalize(dept.name) === deptName);
+
+                cityList.innerHTML = '';
+
+                if (!selectedDepartment) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE}/Department/${selectedDepartment.id}/cities`);
+                    if (!response.ok) {
+                        return;
+                    }
+                    const cities = await response.json();
+                    renderCityOptions(Array.isArray(cities) ? cities : []);
+                } catch (error) {
+                    // Si la API falla, el usuario puede escribir ciudad manualmente.
+                }
+            };
+
+            const loadDepartments = async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/Department`);
+                    if (!response.ok) {
+                        return;
+                    }
+
+                    const data = await response.json();
+                    departments = Array.isArray(data)
+                        ? data.slice().sort((a, b) => a.name.localeCompare(b.name, 'es'))
+                        : [];
+
+                    deptList.innerHTML = '';
+                    departments.forEach((dept) => {
+                        const option = document.createElement('option');
+                        option.value = dept.name;
+                        deptList.appendChild(option);
+                    });
+
+                    if (deptInput.value) {
+                        loadCitiesByDepartmentName();
+                    }
+                } catch (error) {
+                    // Si la API falla, el usuario puede escribir departamento manualmente.
+                }
+            };
+
+            deptInput.addEventListener('change', () => {
+                cityInput.value = '';
+                loadCitiesByDepartmentName();
+            });
+
+            deptInput.addEventListener('blur', loadCitiesByDepartmentName);
+
+            loadDepartments();
+        });
+        </script>
         <div class="mt-4 d-flex justify-content-end align-items-center gap-3" id="profile-edit-btn">
             <button type="button" class="btn btn-outline-primary px-4" onclick="enableProfileEdit()">
                 <i class="bi bi-pencil me-1"></i> Editar
             </button>
         </div>
-    </form>
 </section>
