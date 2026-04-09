@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\ProductoAdminController;
 use App\Http\Controllers\Admin\EstiloAdminController;
+use App\Http\Controllers\Admin\ImportarController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\MailProxyController;
@@ -64,6 +65,10 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
  * Cumple con Ítem 2 (Carga Inicial) e Ítem 4 (PDF) del SENA
  */
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:administrador'])->group(function () {
+    // Carga inicial desde Excel hacia microservicio Java
+    Route::get('importar', [ImportarController::class, 'form'])->name('importar.form');
+    Route::post('importar', [ImportarController::class, 'importar'])->name('importar.excel');
+
         // Envío masivo de correos
         Route::get('mail/crear', [\App\Http\Controllers\Admin\MailAdminController::class, 'create'])->name('mail.create');
         Route::post('mail/enviar', [\App\Http\Controllers\Admin\MailAdminController::class, 'send'])->name('mail.send');

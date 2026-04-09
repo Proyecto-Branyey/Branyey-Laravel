@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('admin-content'); ?>
 <div class="container-fluid mt-2 mass-mail-page">
     <div class="mail-hero mb-4 p-4 rounded-4 shadow-sm">

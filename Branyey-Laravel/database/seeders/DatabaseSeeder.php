@@ -18,10 +18,6 @@ class DatabaseSeeder extends Seeder
 
         // 2. Configuración Maestra de Ropa (Tablas Paramétricas)
         $this->call(ClasificacionTallaSeeder::class);
-        $this->call(ColoresSeeder::class);
-        $this->call(TallasSeeder::class);
-        $this->call(EstilosCamisaSeeder::class);
-        
         // Seeder de venta de prueba
     }
 }
