@@ -79,11 +79,41 @@ class RegisteredUserController extends Controller
             // Enviar correo de bienvenida usando el microservicio Java
             try {
                 $correo = $user->email;
-                $nombre = $user->name;
+                $nombre = $user->nombre_completo ?: $user->username;
+                $nombre = e($nombre);
+                $correo = e($correo);
+                $dashboardUrl = 'http://127.0.0.1:8000/dashboard';
+                $correoBienvenida = "
+                    <div style='margin:0;padding:24px;background:#f5f7fb;font-family:Arial,Helvetica,sans-serif;'>
+                        <div style='max-width:680px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e8ecf2;'>
+                            <div style='background:#111827;padding:22px 24px;color:#fff;'>
+                                <div style='font-size:20px;font-weight:800;letter-spacing:.3px;'>Branyey</div>
+                                <div style='opacity:.85;font-size:13px;margin-top:4px;'>Cuenta creada con exito</div>
+                            </div>
+                            <div style='padding:24px;'>
+                                <h2 style='margin:0 0 10px;color:#111827;font-size:22px;'>Bienvenido a Branyey, {$nombre}</h2>
+                                <p style='margin:0 0 14px;color:#4b5563;'>Tu registro fue completado correctamente. Ya puedes explorar productos, gestionar tu perfil y realizar compras.</p>
+
+                                <div style='border:1px solid #eee;border-radius:10px;padding:14px;background:#fcfcfd;'>
+                                    <p style='margin:0 0 6px;color:#374151;'><strong>Usuario:</strong> {$nombre}</p>
+                                    <p style='margin:0;color:#374151;'><strong>Correo:</strong> {$correo}</p>
+                                </div>
+
+                                <div style='margin-top:18px;'>
+                                    <a href='{$dashboardUrl}' style='display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:10px 14px;border-radius:8px;font-weight:700;'>
+                                        Ir a mi cuenta
+                                    </a>
+                                </div>
+
+                                <p style='margin:18px 0 0;color:#4b5563;'>Gracias por confiar en Branyey.</p>
+                            </div>
+                        </div>
+                    </div>
+                ";
                 $response = Http::post('http://localhost:8080/api/mail/send', [
                     'to' => $correo,
                     'subject' => '¡Bienvenido a Branyey!',
-                    'body' => "Hola $nombre, gracias por registrarte en Branyey. ¡Ya puedes disfrutar de la tienda!"
+                    'body' => $correoBienvenida
                 ]);
                 // Opcional: puedes loguear el resultado o manejar errores
             } catch (\Exception $e) {
