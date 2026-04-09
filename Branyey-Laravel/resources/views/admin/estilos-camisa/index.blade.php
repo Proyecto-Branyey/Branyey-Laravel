@@ -4,66 +4,147 @@
 
 @section('admin-content')
 <div class="container py-4">
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
+    {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0"><i class="bi bi-brush me-2"></i>Gestión de Estilos</h2>
+        <div>
+            <h1 class="fw-bold mb-1 text-dark">
+                <i class="bi bi-brush me-2 text-secondary"></i>Gestión de Estilos
+            </h1>
+            <p class="text-muted small mb-0">Administra los estilos de camisas disponibles en el catálogo</p>
+        </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.estilos-camisa.papelera') }}" class="btn btn-outline-danger">
+            <a href="{{ route('admin.estilos-camisa.papelera') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-trash3 me-1"></i> Papelera
             </a>
-            <a href="{{ route('admin.estilos-camisa.create') }}" class="btn btn-primary">
+            <a href="{{ route('admin.estilos-camisa.create') }}" class="btn btn-dark btn-sm">
                 <i class="bi bi-plus-circle me-1"></i> Nuevo Estilo
             </a>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
+    {{-- Alertas --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-3 p-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-3 p-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    {{-- Tabla --}}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-white py-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted small text-uppercase fw-semibold">Listado de estilos</span>
+                <span class="badge bg-secondary bg-opacity-10 text-secondary">{{ $estilos->count() }} registros</span>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4" style="width: 80px;">ID</th>
+                        <th>Nombre del estilo</th>
+                        <th class="text-end pe-4" style="width: 140px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($estilos as $estilo)
                         <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($estilos as $estilo)
-                            <tr>
-                                <td>{{ $estilo->id }}</td>
-                                <td>{{ $estilo->nombre }}</td>
-                                <td>
-                                    <a href="{{ route('admin.estilos-camisa.show', $estilo) }}" class="btn btn-sm btn-info">
-                                        <i class="bi bi-eye"></i> Ver
+                            <td class="ps-4 text-muted">#{{ $estilo->id }}</td>
+                            <td class="fw-semibold">{{ $estilo->nombre }}</td>
+                            <td class="text-end pe-4">
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <a href="{{ route('admin.estilos-camisa.show', $estilo) }}" class="btn btn-sm btn-outline-secondary" title="Ver detalles">
+                                        <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.estilos-camisa.edit', $estilo) }}" class="btn btn-sm btn-warning">
-                                        <i class="bi bi-pencil"></i> Editar
+                                    <a href="{{ route('admin.estilos-camisa.edit', $estilo) }}" class="btn btn-sm btn-outline-secondary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
                                     </a>
                                     <form action="{{ route('admin.estilos-camisa.destroy', $estilo) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este estilo?')">
-                                            <i class="bi bi-trash"></i> Eliminar
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este estilo? Se moverá a la papelera.')" title="Eliminar">
+                                            <i class="bi bi-trash3"></i>
                                         </button>
                                     </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="text-center">No hay estilos registrados.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 opacity-50"></i>
+                                No hay estilos registrados
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
+<style>
+/* Estilos consistentes con tallas y colores */
+.btn-outline-secondary {
+    border-color: #dee2e6;
+    color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-outline-danger {
+    border-color: #dee2e6;
+    color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-dark {
+    background-color: #212529;
+    border-color: #212529;
+}
+
+.btn-dark:hover {
+    background-color: #1a1a2e;
+    border-color: #1a1a2e;
+}
+
+.alert {
+    border: none;
+}
+
+.card {
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table-light th {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+</style>
 @endsection
