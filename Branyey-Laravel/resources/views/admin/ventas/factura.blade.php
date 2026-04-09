@@ -2,75 +2,277 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Factura de Venta #{{ $venta->id }}</title>
+    <title>Factura de Venta #{{ $venta->id }} - Branyey</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 13px; }
-        .header { margin-bottom: 20px; }
-        .datos { margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #333; padding: 6px; text-align: left; }
-        th { background: #f2f2f2; }
-        .total { font-weight: bold; font-size: 1.1em; }
+        /* Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Times New Roman', 'Georgia', serif;
+            font-size: 11pt;
+            margin: 2cm;
+            color: #000;
+            line-height: 1.3;
+        }
+        
+        /* Tipografía seria */
+        h1, h2, h3, .serif { font-family: 'Times New Roman', serif; }
+        
+        /* Header formal */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header .title {
+            font-size: 18pt;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin-bottom: 5px;
+        }
+        
+        .header .subtitle {
+            font-size: 10pt;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            display: inline-block;
+            padding: 4px 20px;
+            margin-top: 5px;
+        }
+        
+        /* Identificación del documento */
+        .doc-id {
+            text-align: right;
+            font-size: 9pt;
+            margin-bottom: 25px;
+            font-family: monospace;
+        }
+        
+        /* Secciones */
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: #e8e8e8;
+            padding: 4px 8px;
+            margin-bottom: 12px;
+        }
+        
+        /* Tabla de datos */
+        .info-block {
+            margin-bottom: 15px;
+        }
+        
+        .info-row {
+            display: flex;
+            padding: 4px 0;
+            border-bottom: 0.5px dotted #ccc;
+        }
+        
+        .info-label {
+            width: 160px;
+            font-weight: 600;
+        }
+        
+        .info-value {
+            flex: 1;
+        }
+        
+        /* Tabla de productos */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+            margin-top: 10px;
+        }
+        
+        .items-table th {
+            border: 1px solid #000;
+            padding: 8px 6px;
+            background: #e8e8e8;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .items-table td {
+            border: 1px solid #000;
+            padding: 6px;
+        }
+        
+        .items-table td:first-child,
+        .items-table td:nth-child(2),
+        .items-table td:nth-child(4) {
+            text-align: center;
+        }
+        
+        .items-table td:nth-child(3) {
+            text-align: right;
+        }
+        
+        /* Totales */
+        .totals-table {
+            width: 300px;
+            margin-top: 15px;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+        
+        .totals-table td {
+            padding: 6px 8px;
+            border-bottom: 0.5px dotted #ccc;
+        }
+        
+        .totals-table td:first-child {
+            font-weight: 600;
+        }
+        
+        .totals-table td:last-child {
+            text-align: right;
+        }
+        
+        .grand-total {
+            font-size: 12pt;
+            font-weight: bold;
+            border-top: 1px solid #000;
+        }
+        
+        /* Estado en texto plano */
+        .estado-text {
+            text-transform: capitalize;
+            font-weight: normal;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 35px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            font-size: 8pt;
+            text-align: center;
+        }
+        
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
     </style>
 </head>
 <body>
+    @php
+        // Cálculo de envío según ubicación
+        $envio = 0;
+        $ciudad = strtolower($venta->detallesOrden->ciudad ?? '');
+        $departamento = strtolower($venta->detallesOrden->departamento ?? '');
+        
+        if ($ciudad === 'bogotá' || $ciudad === 'bogota') {
+            $envio = 0;
+        } elseif (in_array($ciudad, ['soacha', 'chia', 'cota', 'funza', 'mosquera', 'facatativá', 'zipaquirá', 'facatativa', 'zipaquira'])) {
+            $envio = 7000;
+        } elseif ($departamento === 'cundinamarca') {
+            $envio = 12000;
+        } else {
+            $envio = 18000;
+        }
+        
+        $subtotal = $venta->total;
+        $totalFinal = $subtotal + $envio;
+    @endphp
+    
+    <div class="doc-id">
+        Folio: INV-{{ str_pad($venta->id, 8, '0', STR_PAD_LEFT) }} | Emisión: {{ now()->format('Y-m-d H:i') }}
+    </div>
+
     <div class="header">
-        <h2>Factura de Venta #{{ $venta->id }}</h2>
-        <div class="datos">
-            <strong>Cliente:</strong> {{ $venta->usuario->nombre_completo ?? $venta->usuario->name ?? '-' }}<br>
-            <strong>Email:</strong> {{ $venta->usuario->email ?? '-' }}<br>
-            <strong>Teléfono:</strong> {{ $venta->usuario->telefono ?? '-' }}<br>
-            <strong>Fecha:</strong> {{ $venta->created_at->format('Y-m-d H:i') }}<br>
-            <strong>Estado:</strong> {{ $venta->estado_label }}<br>
-            @if($venta->detallesOrden)
-                <strong>Dirección de envío:</strong> {{ $venta->detallesOrden->direccion_envio ?? '-' }}<br>
-                <strong>Ciudad:</strong> {{ $venta->detallesOrden->ciudad ?? '-' }}<br>
-            @endif
+        <div class="title">BRANYEY</div>
+        <div class="subtitle">FACTURA DE VENTA</div>
+    </div>
+
+    {{-- Sección 1: Datos del cliente --}}
+    <div class="section">
+        <div class="section-title">DATOS DEL CLIENTE</div>
+        <div class="info-block">
+            <div class="info-row"><span class="info-label">Identificador:</span><span class="info-value">CLI-{{ str_pad($venta->usuario->id ?? 0, 6, '0', STR_PAD_LEFT) }}</span></div>
+            <div class="info-row"><span class="info-label">Nombre legal:</span><span class="info-value">{{ $venta->usuario->nombre_completo ?? $venta->usuario->name ?? 'No especificado' }}</span></div>
+            <div class="info-row"><span class="info-label">Correo electrónico:</span><span class="info-value">{{ $venta->usuario->email ?? 'N/A' }}</span></div>
+            <div class="info-row"><span class="info-label">Línea de contacto:</span><span class="info-value">{{ $venta->usuario->telefono ?? 'No especificado' }}</span></div>
         </div>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Precio Unitario</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($venta->detallesVenta as $detalle)
-                <tr>
-                    <td>{{ $detalle->variante && $detalle->variante->producto ? $detalle->variante->producto->nombre_comercial ?? $detalle->variante->producto->nombre ?? '-' : '-' }}</td>
-                    <td>{{ $detalle->cantidad }}</td>
-                    <td>${{ number_format($detalle->precio_cobrado, 0, ',', '.') }}</td>
-                    <td>${{ number_format($detalle->cantidad * $detalle->precio_cobrado, 0, ',', '.') }}</td>
+
+    {{-- Sección 2: Información de la venta --}}
+    <div class="section">
+        <div class="section-title">INFORMACIÓN DE LA VENTA</div>
+        <div class="info-block">
+            <div class="info-row"><span class="info-label">N° Transacción:</span><span class="info-value">TRX-{{ str_pad($venta->id, 7, '0', STR_PAD_LEFT) }}</span></div>
+            <div class="info-row"><span class="info-label">Fecha de emisión:</span><span class="info-value">{{ $venta->created_at->format('d/m/Y H:i:s') }}</span></div>
+            <div class="info-row"><span class="info-label">Estado actual:</span><span class="info-value">{{ ucfirst(str_replace('_', ' ', $venta->estado)) }}</span></div>
+        </div>
+    </div>
+
+    {{-- Sección 3: Dirección de envío --}}
+    @if($venta->detallesOrden)
+    <div class="section">
+        <div class="section-title">DOMICILIO DE ENVÍO</div>
+        <div class="info-block">
+            <div class="info-row"><span class="info-label">Dirección:</span><span class="info-value">{{ $venta->detallesOrden->direccion_envio ?? 'No registrada' }}</span></div>
+            <div class="info-row"><span class="info-label">Ubicación geográfica:</span><span class="info-value">{{ $venta->detallesOrden->ciudad ?? 'No registrada' }}, {{ $venta->detallesOrden->departamento ?? 'No registrado' }}</span></div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Sección 4: Detalle de productos --}}
+    <div class="section">
+        <div class="section-title">DETALLE DE PRODUCTOS</div>
+        
+        @if($venta->detallesVenta && $venta->detallesVenta->count() > 0)
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">#</th>
+                        <th>Producto</th>
+                        <th style="width: 100px;">Cantidad</th>
+                        <th style="width: 130px;">Precio Unitario</th>
+                        <th style="width: 150px;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($venta->detallesVenta as $index => $detalle)
+                        <tr>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td>{{ $detalle->variante && $detalle->variante->producto ? ($detalle->variante->producto->nombre_comercial ?? $detalle->variante->producto->nombre) : 'Producto no disponible' }}</td>
+                            <td class="text-center">{{ $detalle->cantidad }}</td>
+                            <td class="text-right">${{ number_format($detalle->precio_cobrado, 0, ',', '.') }} COP</td>
+                            <td class="text-right">${{ number_format($detalle->cantidad * $detalle->precio_cobrado, 0, ',', '.') }} COP</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            
+            {{-- Totales --}}
+            <table class="totals-table">
+                <tr><td>Subtotal</td><td>${{ number_format($subtotal, 0, ',', '.') }} COP</td></tr>
+                <tr><td>Envío</td>
+                    <td>
+                        @if($envio === 0) 
+                            GRATIS 
+                        @else 
+                            ${{ number_format($envio, 0, ',', '.') }} COP
+                        @endif
+                    </td>
                 </tr>
-            @endforeach
-        </tbody>
-        <tfoot>
-            @php
-                $envio = 0;
-                $ciudad = strtolower($venta->detallesOrden->ciudad ?? '');
-                $departamento = strtolower($venta->detallesOrden->departamento ?? '');
-                if ($ciudad === 'bogotá') {
-                    $envio = 0;
-                } elseif (in_array($ciudad, ['soacha', 'chia', 'cota', 'funza', 'mosquera', 'facatativá', 'zipaquirá'])) {
-                    $envio = 7000;
-                } elseif ($departamento === 'cundinamarca') {
-                    $envio = 12000;
-                } else {
-                    $envio = 18000;
-                }
-            @endphp
-            <tr>
-                <td colspan="3" class="total">Envío</td>
-                <td class="total">@if($envio === 0) GRATIS @else ${{ number_format($envio, 0, ',', '.') }} @endif</td>
-            </tr>
-            <tr>
-                <td colspan="3" class="total">TOTAL</td>
-                <td class="total">${{ number_format($venta->total + $envio, 0, ',', '.') }}</td>
-            </tr>
-        </tfoot>
-    </table>
+                <tr class="grand-total"><td>TOTAL</td><td>${{ number_format($totalFinal, 0, ',', '.') }} COP</td></tr>
+            </table>
+        @else
+            <p>No se encontraron productos asociados a esta venta.</p>
+        @endif
+    </div>
+
+    {{-- Footer --}}
+    <div class="footer">
+        <p>Documento generado automáticamente desde el sistema Branyey.</p>
+        <p>Para cualquier inconsistencia, comunicarse con soporte@branyey.com</p>
+        <p style="margin-top: 8px;">Este documento es una representación fiel de la transacción realizada.</p>
+    </div>
 </body>
 </html>
