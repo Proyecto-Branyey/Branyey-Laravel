@@ -3,11 +3,11 @@
 @section('content')
 
 <!-- ===== HERO SECTION ===== -->
-<section class="hero-enhanced position-relative overflow-hidden">
+<section class="hero-enhanced position-relative overflow-hidden" style="min-height: 91vh;">
     <div class="hero-background"></div>
-    <div class="container h-100 position-relative z-2">
-        <div class="row align-items-center h-100 min-vh-100">
-            <div class="col-lg-6 text-white py-5">
+    <div class="container h-100 position-relative z-2 py-4">
+        <div class="row align-items-center h-100" style="min-height: 80vh;">
+            <div class="col-lg-6 text-white py-4">
                 <div class="animate-fade-in">
                     <span class="badge bg-danger mb-3 px-3 py-2" style="font-size: 0.9rem;">✨ NUEVA COLECCIÓN 2026</span>
                     <h1 class="display-3 fw-900 mb-4 lh-1">
@@ -27,15 +27,8 @@
             </div>
             <div class="col-lg-6 d-none d-lg-flex justify-content-end align-items-center position-relative">
                 <div class="hero-image-container">
-                    @if($destacados->first() && $destacados->first()->imagenes->first())
-                        @php
-                            $imagenUrl = Storage::url($destacados->first()->imagenes->first()->url);
-                        @endphp
-                        <img src="{{ $imagenUrl }}" 
-                             alt="Colección Branyey" class="img-fluid animate-slide-right" style="max-width: 100%; filter: brightness(1.1); height: auto;">
-                    @else
-                        <div class="hero-placeholder"></div>
-                    @endif
+                    <img src="{{ asset('images/fondo.png') }}"
+                         alt="Colección Branyey" class="img-fluid animate-slide-right" style="max-width: 100%; filter: brightness(1.1); height: auto;">
                 </div>
             </div>
         </div>
@@ -196,8 +189,8 @@
                 </div>
             </div>
             <div class="col-lg-6">
-                <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&h=600&fit=crop" 
-                     alt="Equipo Branyey" class="img-fluid rounded-xl shadow-lg" style="border-radius: 20px;">
+                <img src="{{ asset('images/fondo2.png') }}" 
+                    alt="Equipo Branyey" class="img-fluid rounded-xl shadow-lg" style="border-radius: 20px;">
             </div>
         </div>
     </div>
@@ -320,21 +313,21 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        max-width: 500px;
+        max-width: 650px;
         width: 100%;
         padding: 20px;
     }
 
     .hero-image-container img {
-        max-height: 600px;
+        max-height: 700px;
         width: auto;
         border-radius: 20px;
         box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
     }
 
     .hero-placeholder {
-        width: 400px;
-        height: 500px;
+        width: 550px;
+        height: 650px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 20px;
         box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
