@@ -92,7 +92,7 @@ class UserAdminController extends Controller
             'departamento_defecto' => 'nullable|string|max:100',
             'username' => 'required|string|max:255|unique:usuarios',
             'email' => 'required|email|max:255|unique:usuarios',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:8|confirmed',
             'rol_id' => 'required|exists:roles,id',
         ]);
 
@@ -131,7 +131,7 @@ class UserAdminController extends Controller
             'username' => 'required|string|max:255|unique:usuarios,username,' . $usuario->id,
             'email' => 'required|email|max:255|unique:usuarios,email,' . $usuario->id,
             'rol_id' => 'required|exists:roles,id',
-            'password' => 'nullable|string|min:6|confirmed',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         $usuario->nombre_completo = $request->nombre_completo;
