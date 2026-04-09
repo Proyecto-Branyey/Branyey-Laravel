@@ -1,10 +1,8 @@
-@extends('layouts.admin')
+<?php $__env->startSection('title', 'Gestión de Estilos - Branyey'); ?>
 
-@section('title', 'Gestión de Estilos - Branyey')
-
-@section('admin-content')
+<?php $__env->startSection('admin-content'); ?>
 <div class="container py-4">
-    {{-- Header --}}
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="fw-bold mb-1 text-dark">
@@ -13,10 +11,10 @@
             <p class="text-muted small mb-0">Administra los estilos de camisas disponibles en el catálogo</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.estilos-camisa.papelera') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="<?php echo e(route('admin.estilos-camisa.papelera')); ?>" class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-trash3 me-1"></i> Papelera
             </a>
-            <a href="{{ route('admin.estilos-camisa.create') }}" class="btn btn-dark btn-sm">
+            <a href="<?php echo e(route('admin.estilos-camisa.create')); ?>" class="btn btn-dark btn-sm">
                 <i class="bi bi-plus-circle me-1"></i> Nuevo Estilo
             </a>
             <!-- Botón Importar -->
@@ -28,8 +26,8 @@
 
     <!-- Formulario de importación (colapsable) -->
     <div class="collapse mb-3" id="importarEstilosForm">
-        <form action="{{ route('admin.importar.excel') }}" method="POST" enctype="multipart/form-data" class="card card-body border-0 shadow-sm gap-2">
-            @csrf
+        <form action="<?php echo e(route('admin.importar.excel')); ?>" method="POST" enctype="multipart/form-data" class="card card-body border-0 shadow-sm gap-2">
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="tabla" value="estilos-camisa">
             <div class="mb-2">
                 <label for="archivoEstilos" class="form-label">Archivo Excel (.xlsx) de estilos de camisa</label>
@@ -41,29 +39,31 @@
         </form>
     </div>
 
-    {{-- Alertas --}}
-    @if(session('success'))
+    
+    <?php if(session('success')): ?>
         <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-3 p-3 mb-4" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
-            {{ session('success') }}
+            <?php echo e(session('success')); ?>
+
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    @endif
+    <?php endif; ?>
 
-    @if(session('error'))
+    <?php if(session('error')): ?>
         <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-3 p-3 mb-4" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            {{ session('error') }}
+            <?php echo e(session('error')); ?>
+
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    @endif
+    <?php endif; ?>
 
-    {{-- Tabla --}}
+    
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="card-header bg-white py-3 border-bottom">
             <div class="d-flex justify-content-between align-items-center">
                 <span class="text-muted small text-uppercase fw-semibold">Listado de estilos</span>
-                <span class="badge bg-secondary bg-opacity-10 text-secondary">{{ $estilos->count() }} registros</span>
+                <span class="badge bg-secondary bg-opacity-10 text-secondary"><?php echo e($estilos->count()); ?> registros</span>
             </div>
         </div>
         <div class="table-responsive">
@@ -76,21 +76,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($estilos as $estilo)
+                    <?php $__empty_1 = true; $__currentLoopData = $estilos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $estilo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr>
-                            <td class="ps-4 text-muted">#{{ $estilo->id }}</td>
-                            <td class="fw-semibold">{{ $estilo->nombre }}</td>
+                            <td class="ps-4 text-muted">#<?php echo e($estilo->id); ?></td>
+                            <td class="fw-semibold"><?php echo e($estilo->nombre); ?></td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{ route('admin.estilos-camisa.show', $estilo) }}" class="btn btn-sm btn-outline-secondary" title="Ver detalles">
+                                    <a href="<?php echo e(route('admin.estilos-camisa.show', $estilo)); ?>" class="btn btn-sm btn-outline-secondary" title="Ver detalles">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.estilos-camisa.edit', $estilo) }}" class="btn btn-sm btn-outline-secondary" title="Editar">
+                                    <a href="<?php echo e(route('admin.estilos-camisa.edit', $estilo)); ?>" class="btn btn-sm btn-outline-secondary" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form action="{{ route('admin.estilos-camisa.destroy', $estilo) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
+                                    <form action="<?php echo e(route('admin.estilos-camisa.destroy', $estilo)); ?>" method="POST" class="d-inline">
+                                        <?php echo csrf_field(); ?>
+                                        <?php echo method_field('DELETE'); ?>
                                         <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este estilo? Se moverá a la papelera.')" title="Eliminar">
                                             <i class="bi bi-trash3"></i>
                                         </button>
@@ -98,14 +98,14 @@
                                 </div>
                             </td>
                         </tr>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="3" class="text-center py-5 text-muted">
                                 <i class="bi bi-inbox fs-2 d-block mb-2 opacity-50"></i>
                                 No hay estilos registrados
                             </td>
                         </tr>
-                    @endforelse
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -166,4 +166,5 @@
     background-color: #f8f9fa;
 }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\Branyey-Laravel\resources\views/admin/estilos-camisa/index.blade.php ENDPATH**/ ?>
