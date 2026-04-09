@@ -155,26 +155,14 @@
 </head>
 <body>
     @php
-        // El total en BD es el subtotal de productos (SIN envío)
-        $subtotalProductos = $venta->total;
-        
-        // Calcular envío según ubicación
-        $envio = 0;
-        $ciudad = strtolower($venta->detallesOrden->ciudad ?? '');
-        $departamento = strtolower($venta->detallesOrden->departamento ?? '');
-        
-        if ($ciudad === 'bogotá' || $ciudad === 'bogota') {
-            $envio = 0;
-        } elseif (in_array($ciudad, ['soacha', 'chia', 'cota', 'funza', 'mosquera', 'facatativá', 'zipaquirá', 'facatativa', 'zipaquira'])) {
-            $envio = 7000;
-        } elseif ($departamento === 'cundinamarca') {
-            $envio = 12000;
-        } else {
-            $envio = 18000;
-        }
-        
-        // Total final = productos + envío
-        $totalFinal = $subtotalProductos + $envio;
+        // Subtotal real de productos (sumatoria de detalle de venta)
+        $subtotalProductos = (float) ($venta->detallesVenta->sum(function ($detalle) {
+            return ((float) $detalle->precio_cobrado) * ((int) $detalle->cantidad);
+        }) ?: 0);
+
+        // El total guardado en venta ya incluye envío; lo derivamos para no duplicarlo.
+        $totalFinal = (float) ($venta->total ?? 0);
+        $envio = max($totalFinal - $subtotalProductos, 0);
     @endphp
     
     <div class="doc-id">
