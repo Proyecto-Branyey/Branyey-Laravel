@@ -1,9 +1,7 @@
-@extends('layouts.admin')
+<?php $__env->startSection('title', 'Ventas - Branyey'); ?>
 
-@section('title', 'Ventas - Branyey')
-
-@section('admin-content')
-@php
+<?php $__env->startSection('admin-content'); ?>
+<?php
     $estadoOpciones = [
         'pagado' => 'Pagado',
         'en_proceso' => 'En proceso',
@@ -19,10 +17,10 @@
         'entregado' => 'info',
         'cancelado' => 'danger',
     ];
-@endphp
+?>
 
 <div class="container-fluid px-4 py-4">
-    {{-- Header --}}
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="fw-bold mb-1" style="background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
@@ -31,18 +29,18 @@
             <p class="text-muted small mb-0">Gestión completa de transacciones y pedidos</p>
         </div>
         <div class="d-flex gap-2">
-            <form method="GET" action="{{ route('admin.ventas.reporte', ['formato' => 'pdf']) }}" class="d-inline">
-                @foreach(request()->except('page') as $key => $value)
-                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                @endforeach
+            <form method="GET" action="<?php echo e(route('admin.ventas.reporte', ['formato' => 'pdf'])); ?>" class="d-inline">
+                <?php $__currentLoopData = request()->except('page'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <input type="hidden" name="<?php echo e($key); ?>" value="<?php echo e($value); ?>">
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 <button type="submit" class="btn-export-pdf">
                     <i class="bi bi-file-earmark-pdf me-1"></i> PDF
                 </button>
             </form>
-            <form method="GET" action="{{ route('admin.ventas.reporte', ['formato' => 'csv']) }}" class="d-inline">
-                @foreach(request()->except('page') as $key => $value)
-                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                @endforeach
+            <form method="GET" action="<?php echo e(route('admin.ventas.reporte', ['formato' => 'csv'])); ?>" class="d-inline">
+                <?php $__currentLoopData = request()->except('page'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <input type="hidden" name="<?php echo e($key); ?>" value="<?php echo e($value); ?>">
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 <button type="submit" class="btn-export-csv">
                     <i class="bi bi-file-earmark-spreadsheet me-1"></i> CSV
                 </button>
@@ -50,14 +48,14 @@
         </div>
     </div>
 
-    {{-- Filtros --}}
+    
     <div class="filters-card mb-4">
         <form method="GET" class="row g-3 align-items-end" id="filterForm">
             <div class="col-md-4 col-lg-3">
                 <label class="filter-label">
                     <i class="bi bi-person-circle me-1"></i> Cliente
                 </label>
-                <input type="text" name="cliente" value="{{ request('cliente') }}" class="filter-input" placeholder="Nombre, email o teléfono">
+                <input type="text" name="cliente" value="<?php echo e(request('cliente')); ?>" class="filter-input" placeholder="Nombre, email o teléfono">
             </div>
             <div class="col-md-4 col-lg-2">
                 <label class="filter-label">
@@ -65,8 +63,8 @@
                 </label>
                 <select name="tipo_cliente" class="filter-select">
                     <option value="">Todos</option>
-                    <option value="mayorista" @if(request('tipo_cliente')=='mayorista') selected @endif>Mayorista</option>
-                    <option value="minorista" @if(request('tipo_cliente')=='minorista') selected @endif>Minorista</option>
+                    <option value="mayorista" <?php if(request('tipo_cliente')=='mayorista'): ?> selected <?php endif; ?>>Mayorista</option>
+                    <option value="minorista" <?php if(request('tipo_cliente')=='minorista'): ?> selected <?php endif; ?>>Minorista</option>
                 </select>
             </div>
             <div class="col-md-4 col-lg-2">
@@ -75,34 +73,34 @@
                 </label>
                 <select name="estado" class="filter-select">
                     <option value="">Todos</option>
-                    @foreach($estadoOpciones as $key => $label)
-                        <option value="{{ $key }}" @selected(request('estado') === $key)>{{ $label }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $estadoOpciones; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($key); ?>" <?php if(request('estado') === $key): echo 'selected'; endif; ?>><?php echo e($label); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
             </div>
             <div class="col-md-4 col-lg-2">
                 <label class="filter-label">
                     <i class="bi bi-calendar me-1"></i> Fecha desde
                 </label>
-                <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="filter-input" id="fecha_desde" max="{{ request('fecha_hasta') }}">
+                <input type="date" name="fecha_desde" value="<?php echo e(request('fecha_desde')); ?>" class="filter-input" id="fecha_desde" max="<?php echo e(request('fecha_hasta')); ?>">
             </div>
             <div class="col-md-4 col-lg-2">
                 <label class="filter-label">
                     <i class="bi bi-calendar me-1"></i> Fecha hasta
                 </label>
-                <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="filter-input" id="fecha_hasta" min="{{ request('fecha_desde') }}">
+                <input type="date" name="fecha_hasta" value="<?php echo e(request('fecha_hasta')); ?>" class="filter-input" id="fecha_hasta" min="<?php echo e(request('fecha_desde')); ?>">
             </div>
             <div class="col-md-3 col-lg-1">
                 <label class="filter-label">
                     <i class="bi bi-currency-dollar me-1"></i> Total min
                 </label>
-                <input type="number" name="total_min" value="{{ request('total_min') }}" class="filter-input" min="0" step="1000" placeholder="Min">
+                <input type="number" name="total_min" value="<?php echo e(request('total_min')); ?>" class="filter-input" min="0" step="1000" placeholder="Min">
             </div>
             <div class="col-md-3 col-lg-1">
                 <label class="filter-label">
                     <i class="bi bi-currency-dollar me-1"></i> Total max
                 </label>
-                <input type="number" name="total_max" value="{{ request('total_max') }}" class="filter-input" min="0" step="1000" placeholder="Max">
+                <input type="number" name="total_max" value="<?php echo e(request('total_max')); ?>" class="filter-input" min="0" step="1000" placeholder="Max">
             </div>
             <div class="col-md-3 col-lg-1">
                 <button type="submit" class="btn-filter-apply w-100">
@@ -110,29 +108,31 @@
                 </button>
             </div>
             <div class="col-md-3 col-lg-2">
-                <a href="{{ route('admin.ventas.index') }}" class="btn-filter-clear w-100">
+                <a href="<?php echo e(route('admin.ventas.index')); ?>" class="btn-filter-clear w-100">
                     <i class="bi bi-x-circle me-1"></i> Borrar filtros
                 </a>
             </div>
         </form>
     </div>
 
-    {{-- Alertas --}}
-    @if(session('success'))
+    
+    <?php if(session('success')): ?>
         <div class="alert-success-card mb-4">
             <i class="bi bi-check-circle-fill me-2"></i>
-            {{ session('success') }}
-        </div>
-    @endif
+            <?php echo e(session('success')); ?>
 
-    @if(session('error'))
+        </div>
+    <?php endif; ?>
+
+    <?php if(session('error')): ?>
         <div class="alert-error-card mb-4">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            {{ session('error') }}
-        </div>
-    @endif
+            <?php echo e(session('error')); ?>
 
-    {{-- Tabla de ventas --}}
+        </div>
+    <?php endif; ?>
+
+    
     <div class="table-container">
         <table class="admin-table">
             <thead>
@@ -146,49 +146,50 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($ventas as $venta)
+                <?php $__empty_1 = true; $__currentLoopData = $ventas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $venta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr>
-                        <td class="col-id">#{{ $venta->id }}</td>
+                        <td class="col-id">#<?php echo e($venta->id); ?></td>
                         <td class="col-client">
                             <div class="client-cell">
                                 <div class="client-avatar">
-                                    {{ substr($venta->usuario->nombre_completo ?? $venta->usuario->username ?? 'U', 0, 2) }}
+                                    <?php echo e(substr($venta->usuario->nombre_completo ?? $venta->usuario->username ?? 'U', 0, 2)); ?>
+
                                 </div>
                                 <div>
-                                    <div class="client-name">{{ $venta->usuario->nombre_completo ?? $venta->usuario->name ?? '-' }}</div>
-                                    <div class="client-email">{{ $venta->usuario->email ?? '' }}</div>
+                                    <div class="client-name"><?php echo e($venta->usuario->nombre_completo ?? $venta->usuario->name ?? '-'); ?></div>
+                                    <div class="client-email"><?php echo e($venta->usuario->email ?? ''); ?></div>
                                 </div>
                             </div>
                         </td>
                         <td class="col-date">
-                            <div>{{ $venta->created_at->format('d/m/Y') }}</div>
-                            <small class="text-muted">{{ $venta->created_at->format('H:i') }}</small>
+                            <div><?php echo e($venta->created_at->format('d/m/Y')); ?></div>
+                            <small class="text-muted"><?php echo e($venta->created_at->format('H:i')); ?></small>
                         </td>
                         <td class="col-total">
-                            <span class="total-amount">${{ number_format($venta->total, 0, ',', '.') }} COP</span>
+                            <span class="total-amount">$<?php echo e(number_format($venta->total, 0, ',', '.')); ?> COP</span>
                         </td>
                         <td class="col-status">
-                            <form action="{{ route('admin.ventas.cambiarEstado', $venta) }}" method="POST" class="estado-form">
-                                @csrf
-                                <select name="estado" class="status-select status-{{ $estadoClases[$venta->estado] ?? 'secondary' }}" onchange="this.form.submit()">
-                                    @foreach($estadoOpciones as $key => $label)
-                                        <option value="{{ $key }}" @if($venta->estado === $key) selected @endif>{{ $label }}</option>
-                                    @endforeach
+                            <form action="<?php echo e(route('admin.ventas.cambiarEstado', $venta)); ?>" method="POST" class="estado-form">
+                                <?php echo csrf_field(); ?>
+                                <select name="estado" class="status-select status-<?php echo e($estadoClases[$venta->estado] ?? 'secondary'); ?>" onchange="this.form.submit()">
+                                    <?php $__currentLoopData = $estadoOpciones; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($key); ?>" <?php if($venta->estado === $key): ?> selected <?php endif; ?>><?php echo e($label); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </form>
                         </td>
                         <td class="col-actions">
                             <div class="action-buttons">
-                                <a href="{{ route('admin.ventas.show', $venta) }}" class="action-btn view" title="Ver detalles">
+                                <a href="<?php echo e(route('admin.ventas.show', $venta)); ?>" class="action-btn view" title="Ver detalles">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="{{ route('admin.ventas.factura', $venta) }}?pdf=1" class="action-btn invoice" title="Descargar factura" target="_blank">
+                                <a href="<?php echo e(route('admin.ventas.factura', $venta)); ?>?pdf=1" class="action-btn invoice" title="Descargar factura" target="_blank">
                                     <i class="bi bi-file-earmark-arrow-down"></i>
                                 </a>
                             </div>
                         </td>
                     </tr>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <tr>
                         <td colspan="6" class="empty-state-cell">
                             <div class="empty-state">
@@ -198,14 +199,15 @@
                             </div>
                         </td>
                     </tr>
-                @endforelse
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
 
-    {{-- Paginación con Bootstrap --}}
+    
 <div class="d-flex justify-content-center mt-5">
-    {{ $ventas->links('pagination::bootstrap-5') }}
+    <?php echo e($ventas->links('pagination::bootstrap-5')); ?>
+
 </div>
 </div>
 
@@ -519,7 +521,7 @@
 }
 </style>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const fechaDesde = document.getElementById('fecha_desde');
@@ -547,5 +549,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\Branyey-Laravel\resources\views/admin/ventas/index.blade.php ENDPATH**/ ?>

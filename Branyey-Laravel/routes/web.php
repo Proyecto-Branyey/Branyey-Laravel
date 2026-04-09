@@ -64,6 +64,9 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
  * Cumple con Ítem 2 (Carga Inicial) e Ítem 4 (PDF) del SENA
  */
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:administrador'])->group(function () {
+        // Envío masivo de correos
+        Route::get('mail/crear', [\App\Http\Controllers\Admin\MailAdminController::class, 'create'])->name('mail.create');
+        Route::post('mail/enviar', [\App\Http\Controllers\Admin\MailAdminController::class, 'send'])->name('mail.send');
     // Factura de venta (ver y descargar PDF)
     Route::get('ventas/{venta}/factura', [\App\Http\Controllers\Admin\VentaAdminController::class, 'factura'])
         ->name('ventas.factura');

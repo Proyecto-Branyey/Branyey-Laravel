@@ -1,9 +1,10 @@
-<?php $__env->startSection('content'); ?>
+<?php $__env->startSection('admin-layout'); ?>
 <div class="container-fluid">
     <div class="row">
-        <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse min-vh-100 shadow">
+        
+        <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar vh-100 sticky-top shadow">
             <div class="position-sticky pt-3">
-                <h5 class="text-white px-3 mb-4 italic fw-black text-center">BRANYEY ADMIN</h5>
+                <h5 class="text-white px-3 mb-4 italic fw-black text-center">MENÚ</h5>
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link text-white mb-2 <?php echo e(request()->routeIs('admin.dashboard') ? 'active' : ''); ?>" href="<?php echo e(route('admin.dashboard')); ?>">
@@ -90,24 +91,77 @@
                             </ul>
                         </div>
                     </li>
-                    <hr class="text-secondary mx-3">
-
+                    <li class="nav-item mt-3">
+                        <a class="nav-link text-white <?php echo e(request()->routeIs('admin.mail.*') ? 'active' : ''); ?>" href="<?php echo e(route('admin.mail.create')); ?>">
+                            <i class="bi bi-envelope-paper me-2"></i> Correo masivo
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+        
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
             <?php echo $__env->yieldContent('admin-content'); ?>
         </main>
     </div>
 </div>
 <?php $__env->stopSection(); ?>
+
 <?php $__env->startPush('styles'); ?>
     <style>
-        .sidebar { min-height: 100vh; }
-        .sidebar .nav-link { transition: 0.2s; padding: 12px 20px; border-radius: 10px; margin: 5px 12px; font-size: 0.95rem; }
-        .sidebar .nav-link:hover { background: rgba(255,255,255,0.08); color: #fff !important; }
-        .sidebar .nav-link.active { background: #667eea; color: #fff !important; }
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background: linear-gradient(180deg, #0a0e27 0%, #111111 100%) !important;
+        }
+        
+        .sidebar .nav-link {
+            transition: 0.2s;
+            padding: 10px 16px;
+            border-radius: 10px;
+            margin: 4px 12px;
+            font-size: 0.85rem;
+        }
+        
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.08);
+            color: #fff !important;
+        }
+        
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff !important;
+        }
+        
+        .sidebar .nav-link.text-secondary {
+            color: rgba(255,255,255,0.6) !important;
+        }
+        
+        .sidebar .nav-link.text-secondary:hover {
+            color: #fff !important;
+        }
+        
+        .sidebar .nav-link.text-success {
+            color: #10b981 !important;
+        }
+        
+        .sidebar .nav-link.text-danger {
+            color: #ef4444 !important;
+        }
+        
+        /* Scrollbar personalizada para sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
     </style>
 <?php $__env->stopPush(); ?>
-
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\Branyey-Laravel\resources\views/layouts/admin.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.admin_base', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\Branyey-Laravel\resources\views/layouts/admin.blade.php ENDPATH**/ ?>
