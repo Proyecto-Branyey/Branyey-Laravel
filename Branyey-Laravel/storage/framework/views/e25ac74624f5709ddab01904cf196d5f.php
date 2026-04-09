@@ -1,10 +1,8 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Mis Pedidos - Branyey'); ?>
 
-@section('title', 'Mis Pedidos - Branyey')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container py-5">
-    {{-- Header con estilo --}}
+    
     <div class="text-center mb-5">
         <span class="badge bg-danger mb-2 px-3 py-2" style="background: linear-gradient(135deg, #dc3545, #ff6b6b) !important;">
             📦 MIS COMPRAS
@@ -13,7 +11,7 @@
         <p class="text-muted">Historial y seguimiento de tus compras</p>
     </div>
 
-    {{-- Filtros mejorados --}}
+    
     <div class="filters-pedidos mb-4">
         <div class="row g-3 align-items-end">
             <div class="col-md-4">
@@ -50,41 +48,42 @@
         </div>
     </div>
 
-    @if($ventas->isEmpty())
+    <?php if($ventas->isEmpty()): ?>
         <div class="empty-state-pedidos text-center py-5">
             <div class="empty-state-icon">
                 <i class="bi bi-inbox fs-1"></i>
             </div>
             <h4 class="fw-bold mt-3">Aún no tienes pedidos</h4>
             <p class="text-muted mb-4">Explora nuestro catálogo y haz tu primera compra</p>
-            <a href="{{ route('tienda.catalogo') }}" class="btn btn-dark rounded-pill px-5 py-2">
+            <a href="<?php echo e(route('tienda.catalogo')); ?>" class="btn btn-dark rounded-pill px-5 py-2">
                 <i class="bi bi-shop me-2"></i>Ir al Catálogo
             </a>
         </div>
-    @else
+    <?php else: ?>
         <div class="pedidos-container">
-            @foreach($ventas as $venta)
-                <div class="pedido-card" data-estado="{{ $venta->estado }}" data-id="{{ $venta->id }}" data-fecha="{{ $venta->created_at->timestamp }}">
-                    {{-- Cabecera del pedido --}}
+            <?php $__currentLoopData = $ventas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $venta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="pedido-card" data-estado="<?php echo e($venta->estado); ?>" data-id="<?php echo e($venta->id); ?>" data-fecha="<?php echo e($venta->created_at->timestamp); ?>">
+                    
                     <div class="pedido-header" onclick="togglePedidoDetails(this)">
                         <div class="pedido-header-left">
                             <div class="pedido-number">
                                 <i class="bi bi-receipt"></i>
-                                <span>Pedido #{{ $venta->id }}</span>
+                                <span>Pedido #<?php echo e($venta->id); ?></span>
                             </div>
                             <div class="pedido-date">
                                 <i class="bi bi-calendar"></i>
-                                <span>{{ $venta->created_at->format('d/m/Y') }}</span>
-                                <small class="text-muted ms-2">{{ $venta->created_at->format('H:i') }} hrs</small>
+                                <span><?php echo e($venta->created_at->format('d/m/Y')); ?></span>
+                                <small class="text-muted ms-2"><?php echo e($venta->created_at->format('H:i')); ?> hrs</small>
                             </div>
                         </div>
                         <div class="pedido-header-right">
                             <div class="pedido-total">
                                 <span class="total-label">Total</span>
-                                <span class="total-value">${{ number_format($venta->total, 0, ',', '.') }} COP</span>
+                                <span class="total-value">$<?php echo e(number_format($venta->total, 0, ',', '.')); ?> COP</span>
                             </div>
                             <div class="pedido-status">
-                                {!! $venta->estado_badge !!}
+                                <?php echo $venta->estado_badge; ?>
+
                             </div>
                             <div class="pedido-toggle">
                                 <i class="bi bi-chevron-down"></i>
@@ -92,7 +91,7 @@
                         </div>
                     </div>
 
-                    {{-- Detalles del pedido (colapsable) --}}
+                    
                     <div class="pedido-body" style="display: none;">
                         <div class="row g-4">
                             <div class="col-md-8">
@@ -111,38 +110,38 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @if($venta->detallesVenta && $venta->detallesVenta->count() > 0)
-                                                @foreach($venta->detallesVenta as $detalle)
+                                            <?php if($venta->detallesVenta && $venta->detallesVenta->count() > 0): ?>
+                                                <?php $__currentLoopData = $venta->detallesVenta; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $detalle): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <tr>
                                                         <td>
                                                             <div class="product-info-pedido">
-                                                                @php
+                                                                <?php
                                                                     $imagen = $detalle->variante?->producto?->imagenes->first()?->url;
-                                                                @endphp
-                                                                @if($imagen)
-                                                                    <img src="{{ Storage::url($imagen) }}" alt="Producto" class="product-img-pedido">
-                                                                @else
+                                                                ?>
+                                                                <?php if($imagen): ?>
+                                                                    <img src="<?php echo e(Storage::url($imagen)); ?>" alt="Producto" class="product-img-pedido">
+                                                                <?php else: ?>
                                                                     <div class="product-img-placeholder">
                                                                         <i class="bi bi-image"></i>
                                                                     </div>
-                                                                @endif
-                                                                <span class="product-name-pedido">{{ $detalle->variante?->producto?->nombre_comercial ?? 'Producto' }}</span>
+                                                                <?php endif; ?>
+                                                                <span class="product-name-pedido"><?php echo e($detalle->variante?->producto?->nombre_comercial ?? 'Producto'); ?></span>
                                                             </div>
                                                         </td>
-                                                        <td>{{ $detalle->variante?->talla?->nombre ?? 'N/A' }}</td>
-                                                        <td>{{ $detalle->cantidad }}</td>
-                                                        <td>${{ number_format($detalle->precio_cobrado, 0, ',', '.') }} COP</td>
-                                                        <td class="fw-bold">${{ number_format($detalle->precio_cobrado * $detalle->cantidad, 0, ',', '.') }} COP</td>
+                                                        <td><?php echo e($detalle->variante?->talla?->nombre ?? 'N/A'); ?></td>
+                                                        <td><?php echo e($detalle->cantidad); ?></td>
+                                                        <td>$<?php echo e(number_format($detalle->precio_cobrado, 0, ',', '.')); ?> COP</td>
+                                                        <td class="fw-bold">$<?php echo e(number_format($detalle->precio_cobrado * $detalle->cantidad, 0, ',', '.')); ?> COP</td>
                                                     </tr>
-                                                @endforeach
-                                            @else
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            <?php else: ?>
                                                 <tr>
                                                     <td colspan="5" class="text-center py-4 text-muted">
                                                         <i class="bi bi-box-seam me-2"></i>
                                                         No se encontraron productos para este pedido
                                                     </td>
                                                 </tr>
-                                            @endif
+                                            <?php endif; ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -154,7 +153,7 @@
                                     </h6>
                                     <div class="summary-item">
                                         <span>Subtotal:</span>
-                                        <span>${{ number_format($venta->total, 0, ',', '.') }} COP</span>
+                                        <span>$<?php echo e(number_format($venta->total, 0, ',', '.')); ?> COP</span>
                                     </div>
                                     <div class="summary-item">
                                         <span>Envío:</span>
@@ -162,61 +161,62 @@
                                     </div>
                                     <div class="summary-item total">
                                         <span>Total pagado:</span>
-                                        <span class="fw-bold">${{ number_format($venta->total, 0, ',', '.') }} COP</span>
+                                        <span class="fw-bold">$<?php echo e(number_format($venta->total, 0, ',', '.')); ?> COP</span>
                                     </div>
                                     
                                     <hr>
                                     
                                     <div class="summary-item">
                                         <span>Fecha compra:</span>
-                                        <span>{{ $venta->created_at->format('d/m/Y H:i') }}</span>
+                                        <span><?php echo e($venta->created_at->format('d/m/Y H:i')); ?></span>
                                     </div>
                                     <div class="summary-item">
                                         <span>Estado actual:</span>
-                                        <span>{!! $venta->estado_badge !!}</span>
+                                        <span><?php echo $venta->estado_badge; ?></span>
                                     </div>
                                     
-                                    @if($venta->detallesOrden)
+                                    <?php if($venta->detallesOrden): ?>
                                         <hr>
                                         <div class="summary-item">
                                             <span>Envío a:</span>
-                                            <span class="text-muted small">{{ $venta->detallesOrden->direccion_envio ?? 'No especificada' }}</span>
+                                            <span class="text-muted small"><?php echo e($venta->detallesOrden->direccion_envio ?? 'No especificada'); ?></span>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                                 
-                                {{-- Acciones del pedido --}}
+                                
                                 <div class="pedido-actions mt-3">
-                                    <a href="{{ route('tienda.pedidos.factura', $venta->id) }}" 
+                                    <a href="<?php echo e(route('tienda.pedidos.factura', $venta->id)); ?>" 
                                        class="btn-action" target="_blank">
                                         <i class="bi bi-file-earmark-pdf"></i> Descargar Factura
                                     </a>
                                     
-                                    @if($venta->estado === App\Models\Venta::ESTADO_ENVIADO)
-                                        <form action="{{ route('tienda.pedidos.recibido', $venta->id) }}" method="POST" class="d-inline w-100">
-                                            @csrf
+                                    <?php if($venta->estado === App\Models\Venta::ESTADO_ENVIADO): ?>
+                                        <form action="<?php echo e(route('tienda.pedidos.recibido', $venta->id)); ?>" method="POST" class="d-inline w-100">
+                                            <?php echo csrf_field(); ?>
                                             <button type="submit" class="btn-action success w-100">
                                                 <i class="bi bi-check2-circle"></i> Marcar como Recibido
                                             </button>
                                         </form>
-                                    @elseif($venta->estado === App\Models\Venta::ESTADO_ENTREGADO)
+                                    <?php elseif($venta->estado === App\Models\Venta::ESTADO_ENTREGADO): ?>
                                         <div class="btn-action delivered">
                                             <i class="bi bi-check2-all"></i> Pedido Recibido
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
 
-  {{-- Paginación con Bootstrap --}}
+  
 <div class="d-flex justify-content-center mt-5">
-    {{ $ventas->links('pagination::bootstrap-5') }}
+    <?php echo e($ventas->links('pagination::bootstrap-5')); ?>
+
 </div>
-    @endif
+    <?php endif; ?>
 </div>
 
 <style>
@@ -621,4 +621,5 @@ document.addEventListener('DOMContentLoaded', function() {
     if (searchInput) searchInput.addEventListener('keyup', filterPedidos);
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\Documents\Branyeygit\Branyey-Laravel\resources\views/tienda/pedidos.blade.php ENDPATH**/ ?>

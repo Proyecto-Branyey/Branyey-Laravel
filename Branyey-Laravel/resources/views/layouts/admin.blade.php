@@ -93,6 +93,11 @@
                             </ul>
                         </div>
                     </li>
+                    <li class="nav-item mt-3">
+                        <a class="nav-link text-white {{ request()->routeIs('admin.mail.*') ? 'active' : '' }}" href="{{ route('admin.mail.create') }}">
+                            <i class="bi bi-envelope-paper me-2"></i> Correo masivo
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
