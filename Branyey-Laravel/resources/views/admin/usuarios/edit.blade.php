@@ -178,13 +178,13 @@
                             </label>
                             <div class="password-wrapper">
                                 <input type="password" name="password" id="password"
-                                       class="form-input @error('password') is-invalid @enderror" 
-                                       placeholder="Dejar en blanco para no cambiar">
+                                    class="form-input @error('password') is-invalid @enderror" 
+                                    placeholder="Dejar en blanco para no cambiar">
                                 <button type="button" class="password-toggle" onclick="togglePassword('password')">
                                     <i class="bi bi-eye-slash"></i>
                                 </button>
                             </div>
-                            <small class="form-hint">Mínimo 6 caracteres. Dejar en blanco para mantener la actual</small>
+                            <small class="form-hint">Mínimo 8 caracteres. Dejar en blanco para mantener la actual</small>
                             @error('password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

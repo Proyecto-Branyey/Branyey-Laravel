@@ -177,12 +177,13 @@
                             </label>
                             <div class="password-wrapper">
                                 <input type="password" name="password" id="password"
-                                       class="form-input @error('password') is-invalid @enderror" 
-                                       placeholder="Mínimo 6 caracteres" required>
+                                    class="form-input @error('password') is-invalid @enderror" 
+                                    placeholder="Mínimo 8 caracteres" required>
                                 <button type="button" class="password-toggle" onclick="togglePassword('password')">
                                     <i class="bi bi-eye-slash"></i>
                                 </button>
                             </div>
+                            <small class="form-hint">La contraseña debe tener al menos 8 caracteres</small>
                             @error('password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
