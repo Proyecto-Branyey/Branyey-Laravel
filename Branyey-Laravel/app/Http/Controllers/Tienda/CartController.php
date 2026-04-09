@@ -5,14 +5,39 @@ namespace App\Http\Controllers\Tienda;
 use App\Http\Controllers\Controller;
 use App\Models\DetalleVenta;
 use App\Models\DetallesOrden;
+use App\Models\User;
 use App\Models\Venta;
 use App\Models\Variante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class CartController extends Controller
 {
+    /**
+     * Calcula el costo de envío según ciudad/departamento.
+     */
+    private function calculateShippingCost(?string $departamento, ?string $ciudad): int
+    {
+        $departamentoLimpio = strtolower(trim((string) $departamento));
+        $ciudadLimpia = strtolower(trim((string) $ciudad));
+
+        if ($ciudadLimpia === 'bogotá' || $ciudadLimpia === 'bogota') {
+            return 0;
+        }
+
+        if (in_array($ciudadLimpia, ['soacha', 'chia', 'cota', 'funza', 'mosquera', 'facatativá', 'facatativa', 'zipaquirá', 'zipaquira'])) {
+            return 7000;
+        }
+
+        if ($departamentoLimpio === 'cundinamarca') {
+            return 12000;
+        }
+
+        return 18000;
+    }
+
     /**
      * Recalcula y guarda el total del carrito en sesión
      */
@@ -156,7 +181,7 @@ class CartController extends Controller
     /**
      * Finaliza la compra y genera la venta con sus detalles.
      */
-    public function checkout()
+    public function checkout(Request $request)
     {
         $cart = session()->get('cart', []);
 
@@ -167,7 +192,7 @@ class CartController extends Controller
         try {
             DB::beginTransaction();
 
-            $total = 0;
+            $subtotalCarrito = 0;
             $detalles = [];
 
             foreach ($cart as $varianteId => $item) {
@@ -188,16 +213,28 @@ class CartController extends Controller
 
                 $precio = (float) ($item['price'] ?? $variante->getPrecioActual());
                 $subtotal = $precio * $cantidad;
-                $total += $subtotal;
+                $subtotalCarrito += $subtotal;
 
                 $detalles[] = [
                     'variante_id' => $variante->id,
                     'cantidad' => $cantidad,
                     'precio_cobrado' => $precio,
+                    'producto_nombre' => $item['name'] ?? ('Variante ' . $variante->id),
+                    'talla' => $item['talla'] ?? $variante->talla_id,
                 ];
 
                 $variante->decrement('stock', $cantidad);
             }
+
+            $usuario = Auth::user();
+            $nombreEntrega = trim((string) ($request->input('nombre_completo') ?: $usuario->nombre_completo ?: $usuario->username));
+            $telefonoEntrega = trim((string) ($request->input('telefono') ?: $usuario->telefono ?: 'No registrado'));
+            $direccionEntrega = trim((string) ($request->input('direccion') ?: $usuario->direccion_defecto ?: 'No registrada'));
+            $ciudadEntrega = trim((string) ($request->input('ciudad') ?: $usuario->ciudad_defecto ?: 'No registrada'));
+            $departamentoEntrega = trim((string) ($request->input('departamento') ?: $usuario->departamento_defecto ?: 'No registrado'));
+
+            $valorEnvio = $this->calculateShippingCost($departamentoEntrega, $ciudadEntrega);
+            $total = $subtotalCarrito + $valorEnvio;
 
             $venta = Venta::create([
                 'usuario_id' => Auth::id(),
@@ -205,16 +242,14 @@ class CartController extends Controller
                 'estado' => Venta::ESTADO_PAGADO,
             ]);
 
-            $usuario = Auth::user();
-
             DetallesOrden::create([
                 'venta_id' => $venta->id,
-                'nombre_cliente' => $usuario->nombre_completo ?: $usuario->username,
+                'nombre_cliente' => $nombreEntrega,
                 'email_cliente' => $usuario->email,
-                'telefono_cliente' => $usuario->telefono ?: 'No registrado',
-                'direccion_envio' => $usuario->direccion_defecto ?: 'No registrada',
-                'ciudad' => $usuario->ciudad_defecto ?: 'No registrada',
-                'departamento' => $usuario->departamento_defecto ?: 'No registrado',
+                'telefono_cliente' => $telefonoEntrega,
+                'direccion_envio' => $direccionEntrega,
+                'ciudad' => $ciudadEntrega,
+                'departamento' => $departamentoEntrega,
             ]);
 
             foreach ($detalles as $detalle) {
@@ -227,6 +262,184 @@ class CartController extends Controller
             }
 
             DB::commit();
+
+            // Enviar correo de confirmación de compra
+            try {
+                $usuario = Auth::user();
+                $detalles_email_rows = "";
+                $total_calc = 0;
+
+                foreach ($detalles as $detalle) {
+                    $nombre_producto = e($detalle['producto_nombre'] ?? 'Producto');
+                    $talla = e((string) ($detalle['talla'] ?? 'N/A'));
+                    $cantidad = (int) ($detalle['cantidad'] ?? 0);
+                    $precio_unitario = (float) ($detalle['precio_cobrado'] ?? 0);
+                    $subtotal = $detalle['precio_cobrado'] * $detalle['cantidad'];
+
+                    $detalles_email_rows .= "
+                        <tr>
+                            <td style='padding:10px 12px;border-bottom:1px solid #eee;color:#222;'>{$nombre_producto}</td>
+                            <td style='padding:10px 12px;border-bottom:1px solid #eee;color:#555;text-align:center;'>{$talla}</td>
+                            <td style='padding:10px 12px;border-bottom:1px solid #eee;color:#555;text-align:center;'>{$cantidad}</td>
+                            <td style='padding:10px 12px;border-bottom:1px solid #eee;color:#111;text-align:right;'>$" . number_format($precio_unitario, 0, ',', '.') . "</td>
+                            <td style='padding:10px 12px;border-bottom:1px solid #eee;color:#111;text-align:right;font-weight:700;'>$" . number_format($subtotal, 0, ',', '.') . "</td>
+                        </tr>
+                    ";
+                    $total_calc += $subtotal;
+                }
+
+                $nombre_cliente = e($usuario->nombre_completo ?: $usuario->username ?: 'Cliente');
+                $telefono = e($telefonoEntrega ?: 'No registrado');
+                $email_cliente = e($usuario->email ?: 'No registrado');
+                $ciudad = e($ciudadEntrega ?: 'No especificada');
+                $departamento = e($departamentoEntrega ?: 'No especificado');
+                $direccion = e($direccionEntrega ?: 'No registrada');
+                $pedido_id = (int) $venta->id;
+                $subtotal_formatted = '$' . number_format($total_calc, 0, ',', '.');
+                $envio_formatted = $valorEnvio === 0 ? 'GRATIS' : ('$' . number_format($valorEnvio, 0, ',', '.'));
+                $total_formatted = '$' . number_format($total_calc + $valorEnvio, 0, ',', '.');
+
+                // CORREO AL CLIENTE
+                $correo_body = "
+                    <div style='margin:0;padding:24px;background:#f5f7fb;font-family:Arial,Helvetica,sans-serif;'>
+                        <div style='max-width:680px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e8ecf2;'>
+                            <div style='background:#111827;padding:22px 24px;color:#fff;'>
+                                <div style='font-size:20px;font-weight:800;letter-spacing:.3px;'>Branyey</div>
+                                <div style='opacity:.85;font-size:13px;margin-top:4px;'>Confirmacion de compra</div>
+                            </div>
+                            <div style='padding:24px;'>
+                                <h2 style='margin:0 0 8px;color:#111827;font-size:22px;'>Gracias por tu compra</h2>
+                                <p style='margin:0 0 18px;color:#4b5563;'>Tu pedido <strong>#{$pedido_id}</strong> fue registrado correctamente.</p>
+
+                                <h3 style='margin:0 0 10px;color:#111827;font-size:16px;'>Detalle del pedido</h3>
+                                <table style='width:100%;border-collapse:collapse;border:1px solid #eee;border-radius:8px;overflow:hidden;'>
+                                    <thead>
+                                        <tr style='background:#f9fafb;'>
+                                            <th style='padding:10px 12px;text-align:left;color:#374151;font-size:12px;'>Producto</th>
+                                            <th style='padding:10px 12px;text-align:center;color:#374151;font-size:12px;'>Talla</th>
+                                            <th style='padding:10px 12px;text-align:center;color:#374151;font-size:12px;'>Cant.</th>
+                                            <th style='padding:10px 12px;text-align:right;color:#374151;font-size:12px;'>Unitario</th>
+                                            <th style='padding:10px 12px;text-align:right;color:#374151;font-size:12px;'>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {$detalles_email_rows}
+                                    </tbody>
+                                </table>
+
+                                <div style='margin-top:14px;border:1px solid #fed7aa;border-radius:10px;overflow:hidden;'>
+                                    <div style='display:flex;justify-content:space-between;padding:10px 14px;background:#fff7ed;color:#9a3412;'>
+                                        <span>Subtotal productos</span>
+                                        <strong>{$subtotal_formatted}</strong>
+                                    </div>
+                                    <div style='display:flex;justify-content:space-between;padding:10px 14px;background:#fffaf3;color:#9a3412;border-top:1px solid #fed7aa;'>
+                                        <span>Envío</span>
+                                        <strong>{$envio_formatted}</strong>
+                                    </div>
+                                    <div style='display:flex;justify-content:space-between;padding:10px 14px;background:#ffedd5;color:#7c2d12;border-top:1px solid #fed7aa;font-weight:800;'>
+                                        <span>Total pagado</span>
+                                        <strong>{$total_formatted}</strong>
+                                    </div>
+                                </div>
+
+                                <h3 style='margin:22px 0 10px;color:#111827;font-size:16px;'>Informacion de entrega</h3>
+                                <div style='border:1px solid #eee;border-radius:10px;padding:14px;background:#fcfcfd;'>
+                                    <p style='margin:0 0 6px;color:#374151;'><strong>Nombre:</strong> {$nombre_cliente}</p>
+                                    <p style='margin:0 0 6px;color:#374151;'><strong>Telefono:</strong> {$telefono}</p>
+                                    <p style='margin:0 0 6px;color:#374151;'><strong>Direccion:</strong> {$direccion}</p>
+                                    <p style='margin:0 0 6px;color:#374151;'><strong>Ciudad:</strong> {$ciudad}</p>
+                                    <p style='margin:0;color:#374151;'><strong>Departamento:</strong> {$departamento}</p>
+                                </div>
+
+                                <p style='margin:18px 0 0;color:#4b5563;'>Te notificaremos cuando tu pedido cambie de estado.</p>
+                            </div>
+                        </div>
+                    </div>
+                ";
+
+                Http::timeout(5)->post('http://localhost:8080/api/mail/send', [
+                    'to' => $usuario->email,
+                    'subject' => 'Confirmación de compra - Pedido #' . $venta->id,
+                    'body' => $correo_body,
+                ]);
+
+                // CORREO A LOS ADMINISTRADORES
+                $admins = User::whereHas('rol', function($query) {
+                    $query->where('nombre', 'administrador');
+                })->get();
+
+                foreach ($admins as $admin) {
+                    $correo_admin = "
+                        <div style='margin:0;padding:24px;background:#f5f7fb;font-family:Arial,Helvetica,sans-serif;'>
+                            <div style='max-width:700px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e8ecf2;'>
+                                <div style='background:#7f1d1d;padding:20px 24px;color:#fff;'>
+                                    <div style='font-size:19px;font-weight:800;'>Alerta de nueva compra</div>
+                                    <div style='font-size:13px;opacity:.9;'>Pedido #{$pedido_id}</div>
+                                </div>
+                                <div style='padding:22px 24px;'>
+                                    <h3 style='margin:0 0 10px;color:#111827;font-size:16px;'>Datos del cliente</h3>
+                                    <p style='margin:0 0 6px;color:#374151;'><strong>Nombre:</strong> {$nombre_cliente}</p>
+                                    <p style='margin:0 0 6px;color:#374151;'><strong>Email:</strong> {$email_cliente}</p>
+                                    <p style='margin:0 0 12px;color:#374151;'><strong>Telefono:</strong> {$telefono}</p>
+
+                                    <h3 style='margin:14px 0 10px;color:#111827;font-size:16px;'>Direccion de envio</h3>
+                                    <p style='margin:0 0 6px;color:#374151;'><strong>Direccion:</strong> {$direccion}</p>
+                                    <p style='margin:0 0 6px;color:#374151;'><strong>Ciudad:</strong> {$ciudad}</p>
+                                    <p style='margin:0 0 12px;color:#374151;'><strong>Departamento:</strong> {$departamento}</p>
+
+                                    <h3 style='margin:14px 0 10px;color:#111827;font-size:16px;'>Detalle del pedido</h3>
+                                    <table style='width:100%;border-collapse:collapse;border:1px solid #eee;'>
+                                        <thead>
+                                            <tr style='background:#f9fafb;'>
+                                                <th style='padding:10px 12px;text-align:left;color:#374151;font-size:12px;'>Producto</th>
+                                                <th style='padding:10px 12px;text-align:center;color:#374151;font-size:12px;'>Talla</th>
+                                                <th style='padding:10px 12px;text-align:center;color:#374151;font-size:12px;'>Cant.</th>
+                                                <th style='padding:10px 12px;text-align:right;color:#374151;font-size:12px;'>Unitario</th>
+                                                <th style='padding:10px 12px;text-align:right;color:#374151;font-size:12px;'>Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {$detalles_email_rows}
+                                        </tbody>
+                                    </table>
+
+                                    <div style='margin-top:14px;border:1px solid #fecaca;border-radius:10px;overflow:hidden;'>
+                                        <div style='display:flex;justify-content:space-between;padding:10px 14px;background:#fef2f2;color:#991b1b;'>
+                                            <span>Subtotal productos</span>
+                                            <strong>{$subtotal_formatted}</strong>
+                                        </div>
+                                        <div style='display:flex;justify-content:space-between;padding:10px 14px;background:#fff7f7;color:#991b1b;border-top:1px solid #fecaca;'>
+                                            <span>Envío</span>
+                                            <strong>{$envio_formatted}</strong>
+                                        </div>
+                                        <div style='display:flex;justify-content:space-between;padding:10px 14px;background:#fee2e2;color:#7f1d1d;border-top:1px solid #fecaca;font-weight:800;'>
+                                            <span>Total | Estado</span>
+                                            <strong>{$total_formatted} | PAGADO</strong>
+                                        </div>
+                                    </div>
+
+                                    <div style='margin-top:16px;'>
+                                        <a href='http://127.0.0.1:8000/admin/dashboard' style='display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:10px 14px;border-radius:8px;font-weight:700;'>
+                                            Ir al panel de administracion
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ";
+
+                    Http::timeout(5)->post('http://localhost:8080/api/mail/send', [
+                        'to' => $admin->email,
+                        'subject' => '[ALERTA] Nueva compra - Pedido #' . $venta->id,
+                        'body' => $correo_admin,
+                    ]);
+                }
+
+            } catch (\Exception $e) {
+                // Log error pero continúa sin fallar
+                \Log::error('Error enviando correos de compra: ' . $e->getMessage());
+                \Log::error('Stack trace: ' . $e->getTraceAsString());
+            }
 
             // Limpiar carrito y total de sesión
             session()->forget('cart');
@@ -252,18 +465,7 @@ class CartController extends Controller
     {
         $departamento = $request->input('departamento');
         $ciudad = $request->input('ciudad');
-        // Lógica de cotización según distancia
-        $valor_envio = 0;
-        $ciudad_limpia = strtolower(trim($ciudad));
-        if ($ciudad_limpia === 'bogotá') {
-            $valor_envio = 0;
-        } elseif (in_array($ciudad_limpia, ['soacha', 'chia', 'cota', 'funza', 'mosquera', 'facatativá', 'zipaquirá'])) {
-            $valor_envio = 7000;
-        } elseif ($departamento && strtolower($departamento) === 'cundinamarca') {
-            $valor_envio = 12000;
-        } else {
-            $valor_envio = 18000;
-        }
+        $valor_envio = $this->calculateShippingCost($departamento, $ciudad);
         return response()->json([
             'success' => true,
             'valor_envio' => $valor_envio

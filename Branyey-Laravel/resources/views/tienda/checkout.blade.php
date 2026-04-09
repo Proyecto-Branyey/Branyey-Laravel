@@ -25,38 +25,38 @@
                                                     <button type="button" id="btn-confirmar-datos" class="btn btn-success btn-sm" disabled>Confirmar datos</button>
                                                 </div>
                         <div class="col-md-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Nombre Completo</label>
-                            <input type="text" class="form-control form-control-lg rounded-pill bg-light border-0" 
+                            <label for="nombre_completo" class="form-label small fw-bold text-muted text-uppercase">Nombre Completo</label>
+                            <input type="text" id="nombre_completo" class="form-control form-control-lg rounded-pill bg-light border-0" 
                                 value="{{ $user->nombre_completo ?: $user->username }}" readonly>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Teléfono de Contacto</label>
-                            <input type="text" name="telefono" class="form-control form-control-lg rounded-pill @error('telefono') is-invalid @enderror" 
-                                value="{{ old('telefono', $user->telefono ?? '') }}" placeholder="Ej: 300 123 4567" required disabled>
+                            <label for="telefono_checkout" class="form-label small fw-bold text-muted text-uppercase">Teléfono de Contacto</label>
+                            <input type="text" id="telefono_checkout" name="telefono" class="form-control form-control-lg rounded-pill @error('telefono') is-invalid @enderror" 
+                                value="{{ old('telefono', $user->telefono ?? '') }}" placeholder="Ej: 300 123 4567" required readonly>
                             @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Departamento</label>
+                            <label for="departamento_checkout" class="form-label small fw-bold text-muted text-uppercase">Departamento</label>
                             <input type="text" name="departamento" id="departamento_checkout" list="departamentos_list_checkout" class="form-control form-control-lg rounded-pill" 
-                                value="{{ old('departamento', $user->departamento_defecto ?? 'Cundinamarca') }}" required disabled>
+                                value="{{ old('departamento', $user->departamento_defecto ?? 'Cundinamarca') }}" required readonly>
                             <datalist id="departamentos_list_checkout"></datalist>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Ciudad</label>
+                            <label for="ciudad_checkout" class="form-label small fw-bold text-muted text-uppercase">Ciudad</label>
                             <input type="text" name="ciudad" id="ciudad_checkout" list="ciudades_list_checkout" class="form-control form-control-lg rounded-pill" 
-                                value="{{ old('ciudad', $user->ciudad_defecto ?? 'Bogotá') }}" required disabled>
+                                value="{{ old('ciudad', $user->ciudad_defecto ?? 'Bogotá') }}" required readonly>
                             <datalist id="ciudades_list_checkout"></datalist>
                             <small class="text-muted">Selecciona primero un departamento para sugerir municipios.</small>
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Dirección de Residencia</label>
-                            <input type="text" name="direccion" class="form-control form-control-lg rounded-pill @error('direccion') is-invalid @enderror" 
-                                value="{{ old('direccion', $user->direccion_defecto ?? '') }}" placeholder="Calle, Carrera, Conjunto, Apto..." required disabled>
+                            <label for="direccion_checkout" class="form-label small fw-bold text-muted text-uppercase">Dirección de Residencia</label>
+                            <input type="text" id="direccion_checkout" name="direccion" class="form-control form-control-lg rounded-pill @error('direccion') is-invalid @enderror" 
+                                value="{{ old('direccion', $user->direccion_defecto ?? '') }}" placeholder="Calle, Carrera, Conjunto, Apto..." required readonly>
                             @error('direccion') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
@@ -213,14 +213,14 @@
                             // El mensaje es visible por defecto
 
                             btnEditar.addEventListener('click', function () {
-                                campos.forEach(c => c.disabled = false);
+                                campos.forEach(c => c.readOnly = false);
                                 btnConfirmar.disabled = false;
                                 btnEditar.disabled = true;
                                 btnPedido.disabled = true;
                                 mensaje.classList.remove('d-none');
                             });
                             btnConfirmar.addEventListener('click', function () {
-                                campos.forEach(c => c.disabled = true);
+                                campos.forEach(c => c.readOnly = true);
                                 btnConfirmar.disabled = true;
                                 btnEditar.disabled = false;
                                 btnPedido.disabled = false;
