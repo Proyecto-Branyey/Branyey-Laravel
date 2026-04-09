@@ -140,12 +140,6 @@
             border-top: 1px solid #000;
         }
         
-        /* Estado en texto plano */
-        .estado-text {
-            text-transform: capitalize;
-            font-weight: normal;
-        }
-        
         /* Footer */
         .footer {
             margin-top: 35px;
@@ -161,7 +155,10 @@
 </head>
 <body>
     @php
-        // Cálculo de envío según ubicación
+        // El total en BD es el subtotal de productos (SIN envío)
+        $subtotalProductos = $venta->total;
+        
+        // Calcular envío según ubicación
         $envio = 0;
         $ciudad = strtolower($venta->detallesOrden->ciudad ?? '');
         $departamento = strtolower($venta->detallesOrden->departamento ?? '');
@@ -176,8 +173,8 @@
             $envio = 18000;
         }
         
-        $subtotal = $venta->total;
-        $totalFinal = $subtotal + $envio;
+        // Total final = productos + envío
+        $totalFinal = $subtotalProductos + $envio;
     @endphp
     
     <div class="doc-id">
@@ -249,10 +246,14 @@
                 </tbody>
             </table>
             
-            {{-- Totales --}}
+            {{-- Totales CORREGIDOS --}}
             <table class="totals-table">
-                <tr><td>Subtotal</td><td>${{ number_format($subtotal, 0, ',', '.') }} COP</td></tr>
-                <tr><td>Envío</td>
+                <tr>
+                    <td>Subtotal productos</td>
+                    <td>${{ number_format($subtotalProductos, 0, ',', '.') }} COP</td>
+                </tr>
+                <tr>
+                    <td>Envío</td>
                     <td>
                         @if($envio === 0) 
                             GRATIS 
@@ -261,7 +262,10 @@
                         @endif
                     </td>
                 </tr>
-                <tr class="grand-total"><td>TOTAL</td><td>${{ number_format($totalFinal, 0, ',', '.') }} COP</td></tr>
+                <tr class="grand-total">
+                    <td>TOTAL</td>
+                    <td>${{ number_format($totalFinal, 0, ',', '.') }} COP</td>
+                </tr>
             </table>
         @else
             <p>No se encontraron productos asociados a esta venta.</p>
